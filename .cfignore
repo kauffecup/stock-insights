@@ -1,0 +1,4 @@
+**/node_modules/*
+client
+server/config.json
+server/VCAP_SERVICES.json

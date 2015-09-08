@@ -1,0 +1,107 @@
+//------------------------------------------------------------------------------
+// Copyright IBM Corp. 2015
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//    http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+//------------------------------------------------------------------------------
+
+@accent-color: #91bfdb;
+@accent-color2: #fc8d59;
+@background-color: #f0f0f0;
+@secondary-text-color: #c1c1c1;
+
+// get the page ready
+* { outline: none; box-sizing: border-box; }
+body { padding: 0; margin: 0; }
+html, body { height: 100%; width: 100%; position: absolute; top: 0; right: 0; }
+body, button, input {
+  font-family: "HelveticaNeue-Light","Helvetica Neue Light","Helvetica Neue",Helvetica,Arial,"Lucida Grande",sans-serif;
+  font-size: 1em;
+}
+ul {list-style: none; margin: 0; padding: 0;}
+h1, h2, h3, h4, h5, h6 {margin: 0;}
+h1 { font-size: 2.25em; font-weight: normal; font-family: "HelveticaNeue-UltraLight", "Helvetica Neue UltraLight", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;}
+h2 { font-size: 1.75em; font-weight: normal;}
+h3 { font-size: 1.5em;  font-weight: normal;}
+h4 { font-size: 1.25em; font-weight: normal;}
+h5 { font-size: 1em;  font-weight: normal;}
+h6 { font-size: 1em;  font-weight: normal;}
+
+a {
+  &:visited, &:link {
+    color: @secondary-text-color;
+  }
+  &:hover, &:active {
+    color: @accent-color;
+  }
+}
+
+// let the real CSS begin
+.stock-insights {
+  .stock-insights-title{
+    height: 80px;
+    color: #fff;
+    background-color: @accent-color;
+    text-indent: 30px;
+    display: flex;
+    align-items: center;
+  }
+
+  .company-container {
+    display: flex;
+    flex-wrap: wrap;
+    padding: 20px;
+
+    .company {
+      padding: 5px;
+      margin-right: 10px;
+      margin-bottom: 10px;
+      background-color: @background-color;
+      cursor: default;
+
+      .company-close {
+        cursor: pointer;
+        margin-left: 5px;
+      }
+    }
+
+    .company, .company-searcher { height: 28px; }
+
+    .company-searcher {
+      position: relative;
+      width: 300px;
+
+      input {
+        margin: 0;
+        padding: 0;
+        width: 100%;
+        height: 100%;
+      }
+    }
+
+    .potential-companies {
+      position: absolute;
+      width: 100%;
+      top: 100%;
+    }
+
+    .potential-company {
+      background-color: @accent-color;
+      padding: 5px;
+      color: #fff;
+
+      &:hover {
+        background-color: @accent-color2;
+      }
+    }
+  }
+}
