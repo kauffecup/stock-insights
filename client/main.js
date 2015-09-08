@@ -17,7 +17,12 @@
 import React            from 'react';
 import Constants        from './constants/Constants';
 import CompaniesStore   from './stores/CompaniesStore';
+import StockDataStore   from './stores/StockDataStore';
 import CompanyContainer from './components/CompanyContainer';
+import StockVisualizer  from './components/StockVisualizer';
+import {
+  getStockData
+} from './Actions';
 
 /**
  * The app entry point
@@ -39,6 +44,7 @@ class StockInsights extends React.Component {
       <div className="stock-insights">
         <h1 className="stock-insights-title">Stock Insights</h1>
         <CompanyContainer companies={this.state.companies} potentialCompanies={this.state.potentialCompanies} />
+        <StockVisualizer stockData={this.state.stockData} />
       </div>
     );
   }
@@ -48,9 +54,16 @@ class StockInsights extends React.Component {
    */
   componentDidMount() {
     CompaniesStore.addChangeListener(this._onChange);
+    StockDataStore.addChangeListener(this._onChange);
+    // if we already have companies, request the stock data to populate
+    // our visualizations
+    if (this.state.companies.length) {
+      getStockData(this.state.companies.map(c => c.symbol));
+    }
   }
   componentWillUnmount() {
     CompaniesStore.removeChangeListener(this._onChange);
+    StockDataStore.removeChangeListener(this._onChange);
   }
 
   /**
@@ -59,7 +72,8 @@ class StockInsights extends React.Component {
   _getStateObj() {
     return {
       companies: CompaniesStore.getCompanies(),
-      potentialCompanies: CompaniesStore.getPotentialCompanies()
+      potentialCompanies: CompaniesStore.getPotentialCompanies(),
+      stockData: StockDataStore.getStockData()
     }
   }
 };

@@ -22,7 +22,7 @@
 // get the page ready
 * { outline: none; box-sizing: border-box; }
 body { padding: 0; margin: 0; }
-html, body { height: 100%; width: 100%; position: absolute; top: 0; right: 0; }
+html, body, .stock-insights { height: 100%; width: 100%; position: absolute; top: 0; right: 0; }
 body, button, input {
   font-family: "HelveticaNeue-Light","Helvetica Neue Light","Helvetica Neue",Helvetica,Arial,"Lucida Grande",sans-serif;
   font-size: 1em;
@@ -47,6 +47,9 @@ a {
 
 // let the real CSS begin
 .stock-insights {
+  display: flex;
+  flex-direction: column;
+
   .stock-insights-title{
     height: 80px;
     color: #fff;
@@ -60,6 +63,7 @@ a {
     display: flex;
     flex-wrap: wrap;
     padding: 20px;
+    z-index: 500;
 
     .company {
       padding: 5px;
@@ -101,6 +105,31 @@ a {
 
       &:hover {
         background-color: @accent-color2;
+      }
+    }
+  }
+
+  .stock-visualizer {
+    flex: 1;
+    position: relative;
+    display: flex;
+    user-select: none;
+    justify-content: center;
+
+    .bubble-chart-text {
+      .bubble-label {
+        text-align: center;
+        overflow: hidden;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: space-around;
+        broder-radius: 50%;
+        will-change: left, top, height, width;
+        &:hover {
+          overflow: visible;
+          font-weight: bold;
+        }
       }
     }
   }

@@ -38,6 +38,7 @@ export function clearPotentialCompanies() {
 /** Add a company */
 export function addCompany(company) {
   Dispatcher.dispatch({actionType: Constants.ADD_COMPANY, company: company});
+  company.symbol && getStockData(company.symbol);
 }
 
 /** Remove a company */
