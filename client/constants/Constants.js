@@ -21,7 +21,9 @@ module.exports = keyMirror({
   COMPANY_DATA: null,
   ADD_COMPANY: null,
   REMOVE_COMPANY: null,
+  CLEAR_POTENTIAL_COMPANIES: null,
   STOCK_PRICE_LOADING: null,
   STOCK_PRICE_DATA: null,
-  CLEAR_POTENTIAL_COMPANIES: null
+  NEWS_LOADING: null,
+  NEWS_DATA: null
 });

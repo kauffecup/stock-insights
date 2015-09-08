@@ -42,6 +42,13 @@ router.get('/stockprice', (req, res) => {
   return _doGet(url + '/markets/quote', {client_id: client_id, symbol: symbol}, res);
 });
 
+/* Stock News */
+router.get('/stocknews', (req, res) => {
+  var symbol = req.query.symbol;
+  var {client_id, client_secret, url} = vcapServices.stockPrice.credentials;
+  return _doGet(url + '/news/find', {client_id: client_id, symbol: symbol}, res);
+});
+
 /* Helper GET method for companylookup and stockprice similarities */
 function _doGet(url, qs, res) {
   return request.getAsync({url: url, qs: qs}).then(([response, body]) => {

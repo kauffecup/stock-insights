@@ -21,18 +21,7 @@ import request from 'superagent';
  * Return a promise that resolves with the response.
  */
 export function companyLookup(company) {
-  return new Promise(function (resolve, reject) {
-    request.get('/companylookup')
-      .query({company: company})
-      .end((err, res) => {
-        if (err) {
-          reject(err);
-        } else {
-          resolve(res.body);
-        }
-      }
-    );
-  });
+  return _queryHelper('/companylookup', {company: company});
 }
 
 /**
@@ -40,9 +29,25 @@ export function companyLookup(company) {
  * Return a promise that resolves with the response.
  */
 export function stockPrice(symbol) {
-  return new Promise(function (resolve, reject) {
-    request.get('/stockprice')
-      .query({symbol: symbol})
+  return _queryHelper('/stockprice', {symbol: symbol});
+}
+
+/**
+ * Hit the stocknews endpoint with the proper query.
+ * Return a promise that resolves with the response.
+ */
+export function stockNews(symbol) {
+  return _queryHelper('/stocknews', {symbol: symbol});
+}
+
+/**
+ * Helper method that handles promise creation, resolution
+ * and rejection for a given endpoint and query.
+ */
+function _queryHelper(url, query) {
+  return new Promise((resolve, reject) => {
+    request.get(url)
+      .query(query)
       .end((err, res) => {
         if (err) {
           reject(err);

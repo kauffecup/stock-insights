@@ -18,7 +18,8 @@ import Dispatcher from './Dispatcher';
 import Constants  from './constants/Constants';
 import {
   companyLookup,
-  stockPrice
+  stockPrice,
+  stockNews
 } from './requester'
 
 /** Search for companies */
@@ -49,5 +50,13 @@ export function getStockData(symbol) {
   Dispatcher.dispatch({actionType: Constants.STOCK_PRICE_LOADING});
   stockPrice(symbol).then(data => {
     Dispatcher.dispatch({actionType: Constants.STOCK_PRICE_DATA, data: data});
+  });
+}
+
+/** Get the articles for a given company */
+export function getNews(symbol) {
+  Dispatcher.dispatch({actionType: Constants.NEWS_LOADING});
+  stockNews(symbol).then(news => {
+    Dispatcher.dispatch({actionType: Constants.NEWS_DATA, news: news});
   });
 }

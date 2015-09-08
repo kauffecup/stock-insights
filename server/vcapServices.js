@@ -37,6 +37,9 @@ for (var service in vcapServices) {
   } else if (service.indexOf('Stock Price') > -1) {
     vcapServices.stockPrice = vcapServices[service][0];
     delete vcapServices[service];
+  } else if (service.indexOf('Stock News') > -1) {
+    vcapServices.stockNews = vcapServices[service][0];
+    delete vcapServices[service];
   }
 }
 
