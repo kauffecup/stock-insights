@@ -49,7 +49,7 @@ class StockInsights extends React.Component {
   componentDidMount() {
     CompaniesStore.addChangeListener(this._onChange);
   }
-  componentWillUnMount() {
+  componentWillUnmount() {
     CompaniesStore.removeChangeListener(this._onChange);
   }
 

@@ -45,10 +45,10 @@ export function removeCompany(company) {
   Dispatcher.dispatch({actionType: Constants.REMOVE_COMPANY, company: company});
 }
 
-/** Get the stock data for a given company */
-export function getStockData(symbol) {
+/** Get the stock data for a given company or array of companies */
+export function getStockData(symbols) {
   Dispatcher.dispatch({actionType: Constants.STOCK_PRICE_LOADING});
-  stockPrice(symbol).then(data => {
+  stockPrice(symbols).then(data => {
     Dispatcher.dispatch({actionType: Constants.STOCK_PRICE_DATA, data: data});
   });
 }

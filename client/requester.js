@@ -28,8 +28,8 @@ export function companyLookup(company) {
  * Hit the stockprice endpoint with the proper query.
  * Return a promise that resolves with the response.
  */
-export function stockPrice(symbol) {
-  return _queryHelper('/stockprice', {symbol: symbol});
+export function stockPrice(symbols) {
+  return _queryHelper('/stockprice', {symbols: symbols});
 }
 
 /**
