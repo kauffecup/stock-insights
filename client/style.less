@@ -19,15 +19,19 @@
 @background-color: #f0f0f0;
 @secondary-text-color: #c1c1c1;
 
+@article-list-z: 1000;
+@stock-chiclets-z: 500;
+
 // get the page ready
 * { outline: none; box-sizing: border-box; }
 body { padding: 0; margin: 0; }
-html, body, .stock-insights { height: 100%; width: 100%; position: absolute; top: 0; right: 0; }
+html, body, .stock-insights { height: 100%; width: 100%; position: absolute; top: 0; right: 0; overflow: hidden;}
 body, button, input {
   font-family: "HelveticaNeue-Light","Helvetica Neue Light","Helvetica Neue",Helvetica,Arial,"Lucida Grande",sans-serif;
   font-size: 1em;
 }
 ul {list-style: none; margin: 0; padding: 0;}
+button { background-color: transparent; border: none; cursor: pointer;}
 h1, h2, h3, h4, h5, h6 {margin: 0;}
 h1 { font-size: 2.25em; font-weight: normal; font-family: "HelveticaNeue-UltraLight", "Helvetica Neue UltraLight", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;}
 h2 { font-size: 1.75em; font-weight: normal;}
@@ -63,7 +67,7 @@ a {
     display: flex;
     flex-wrap: wrap;
     padding: 20px;
-    z-index: 500;
+    z-index: @stock-chiclets-z;
 
     .company {
       padding: 5px;
@@ -130,6 +134,42 @@ a {
           overflow: visible;
           font-weight: bold;
         }
+      }
+    }
+  }
+
+  .article-list {
+    position: absolute;
+    right: 10px;
+    top: 40px;
+    width: 35%;
+    height: ~"calc(100% - 80px)";
+    background-color: #fff;
+    box-shadow: 0 3px 2px #777;
+    flex-direction: column;
+    z-index: @article-list-z;
+    display: none;
+    display: flex;
+
+    .back {
+      position: absolute;
+      top: 24px;
+      left: 12px;
+    }
+
+    h2 {
+      padding-left: 40px;
+      padding-top: 20px;
+    }
+
+    .the-articles {
+      flex: 1;
+      overflow: auto;
+      -webkit-overflow-scrolling: touch;
+      padding: 0px 40px;
+
+      .article {
+        margin-bottom: 10px;
       }
     }
   }

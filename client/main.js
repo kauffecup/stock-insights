@@ -14,12 +14,14 @@
 // limitations under the License.
 //------------------------------------------------------------------------------
 
-import React            from 'react';
-import Constants        from './constants/Constants';
-import CompaniesStore   from './stores/CompaniesStore';
-import StockDataStore   from './stores/StockDataStore';
-import CompanyContainer from './components/CompanyContainer';
-import StockVisualizer  from './components/StockVisualizer';
+import React             from 'react';
+import Constants         from './constants/Constants';
+import CompaniesStore    from './stores/CompaniesStore';
+import StockDataStore    from './stores/StockDataStore';
+import NewsArticlesStore from './stores/NewsArticlesStore';
+import CompanyContainer  from './components/CompanyContainer';
+import StockVisualizer   from './components/StockVisualizer';
+import ArticleList       from './components/ArticleList';
 import {
   getStockData
 } from './Actions';
@@ -45,6 +47,10 @@ class StockInsights extends React.Component {
         <h1 className="stock-insights-title">Stock Insights</h1>
         <CompanyContainer companies={this.state.companies} potentialCompanies={this.state.potentialCompanies} />
         <StockVisualizer stockData={this.state.stockData} />
+        {!!this.state.selectedCompany ?
+          <ArticleList selectedCompany={this.state.selectedCompany} articles={this.state.articles} />
+          : null
+        }
       </div>
     );
   }
@@ -55,6 +61,7 @@ class StockInsights extends React.Component {
   componentDidMount() {
     CompaniesStore.addChangeListener(this._onChange);
     StockDataStore.addChangeListener(this._onChange);
+    NewsArticlesStore.addChangeListener(this._onChange);
     // if we already have companies, request the stock data to populate
     // our visualizations
     if (this.state.companies.length) {
@@ -64,6 +71,7 @@ class StockInsights extends React.Component {
   componentWillUnmount() {
     CompaniesStore.removeChangeListener(this._onChange);
     StockDataStore.removeChangeListener(this._onChange);
+    NewsArticlesStore.removeChangeListener(this._onChange);
   }
 
   /**
@@ -73,7 +81,9 @@ class StockInsights extends React.Component {
     return {
       companies: CompaniesStore.getCompanies(),
       potentialCompanies: CompaniesStore.getPotentialCompanies(),
-      stockData: StockDataStore.getStockData()
+      stockData: StockDataStore.getStockData(),
+      selectedCompany: NewsArticlesStore.getSelectedCompany(),
+      articles: NewsArticlesStore.getArticles()
     }
   }
 };

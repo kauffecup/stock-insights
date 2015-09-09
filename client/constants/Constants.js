@@ -25,5 +25,6 @@ module.exports = keyMirror({
   STOCK_PRICE_LOADING: null,
   STOCK_PRICE_DATA: null,
   NEWS_LOADING: null,
-  NEWS_DATA: null
+  NEWS_DATA: null,
+  CLOSE_ARTICLE_LIST: null
 });

@@ -56,8 +56,14 @@ export function getStockData(symbols) {
 
 /** Get the articles for a given company */
 export function getNews(symbol) {
-  Dispatcher.dispatch({actionType: Constants.NEWS_LOADING});
+  symbol = symbol._id || symbol.symbol || symbol;
+  Dispatcher.dispatch({actionType: Constants.NEWS_LOADING, symbol: symbol});
   stockNews(symbol).then(news => {
     Dispatcher.dispatch({actionType: Constants.NEWS_DATA, news: news});
   });
+}
+
+/** Close the article list */
+export function closeArticleList() {
+  Dispatcher.dispatch({actionType: Constants.CLOSE_ARTICLE_LIST});
 }

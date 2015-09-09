@@ -16,6 +16,9 @@
 
 import React             from 'react';
 import ReactBubbleChart  from 'react-bubble-chart';
+import {
+  getNews
+} from '../Actions';
 
 var colorLegend = [
   // oranges from dark to light
@@ -48,6 +51,7 @@ class StockVisualizer extends React.Component {
       className="stock-visualizer"
       colorLegend={colorLegend}
       data={data}
+      onClick={getNews}
       fixedDomain={{
         max: max,
         min: min
