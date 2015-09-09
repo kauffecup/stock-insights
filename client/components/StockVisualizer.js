@@ -34,10 +34,24 @@ class StockVisualizer extends React.Component {
       colorValue: s.change
     })).sort((s1, s2) => s2.value - s1.value);
 
+    // ensure that min and max are equidistant around 0
+    // otherwise something that's positive might show up as orange and vice-versa
+    var max = Math.max(0, ...data.map(d => d.colorValue));
+    var min = Math.min(0, ...data.map(d => d.colorValue));
+    if (max > Math.abs(min)) {
+      min = -max;
+    } else {
+      max = -min;
+    }
+
     return <ReactBubbleChart
       className="stock-visualizer"
       colorLegend={colorLegend}
       data={data}
+      fixedDomain={{
+        max: max,
+        min: min
+      }}
     />;
   }
 }
