@@ -14,34 +14,31 @@
 // limitations under the License.
 //------------------------------------------------------------------------------
 
-import StockVisualizerD3 from './StockVisualizerD3';
 import React             from 'react';
+import ReactBubbleChart  from 'react-bubble-chart';
+
+var colorLegend = [
+  // oranges from dark to light
+  {color: "#990000", text: '(-) Change'},  "#d7301f", "#ef6548", "#fc8d59", "#fdbb84", "#fdd49e", "#fee8c8", "#fff7ec",
+  //neutral grey
+  "#f0f0f0",
+  // blues from light to dark
+  "#deebf7", "#c6dbef", "#9ecae1", "#6baed6", "#4292c6", "#2171b5", "#08519c", {color: "#08306b", text: '(+) Change'}
+];
 
 class StockVisualizer extends React.Component {
   render () {
-    return <div className='stock-visualizer'></div>;
-  }
+    var data = this.props.stockData.map(s => ({
+      value: s.last || s.close,
+      _id: s.symbol,
+      colorValue: s.change
+    })).sort((s1, s2) => s2.value - s1.value);
 
-  componentDidMount () {
-    StockVisualizerD3.create(this.getDOMNode(), this.getChartState());
-  }
-
-  componentDidUpdate () {
-    StockVisualizerD3.update(this.getDOMNode(), this.getChartState());
-  }
-
-  getChartState () {
-    return {
-      stockData: this.props.stockData
-    }
-  }
-
-  componentWillUnmount () {
-    StockVisualizerD3.destroy(this.getDOMNode());
-  }
-
-  getDOMNode () {
-    return React.findDOMNode(this);
+    return <ReactBubbleChart
+      className="stock-visualizer"
+      colorLegend={colorLegend}
+      data={data}
+    />;
   }
 }
 
