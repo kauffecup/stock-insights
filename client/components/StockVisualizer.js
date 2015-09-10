@@ -44,7 +44,7 @@ var colorLegend52 = [
   "#deebf7", "#c6dbef", "#9ecae1", "#6baed6", "#4292c6", "#2171b5", "#08519c", {color: "#08306b", text: '↑ 52 High'}
 ];
 
-class StockVisualizer extends React.Component {
+export default class StockVisualizer extends React.Component {
   /**
    * Given a function to determine a stocks color value, and
    * a function to determine a stocks time value, produce an array
@@ -174,5 +174,3 @@ class StockVisualizer extends React.Component {
     />;
   }
 }
-
-export default StockVisualizer;

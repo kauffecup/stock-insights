@@ -40,7 +40,7 @@ class Company extends React.Component {
  * The actual company container that we will export. Instantiates one company for each...
  * company, and instantiates a CompanySearcher
  */
-class CompanyContainer extends React.Component {
+export default class CompanyContainer extends React.Component {
   render () {
     return (
       <div className="company-container">
@@ -52,5 +52,3 @@ class CompanyContainer extends React.Component {
     );
   }
 }
-
-export default CompanyContainer;

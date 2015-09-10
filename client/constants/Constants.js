@@ -16,7 +16,7 @@
 
 import keyMirror from 'keymirror';
 
-module.exports = keyMirror({
+export default keyMirror({
   COMPANIES_LOADING: null,
   COMPANY_DATA: null,
   ADD_COMPANY: null,

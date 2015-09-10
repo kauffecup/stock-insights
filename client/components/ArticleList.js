@@ -31,7 +31,7 @@ class Article extends React.Component {
   }
 }
 
-class ArticleList extends React.Component {
+export default class ArticleList extends React.Component {
   constructor(props) {
     super(props);
     // instantiate this this way so that we have a reference to the bound function
@@ -75,5 +75,3 @@ class ArticleList extends React.Component {
     document.removeEventListener('click', this._handleClear);
   }
 }
-
-module.exports = ArticleList;

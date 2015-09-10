@@ -22,7 +22,7 @@ var CHANGE_EVENT = 'change';
 /**
  * A base class store that all other stores will inherit from
  */
-var _Store = assign({}, EventEmitter.prototype, {
+export default assign({}, EventEmitter.prototype, {
   /** ... emit a change event! */
   emitChange: function() {
     this.emit(CHANGE_EVENT);
@@ -38,5 +38,3 @@ var _Store = assign({}, EventEmitter.prototype, {
     this.removeListener(CHANGE_EVENT, callback);
   }
 });
-
-module.exports = _Store;

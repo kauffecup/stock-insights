@@ -28,7 +28,7 @@ import {
  * the companies that have already been added from the drop down, and limits the drop down
  * to 15 companies
  */
-class CompanySearcher extends React.Component {
+export default class CompanySearcher extends React.Component {
   constructor(props) {
     super(props);
     this.state = {value: ''};
@@ -127,5 +127,3 @@ class CompanySearcher extends React.Component {
     document.removeEventListener('click', this._handleClear);
   }
 }
-
-export default CompanySearcher;
