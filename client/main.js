@@ -22,6 +22,7 @@ import NewsArticlesStore from './stores/NewsArticlesStore';
 import CompanyContainer  from './components/CompanyContainer';
 import StockVisualizer   from './components/StockVisualizer';
 import ArticleList       from './components/ArticleList';
+import AnalysisToggle    from './components/AnalysisToggle';
 import {
   getStockData
 } from './Actions';
@@ -46,11 +47,9 @@ class StockInsights extends React.Component {
       <div className="stock-insights">
         <h1 className="stock-insights-title">Stock Insights</h1>
         <CompanyContainer companies={this.state.companies} potentialCompanies={this.state.potentialCompanies} />
-        <StockVisualizer stockData={this.state.stockData} />
-        {!!this.state.selectedCompany ?
-          <ArticleList selectedCompany={this.state.selectedCompany} articles={this.state.articles} />
-          : null
-        }
+        <StockVisualizer stockData={this.state.stockData} currentColorMode={this.state.currentColorMode} currentSizeMode={this.state.currentSizeMode} />
+        {!!this.state.selectedCompany && <ArticleList selectedCompany={this.state.selectedCompany} articles={this.state.articles} /> }
+        <AnalysisToggle analysisColorModes={this.state.analysisColorModes} analysisSizeModes={this.state.analysisSizeModes} />
       </div>
     );
   }
@@ -82,6 +81,10 @@ class StockInsights extends React.Component {
       companies: CompaniesStore.getCompanies(),
       potentialCompanies: CompaniesStore.getPotentialCompanies(),
       stockData: StockDataStore.getStockData(),
+      analysisColorModes: StockDataStore.getAnalysisColorModes(),
+      analysisSizeModes: StockDataStore.getAnalysisSizeModes(),
+      currentColorMode: StockDataStore.getCurrentAnalysisColorMode(),
+      currentSizeMode: StockDataStore.getCurrentAnalysisSizeMode(),
       selectedCompany: NewsArticlesStore.getSelectedCompany(),
       articles: NewsArticlesStore.getArticles()
     }

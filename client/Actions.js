@@ -67,3 +67,13 @@ export function getNews(symbol) {
 export function closeArticleList() {
   Dispatcher.dispatch({actionType: Constants.CLOSE_ARTICLE_LIST});
 }
+
+/** Switch the analysis color mode */
+export function switchAnalysisColorMode(id) {
+  Dispatcher.dispatch({actionType: Constants.SWITCH_ANALYSIS_COLOR_MODE, id: id});
+}
+
+/** Switch the analysis size mode */
+export function switchAnalysisSizeMode(id) {
+  Dispatcher.dispatch({actionType: Constants.SWITCH_ANALYSIS_SIZE_MODE, id: id});
+}
