@@ -100,7 +100,13 @@ export default class StockVisualizer extends React.Component {
     var high = s.week_52_high || s.high;
     var low  = s.week_52_low  || s.low;
     var now  = s.last || s.close;
-    return (high - now) / (high - low);
+    // protect against dividing by 0. this may seem a little... fake, but if we
+    // don't have the data we'll give it a perfectly average score.
+    if (!high && !low) {
+      return 0.5;
+    } else {
+      return (high - now) / (high - low);
+    }
   }
 
   /**
@@ -115,6 +121,12 @@ export default class StockVisualizer extends React.Component {
       min = -max;
     } else {
       max = -min;
+    }
+    // if all of the change data is 0 (the market just opened), make sure our
+    // domain isn't from 0 to 0. that'll make all of the circles black!
+    if (!min && !max) {
+      min = -1;
+      max = 1;
     }
     return {
       min: min,
