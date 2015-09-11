@@ -91,4 +91,5 @@ class StockInsights extends React.Component {
   }
 };
 
+React.initializeTouchEvents(true);
 React.render(<StockInsights />, document.body);
