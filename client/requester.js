@@ -41,6 +41,22 @@ export function stockNews(symbol) {
 }
 
 /**
+ * Hit the stockhistory endpoint with the proper query.
+ * Return a promise that resolves with the response.
+ */
+export function stockHistory(symbols) {
+  return _queryHelper('/stockhistory', {symbols: symbols});
+}
+
+/**
+ * Hit the sentiment endpoint with the proper query.
+ * Return a promise that resolves with the response.
+ */
+export function sentiment(symbol, entity) {
+  return _queryHelper('/sentiment', {symbol: symbol, sentiment: sentiment});
+}
+
+/**
  * Helper method that handles promise creation, resolution
  * and rejection for a given endpoint and query.
  */

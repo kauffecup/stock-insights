@@ -19,7 +19,9 @@ import Constants  from './constants/Constants';
 import {
   companyLookup,
   stockPrice,
-  stockNews
+  stockNews,
+  stockHistory,
+  sentiment
 } from './requester'
 
 /** Search for companies */
@@ -46,12 +48,28 @@ export function removeCompany(company) {
   Dispatcher.dispatch({actionType: Constants.REMOVE_COMPANY, company: company});
 }
 
-/** Get the stock data for a given company or array of companies */
+/** Get the stock data for a given array of companies */
 export function getStockData(symbols) {
-  Dispatcher.dispatch({actionType: Constants.STOCK_PRICE_LOADING});
+  Dispatcher.dispatch({actionType: Constants.STOCK_PRICE_LOADING, symbols: symbols});
   stockPrice(symbols).then(data => {
     Dispatcher.dispatch({actionType: Constants.STOCK_PRICE_DATA, data: data});
   });
+}
+
+/** Get the stock history data for a given array of companies */
+export function getStockHistory(symbols) {
+  Dispatcher.dispatch({actionType: Constants.STOCK_HISTORY_LOADING, symbols: symbols});
+  stockHistory(symbols).then(history => {
+    Dispatcher.dispatch({actionType: Constants.STOCK_HISTORY_DATA, history: history});
+  });
+}
+
+/** Get the sentiment around a symbol and/or entity */
+export function getSentiment(symbol, entity) {
+  Dispatcher.dispatch({actionType: Constants.SENTIMENT_LOADING, symbol: symbol, entity: entity});
+  sentiment(symbol, entity).then(data => {
+    Dispatcher.dispatch({actionType: Constants.SENTIMENT_DATA, data: data});
+  })
 }
 
 /** Get the articles for a given company */
