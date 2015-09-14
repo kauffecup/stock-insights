@@ -32,13 +32,6 @@ class Article extends React.Component {
 }
 
 export default class ArticleList extends React.Component {
-  constructor(props) {
-    super(props);
-    // instantiate this this way so that we have a reference to the bound function
-    // this is necessary for document add/remove event listener to work properly
-    this._handleClear = this.handleClear.bind(this);
-  }
-
   render() {
     var articles = this.props.articles.map(a => <Article article={a} />);
     var classes = classnames('article-list', {
@@ -47,31 +40,11 @@ export default class ArticleList extends React.Component {
     return (
       <div className={classes} onClick={e => e.stopPropagation()}>
         <button className="back" onClick={closeArticleList}>x</button>
-        <h2>{this.props.selectedCompany && (this.props.selectedCompany._id || this.props.selectedCompany)}</h2>
+        <h2>{this.props.selectedCompanies.join(', ')}</h2>
         <ul className="the-articles">
           {articles}
         </ul>
       </div>
     );
-  }
-
-  /**
-   * Only close the article list if the document click event happens outside of this component's
-   * dom node
-   */
-  handleClear(event) {
-    if (!React.findDOMNode(this).contains(event.target)) {
-      closeArticleList();
-    }
-  }
-
-  /**
-   * When mounting/unmounting set up the clear click handlers
-   */
-  componentDidMount() {
-    document.addEventListener('click', this._handleClear);
-  }
-  componentWillUnmount() {
-    document.removeEventListener('click', this._handleClear);
   }
 }

@@ -81,6 +81,12 @@ export function getNews(symbol) {
   });
 }
 
+/* Deselect a company */
+export function deselectCompany(company) {
+  var symbol = company._id || company.symbol || symbol;
+  Dispatcher.dispatch({actionType: Constants.DESELECT_COMPANY, symbol: symbol});
+}
+
 /** Close the article list */
 export function closeArticleList() {
   Dispatcher.dispatch({actionType: Constants.CLOSE_ARTICLE_LIST});

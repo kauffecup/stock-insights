@@ -19,20 +19,37 @@ import Dispatcher from'../Dispatcher';
 import Constants  from'../constants/Constants';
 import assign     from'object-assign';
 
-var _selectedCompany;
-var _articles = [];
+var _selectedCompanies = [];
+var _articleMap = {};
 
 /**
  * Here are some setters
  */
-function setSelectedCompany (newState) {
-  _selectedCompany = newState;
+function selectCompany (company) {
+  _selectedCompanies.push(company);
 }
-function setArticles (newArticles) {
-  _articles = newArticles.map(a => ({
+function clearCompanies () {
+  _selectedCompanies = [];
+}
+function removeCompany (symbol) {
+  delete _articleMap[symbol.toLowerCase()];
+  _selectedCompanies.splice(_selectedCompanies.indexOf(symbol), 1);
+}
+function addArticles (newArticles, symbol) {
+  _articleMap[symbol.toLowerCase()] = newArticles.map(a => ({
     title: a.title,
     url: a.url
   }));
+}
+function clearArticles () {
+  _articleMap = {};
+}
+function flattenArticles () {
+  var articles = [];
+  for (var symbol in _articleMap) {
+    articles = articles.concat(_articleMap[symbol]);
+  }
+  return articles;
 }
 
 /**
@@ -41,11 +58,11 @@ function setArticles (newArticles) {
  * themselves
  */
 var NewsArticlesStore = assign({}, _Store, {
-  getSelectedCompany: function () {
-    return _selectedCompany
+  getSelectedCompanies: function () {
+    return _selectedCompanies
   },
   getArticles: function () {
-    return _articles;
+    return flattenArticles();
   }
 });
 
@@ -58,25 +75,29 @@ Dispatcher.register(function(action) {
     // clear existing articles if we're about to load a new symbol
     // only emit a change... if a change happened
     case Constants.NEWS_LOADING:
-      if (action.symbol !== _selectedCompany) {
-        setSelectedCompany(action.symbol);
-        setArticles([]);
+        selectCompany(action.symbol);
         NewsArticlesStore.emitChange();
-      }
       break;
 
     // when we get the articles, only set and emit if an article is
     // still selected. otherwise we know the window has been closed.
     case Constants.NEWS_DATA:
-      setArticles(action.news.news || action.news);
-      NewsArticlesStore.emitChange();
+      if (_selectedCompanies.length) {
+        addArticles(action.news.news || action.news, action.news.symbol || action.symbol);
+        NewsArticlesStore.emitChange();
+      }
       break;
 
     // when closing the article list, clear the selected company and
     // loaded articles
     case Constants.CLOSE_ARTICLE_LIST:
-      setSelectedCompany(null);
-      setArticles([]);
+      clearCompanies();
+      clearArticles();
+      NewsArticlesStore.emitChange();
+      break;
+
+    case Constants.DESELECT_COMPANY:
+      removeCompany(action.symbol);
       NewsArticlesStore.emitChange();
       break;
   }

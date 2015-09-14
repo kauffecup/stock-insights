@@ -18,7 +18,9 @@ import React           from 'react';
 import classNames      from 'classnames';
 import CompanySearcher from './CompanySearcher';
 import {
+  getNews,
   removeCompany,
+  deselectCompany,
   toggleCondensedCompanies
 } from '../Actions';
 
@@ -27,10 +29,20 @@ import {
  * click on to remove the company
  */
 class Company extends React.Component {
-  render () {
+  toggleSelected() {
+    if (this.props.selected) {
+      deselectCompany(this.props.company);
+    } else {
+      getNews(this.props.company);
+    }
+  }
+  render() {
     var c = this.props.company;
+    var classes = classNames('company', {
+      selected: this.props.selected
+    });
     return (
-      <div className="company">
+      <div className={classes} onClick={this.toggleSelected.bind(this)}>
         <span className="company-description">{c.description}</span>
         <span className="company-symbol">{c.symbol}</span>
         <span className="company-close" onClick={removeCompany.bind(null, c)}>x</span>
@@ -44,14 +56,18 @@ class Company extends React.Component {
  * company, and instantiates a CompanySearcher
  */
 export default class CompanyContainer extends React.Component {
-  render () {
+  render() {
     var classes=classNames('company-container', {
       condensed: this.props.condensed
     });
+    var selected = {};
+    for (var sym of this.props.selectedCompanies) {
+      selected[sym] = true;
+    }
     return (
       <div className={classes}>
         {this.props.companies.map(c =>
-          <Company company={c} key={c.symbol} condensed={this.props.condensed} />
+          <Company company={c} key={c.symbol} condensed={this.props.condensed} selected={!!selected[c.symbol]} />
         )}
         {this.props.companies.length ? <button onClick={toggleCondensedCompanies}>
           {this.props.condensed ? "Show" : "Hide Company Names"}

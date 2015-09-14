@@ -65,7 +65,7 @@ button {
   display: flex;
   flex-direction: column;
 
-  .stock-insights-title{
+  .stock-insights-title {
     height: 80px;
     color: #fff;
     background-color: @accent-color;
@@ -84,15 +84,19 @@ button {
       padding: 5px;
       margin-bottom: 10px;
       background-color: @background-color;
-      cursor: default;
+      cursor: pointer;
 
       .company-symbol {
         display: none;
       }
 
       .company-close {
-        cursor: pointer;
         margin-left: 5px;
+      }
+
+      &.selected {
+        background-color: @accent-color;
+        color: #fff;
       }
     }
     &.condensed .company {
@@ -132,8 +136,14 @@ button {
     }
   }
 
-  .stock-visualizer {
+  .cool-stuff {
     flex: 1;
+    position: relative;
+    display: flex;
+  }
+
+  .stock-visualizer {
+    flex: 2;
     position: relative;
     display: flex;
     user-select: none;
@@ -158,17 +168,11 @@ button {
   }
 
   .article-list {
-    position: absolute;
-    right: 10px;
-    top: 40px;
-    width: 35%;
-    height: ~"calc(100% - 80px)";
-    background-color: #fff;
-    box-shadow: 0 3px 2px #777;
+    flex: 1;
     flex-direction: column;
     z-index: @article-list-z;
-    display: none;
     display: flex;
+    position: relative;
 
     .back {
       position: absolute;
@@ -183,13 +187,14 @@ button {
     h2 {
       padding-left: 40px;
       padding-top: 20px;
+      min-height: 55px;
     }
 
     .the-articles {
       flex: 1;
       overflow: auto;
       -webkit-overflow-scrolling: touch;
-      padding: 0px 40px;
+      padding: 0px 40px 40px 40px;
 
       .article {
         margin-bottom: 10px;

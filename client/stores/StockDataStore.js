@@ -54,7 +54,8 @@ function flattenStockData() {
 /**
  * 
  */
-function addEntities(articles) {
+function addEntities(articles, symbol) {
+  var entityMap = {};
   for (var article of articles) {
     for (var {score, sentiment, text} of article.entities) {
       var cased = text.replace(/\w*/g, txt =>
@@ -68,25 +69,42 @@ function addEntities(articles) {
       } else if (sentiment === 'neutral') {
         multiplier = 0;
       }
-      if (!_entityMap[cased]) {
-        _entityMap[cased] = [];
+      if (!entityMap[cased]) {
+        entityMap[cased] = [];
       }
-      _entityMap[cased].push(multiplier * score);
+      entityMap[cased].push(multiplier * score);
     }
   }
+  _entityMap[symbol.toLowerCase()] = entityMap;
 }
 
 function reduceEntityMap() {
+  var entityMap = {};
+  for (var symbol in _entityMap) {
+    var _smallMap = _entityMap[symbol];
+    for (var entity in _smallMap) {
+      if (entityMap[entity]) {
+        entityMap[entity].concat(_smallMap[entity])
+      } else {
+        entityMap[entity] = _smallMap[entity];
+      }
+    }
+  }
+
   var entities = [];
-  for (var text in _entityMap) {
-    var __entities = _entityMap[text];
+  for (var text in entityMap) {
+    var __entities = entityMap[text];
     entities.push({_id: text, value: __entities.length, colorValue: __entities.reduce((s, it) => s+it, 0)/__entities.length})
   }
-  return entities.sort((e1, e2) => e2.value - e1.value);
+  return entities.sort((e1, e2) => e2.value - e1.value).slice(0, 50);
 }
 
 function clearEntities() {
   _entityMap = {};
+}
+
+function removeCompanyEntities(symbol) {
+  delete _entityMap[symbol.toLowerCase()];
 }
 
 /**
@@ -122,12 +140,17 @@ Dispatcher.register(function(action) {
       break;
 
     case Constants.NEWS_DATA:
-      addEntities(action.news.news || action.news);
+      addEntities(action.news.news || action.news, action.news.symbol || action.symbol);
       StockDataStore.emitChange();
       break;
 
     case Constants.CLOSE_ARTICLE_LIST:
       clearEntities();
+      StockDataStore.emitChange();
+      break;
+
+    case Constants.DESELECT_COMPANY:
+      removeCompanyEntities(action.symbol);
       StockDataStore.emitChange();
       break;
 

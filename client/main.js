@@ -49,10 +49,24 @@ class StockInsights extends React.Component {
         <div className="stock-insights-title">
           <h1 className="stock-insights-title">Stock Insights</h1>
         </div>
-        <CompanyContainer companies={this.state.companies} potentialCompanies={this.state.potentialCompanies} condensed={this.state.condensedCompanies} />
-        <StockVisualizer stockData={this.state.stockData} entityData={this.state.entityData} currentColorMode={this.state.currentColorMode} currentSizeMode={this.state.currentSizeMode} />
-        {!!this.state.selectedCompany && <ArticleList selectedCompany={this.state.selectedCompany} articles={this.state.articles} /> }
-        {!this.state.selectedCompany && <AnalysisToggle analysisColorModes={this.state.analysisColorModes} analysisSizeModes={this.state.analysisSizeModes} />}
+        <CompanyContainer companies={this.state.companies}
+          potentialCompanies={this.state.potentialCompanies}
+          condensed={this.state.condensedCompanies}
+          selectedCompanies={this.state.selectedCompanies} />
+        <div className="cool-stuff">
+          <StockVisualizer stockData={this.state.stockData}
+            entityData={this.state.entityData}
+            currentColorMode={this.state.currentColorMode}
+            currentSizeMode={this.state.currentSizeMode} />
+          {!!this.state.selectedCompanies.length && 
+            <ArticleList selectedCompanies={this.state.selectedCompanies}
+              articles={this.state.articles} />
+          }
+        </div>
+        {!this.state.selectedCompanies.length && 
+          <AnalysisToggle analysisColorModes={this.state.analysisColorModes}
+            analysisSizeModes={this.state.analysisSizeModes} />
+        }
       </div>
     );
   }
@@ -92,7 +106,7 @@ class StockInsights extends React.Component {
       currentColorMode: PageStateStore.getCurrentAnalysisColorMode(),
       currentSizeMode: PageStateStore.getCurrentAnalysisSizeMode(),
       condensedCompanies: PageStateStore.getCondensedCompanies(),
-      selectedCompany: NewsArticlesStore.getSelectedCompany(),
+      selectedCompanies: NewsArticlesStore.getSelectedCompanies(),
       articles: NewsArticlesStore.getArticles()
     }
   }
