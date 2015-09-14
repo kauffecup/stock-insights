@@ -47,7 +47,7 @@ class StockInsights extends React.Component {
     return (
       <div className="stock-insights">
         <h1 className="stock-insights-title">Stock Insights</h1>
-        <CompanyContainer companies={this.state.companies} potentialCompanies={this.state.potentialCompanies} />
+        <CompanyContainer companies={this.state.companies} potentialCompanies={this.state.potentialCompanies} condensed={this.state.condensedCompanies} />
         <StockVisualizer stockData={this.state.stockData} currentColorMode={this.state.currentColorMode} currentSizeMode={this.state.currentSizeMode} />
         {!!this.state.selectedCompany && <ArticleList selectedCompany={this.state.selectedCompany} articles={this.state.articles} /> }
         <AnalysisToggle analysisColorModes={this.state.analysisColorModes} analysisSizeModes={this.state.analysisSizeModes} />
@@ -88,6 +88,7 @@ class StockInsights extends React.Component {
       analysisSizeModes: PageStateStore.getAnalysisSizeModes(),
       currentColorMode: PageStateStore.getCurrentAnalysisColorMode(),
       currentSizeMode: PageStateStore.getCurrentAnalysisSizeMode(),
+      condensedCompanies: PageStateStore.getCondensedCompanies(),
       selectedCompany: NewsArticlesStore.getSelectedCompany(),
       articles: NewsArticlesStore.getArticles()
     }

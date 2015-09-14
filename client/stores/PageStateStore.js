@@ -20,6 +20,9 @@ import Constants  from '../constants/Constants';
 import assign     from 'object-assign';
 import clone      from 'clone';
 
+/** @type {Boolean} When condensed, only display the ticker symbol */
+var _condensedCompanies = false;
+
 /** @type {String} The id for the current selected color mode */
 var _selectedColorMode = '_am_color_change';
 /** @type {Array} The possible color modes - each has a label and id */
@@ -58,11 +61,19 @@ function setSelectedSizeMode(newMode) {
   _selectedSizeMode = newMode;
 }
 
+function toggleCondensedCompanies() {
+  _condensedCompanies = !_condensedCompanies;
+}
+
 /**
  * The store we'll be exporting. Contains getter methods for
  * stock data, color modes and size modes
  */
 var PageStateStore = assign({}, _Store, {
+  getCondensedCompanies: function () {
+    return _condensedCompanies;
+  },
+
   getAnalysisColorModes: function () {
     return _analysisColorModes.map((am => {
       var amr = clone(am);
@@ -107,6 +118,12 @@ Dispatcher.register(function(action) {
         setSelectedSizeMode(action.id);
         PageStateStore.emitChange();
       }
+      break;
+
+    // toggle the state of the company chiclets
+    case Constants.TOGGLE_CONDENSED_COMPANIES:
+      toggleCondensedCompanies();
+      PageStateStore.emitChange();
       break;
 
     default:

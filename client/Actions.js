@@ -95,3 +95,8 @@ export function switchAnalysisColorMode(id) {
 export function switchAnalysisSizeMode(id) {
   Dispatcher.dispatch({actionType: Constants.SWITCH_ANALYSIS_SIZE_MODE, id: id});
 }
+
+/** Toggle the company condensed-ness */
+export function toggleCondensedCompanies() {
+  Dispatcher.dispatch({actionType: Constants.TOGGLE_CONDENSED_COMPANIES});
+}

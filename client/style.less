@@ -31,7 +31,6 @@ body, button, input {
   font-size: 1em;
 }
 ul {list-style: none; margin: 0; padding: 0;}
-button { background-color: transparent; border: none; cursor: pointer;}
 h1, h2, h3, h4, h5, h6 {margin: 0;}
 h1 { font-size: 2.25em; font-weight: normal; font-family: "HelveticaNeue-UltraLight", "Helvetica Neue UltraLight", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;}
 h2 { font-size: 1.75em; font-weight: normal;}
@@ -46,6 +45,18 @@ a {
   }
   &:hover, &:active {
     color: @accent-color;
+  }
+}
+
+button {
+  background-color: transparent;
+  border: 2px solid @accent-color;
+  cursor: pointer;
+  color: @accent-color;
+
+  &:hover {
+    background-color: @accent-color;
+    color: #fff;
   }
 }
 
@@ -71,18 +82,26 @@ a {
 
     .company {
       padding: 5px;
-      margin-right: 10px;
       margin-bottom: 10px;
       background-color: @background-color;
       cursor: default;
+
+      .company-symbol {
+        display: none;
+      }
 
       .company-close {
         cursor: pointer;
         margin-left: 5px;
       }
     }
+    &.condensed .company {
+      .company-description { display: none; }
+      .company-symbol { display: inline; }
+    }
 
-    .company, .company-searcher { height: 28px; }
+    .company, .company-searcher, button { height: 28px; }
+    .company, button { margin-right: 10px; }
 
     .company-searcher {
       position: relative;
@@ -155,6 +174,10 @@ a {
       position: absolute;
       top: 24px;
       left: 12px;
+      border: none;
+      background: transparent;
+      color: #000;
+      &:hover { color: @accent-color; }
     }
 
     h2 {

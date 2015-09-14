@@ -15,9 +15,11 @@
 //------------------------------------------------------------------------------
 
 import React           from 'react';
+import classNames      from 'classnames';
 import CompanySearcher from './CompanySearcher';
 import {
-  removeCompany
+  removeCompany,
+  toggleCondensedCompanies
 } from '../Actions';
 
 /**
@@ -29,7 +31,8 @@ class Company extends React.Component {
     var c = this.props.company;
     return (
       <div className="company">
-        <span className="company-description">{c.description + ' (' + c.symbol + ')'}</span>
+        <span className="company-description">{c.description}</span>
+        <span className="company-symbol">{c.symbol}</span>
         <span className="company-close" onClick={removeCompany.bind(null, c)}>x</span>
       </div>
     );
@@ -42,11 +45,17 @@ class Company extends React.Component {
  */
 export default class CompanyContainer extends React.Component {
   render () {
+    var classes=classNames('company-container', {
+      condensed: this.props.condensed
+    });
     return (
-      <div className="company-container">
+      <div className={classes}>
         {this.props.companies.map(c =>
-          <Company company={c} key={c.symbol} />
+          <Company company={c} key={c.symbol} condensed={this.props.condensed} />
         )}
+        {this.props.companies.length ? <button onClick={toggleCondensedCompanies}>
+          {this.props.condensed ? "Show" : "Hide Company Names"}
+        </button> : null}
         <CompanySearcher {...this.props} />
       </div>
     );
