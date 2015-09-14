@@ -29,7 +29,10 @@ function setSelectedCompany (newState) {
   _selectedCompany = newState;
 }
 function setArticles (newArticles) {
-  _articles = newArticles;
+  _articles = newArticles.map(a => ({
+    title: a.title,
+    url: a.url
+  }));
 }
 
 /**
@@ -65,10 +68,8 @@ Dispatcher.register(function(action) {
     // when we get the articles, only set and emit if an article is
     // still selected. otherwise we know the window has been closed.
     case Constants.NEWS_DATA:
-      if (!!_selectedCompany) {
-        setArticles(action.news.news || action.news);
-        NewsArticlesStore.emitChange();
-      }
+      setArticles(action.news.news || action.news);
+      NewsArticlesStore.emitChange();
       break;
 
     // when closing the article list, clear the selected company and

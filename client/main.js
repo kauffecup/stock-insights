@@ -46,11 +46,13 @@ class StockInsights extends React.Component {
   render() {
     return (
       <div className="stock-insights">
-        <h1 className="stock-insights-title">Stock Insights</h1>
+        <div className="stock-insights-title">
+          <h1 className="stock-insights-title">Stock Insights</h1>
+        </div>
         <CompanyContainer companies={this.state.companies} potentialCompanies={this.state.potentialCompanies} condensed={this.state.condensedCompanies} />
-        <StockVisualizer stockData={this.state.stockData} currentColorMode={this.state.currentColorMode} currentSizeMode={this.state.currentSizeMode} />
+        <StockVisualizer stockData={this.state.stockData} entityData={this.state.entityData} currentColorMode={this.state.currentColorMode} currentSizeMode={this.state.currentSizeMode} />
         {!!this.state.selectedCompany && <ArticleList selectedCompany={this.state.selectedCompany} articles={this.state.articles} /> }
-        <AnalysisToggle analysisColorModes={this.state.analysisColorModes} analysisSizeModes={this.state.analysisSizeModes} />
+        {!this.state.selectedCompany && <AnalysisToggle analysisColorModes={this.state.analysisColorModes} analysisSizeModes={this.state.analysisSizeModes} />}
       </div>
     );
   }
@@ -84,6 +86,7 @@ class StockInsights extends React.Component {
       companies: CompaniesStore.getCompanies(),
       potentialCompanies: CompaniesStore.getPotentialCompanies(),
       stockData: StockDataStore.getStockData(),
+      entityData: StockDataStore.getEntities(),
       analysisColorModes: PageStateStore.getAnalysisColorModes(),
       analysisSizeModes: PageStateStore.getAnalysisSizeModes(),
       currentColorMode: PageStateStore.getCurrentAnalysisColorMode(),

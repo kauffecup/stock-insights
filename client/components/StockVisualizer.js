@@ -24,24 +24,36 @@ import {
  * The color legend we will use when colors reflect change
  */
 var colorLegendChange = [
-  // oranges from dark to light
-  {color: "#990000", text: '(-) Change'},  "#d7301f", "#ef6548", "#fc8d59", "#fdbb84", "#fdd49e", "#fee8c8", "#fff7ec",
+  // reds from dark to light
+  {color: "#67000d", text: '(-) Change'},  "#a50f15", "#cb181d", "#ef3b2c", "#fb6a4a", "#fc9272", "#fcbba1", "#fee0d2",
   //neutral grey
   "#f0f0f0",
   // blues from light to dark
-  "#deebf7", "#c6dbef", "#9ecae1", "#6baed6", "#4292c6", "#2171b5", "#08519c", {color: "#08306b", text: '(+) Change'}
+  "#deebf7", "#c6dbef", "#9ecae1", "#6baed6", "#4292c6", "#2171b5", '#08519c', {color: "#08306b", text: '(+) Change'}
 ];
 
 /**
  * The color legend we will use when colors reflect the 52 week analysis
  */
 var colorLegend52 = [
-  // oranges from dark to light
-  {color: "#990000", text: '↓ 52 Low'},  "#d7301f", "#ef6548", "#fc8d59", "#fdbb84", "#fdd49e", "#fee8c8", "#fff7ec",
+  // reds to yellows from dark to light
+  {color: "#9e0142", text: '↓ 52 Low'},  "#d53e4f", "#f46d43", "#fdae61", "#fee08b",
+  //neutral yellow
+  "#ffffbf",
+  // greens to blue from light to dark
+  "#e6f598", "#abdda4", "#66c2a5", "#3288bd", {color: "#5e4fa2", text: '↑ 52 High'}
+];
+
+/**
+ * The color legend we will use when colors reflect change
+ */
+var colorLegendEntity = [
+  // reds from dark to light
+  {color: "#67000d", text: '(-) Sentiment'},  "#a50f15", "#cb181d", "#ef3b2c", "#fb6a4a", "#fc9272", "#fcbba1", "#fee0d2",
   //neutral grey
   "#f0f0f0",
   // blues from light to dark
-  "#deebf7", "#c6dbef", "#9ecae1", "#6baed6", "#4292c6", "#2171b5", "#08519c", {color: "#08306b", text: '↑ 52 High'}
+  "#deebf7", "#c6dbef", "#9ecae1", "#6baed6", "#4292c6", "#2171b5", '#08519c', {color: "#08306b", text: '(+) Sentiment'}
 ];
 
 export default class StockVisualizer extends React.Component {
@@ -149,39 +161,50 @@ export default class StockVisualizer extends React.Component {
    */
   render() {
     var data, legend, domain, sizeFunc;
-    // first we identify which function to use to size our bubbles
-    switch(this.props.currentSizeMode) {
-      case '_am_size_value':
-        sizeFunc = this.getValueAnalysis;
-        break;
-      case '_am_size_change':
-        sizeFunc = this.getChangeAnalysis;
-        break;
-      case '_am_size_52week':
-        sizeFunc = this.getWeek52Analysis;
-        break;
-    }
-    // then, depending on the color mode, get the actual data, color
-    // domain, and color legend.
-    switch(this.props.currentColorMode) {
-      case '_am_color_change':
-        data = this.getData(this.getChangeAnalysis, sizeFunc);
-        domain = this.getChangeDomain(data);
-        legend = colorLegendChange;
-        break;
+    var isEntities = !!this.props.entityData.length;
 
-      case '_am_color_52week':
-        data = this.getData(this.getWeek52Analysis, sizeFunc);
-        domain = this.getWeek52Domain();
-        legend = colorLegend52;
-        break;
+    if (isEntities) {
+      data = this.props.entityData;
+      legend = colorLegendEntity;
+      domain = {
+        min: -1,
+        max: 1
+      }
+    } else {
+      // first we identify which function to use to size our bubbles
+      switch(this.props.currentSizeMode) {
+        case '_am_size_value':
+          sizeFunc = this.getValueAnalysis;
+          break;
+        case '_am_size_change':
+          sizeFunc = this.getChangeAnalysis;
+          break;
+        case '_am_size_52week':
+          sizeFunc = this.getWeek52Analysis;
+          break;
+      }
+      // then, depending on the color mode, get the actual data, color
+      // domain, and color legend.
+      switch(this.props.currentColorMode) {
+        case '_am_color_change':
+          data = this.getData(this.getChangeAnalysis, sizeFunc);
+          domain = this.getChangeDomain(data);
+          legend = colorLegendChange;
+          break;
+
+        case '_am_color_52week':
+          data = this.getData(this.getWeek52Analysis, sizeFunc);
+          domain = this.getWeek52Domain();
+          legend = colorLegend52;
+          break;
+      }
     }
     // now we make a bubble chart! yay!
     return <ReactBubbleChart
       className="stock-visualizer"
       colorLegend={legend}
       data={data}
-      onClick={getNews}
+      onClick={isEntities ? null : getNews}
       fixedDomain={domain}
     />;
   }
