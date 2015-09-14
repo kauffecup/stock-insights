@@ -5,6 +5,9 @@
   1. Create a Node.js runtime
   1. Add the custom "Company Lookup" API
   1. Add the custom "Stock Price" API
+  1. Add the custom "Stock News" API
+  1. Add the custom "Stock History" API
+  1. Add the custom "Stock Sentiment" API
 
 ## Running Locally
 
@@ -36,9 +39,13 @@ that is identical to your deployed environment variables. For example:
             "url": "your_client_url"
          }
       }
-   ]
+   ],
+   ...
 }
 ```
+
+Where the `...` represents the JSON for `Stock News`, `Stock History`, and
+`Stock Sentiment`.
 
 Then you only need to run:
 

@@ -28,8 +28,8 @@ if (process.env.VCAP_SERVICES) {
 }
 
 // the keys are complex, for example: `Company Lookup v1 : Sandbox 55e768c90cf2722940e66db9 prod`
-// iterate over the keys and convert to companyLookup and stockPrice for easier use throughout
-// the application
+// iterate over the keys and convert to companyLookup, stockPrice, stockNews, stockHistory, and
+// stockSentiment for easier use throughout the application
 for (var service in vcapServices) {
   if (service.indexOf('Company Lookup') > -1) {
     vcapServices.companyLookup = vcapServices[service][0];
@@ -39,6 +39,12 @@ for (var service in vcapServices) {
     delete vcapServices[service];
   } else if (service.indexOf('Stock News') > -1) {
     vcapServices.stockNews = vcapServices[service][0];
+    delete vcapServices[service];
+  } else if (service.indexOf('Stock History') > -1) {
+    vcapServices.stockHistory = vcapServices[service][0];
+    delete vcapServices[service];
+  } else if (service.indexOf('Stock Sentiment') > -1) {
+    vcapServices.stockSentiment = vcapServices[service][0];
     delete vcapServices[service];
   }
 }

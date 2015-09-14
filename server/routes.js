@@ -22,78 +22,44 @@ var router = express.Router();
 var request = Promise.promisify(require('request'));
 Promise.promisifyAll(request);
 
-/**
- * An object that we'll cache stock prices in.
- * @type {
- *         symbol: {
- *           timestamp: number, // when we cached the data
- *           data: Object       // the data we get back from our endpoint
- *         }
- *       }
- */
-var _stockPriceCache = {};
-
 /* GET home page. */
 router.get('/', (req, res) => {
   res.render('index');
 });
 
-/* Company Lookup */
+/* Company Lookup. query takes company */
 router.get('/companylookup', (req, res) => {
   var company = req.query.company;
   var {client_id, client_secret, url} = vcapServices.companyLookup.credentials;
   return _doGet(url + '/markets/find', {client_id: client_id, name: company}, res);
 });
 
-/* Stock News */
+/* Stock News. query takes symbol */
 router.get('/stocknews', (req, res) => {
   var symbol = req.query.symbol;
   var {client_id, client_secret, url} = vcapServices.stockPrice.credentials;
   return _doGet(url + '/news/find', {client_id: client_id, symbol: symbol}, res);
 });
 
-/* Stock Price. Holds on to a value for each stock for 10m */
+/* Stock Price. query takes symbols */
 router.get('/stockprice', (req, res) => {
-  _pruneStockPriceCache();
-
-  // initialize the response with what we already have in our
-  // 10 minute cache
-  var futureResponse = [];
-  var symbols = req.query.symbols.split(',');
-  for (var symbol of symbols) {
-    if (_stockPriceCache[symbol]) {
-      futureResponse.push(_stockPriceCache[symbol].data);
-    }
-  }
-
-  // build an array of promises tracking the requests for each of the stocks that
-  // we don't have yet
-  var stockPromises = [];
-  var symbolsToLookUp = symbols.filter(s => !_stockPriceCache[s]);
+  var symbols = req.query.symbols;
   var {client_id, client_secret, url} = vcapServices.stockPrice.credentials;
-  for (var symbol of symbolsToLookUp) {
-    stockPromises.push(request.getAsync({
-      url: url + '/markets/quote',
-      qs: {client_id: client_id, symbol: symbol}
-    }));
-  }
+  return _doGet(url + '/markets/quote', {client_id: client_id, symbols: symbols}, res);
+});
 
-  // once all of the promises resolve, add the new data to our response array,
-  // and cache it for later
-  Promise.all(stockPromises).then(stockResponses => {
-    for (var [response, body] of stockResponses) {
-      var parsedResponse = typeof body === 'string' ? JSON.parse(body) : body;
-      futureResponse.push(parsedResponse);
-      _stockPriceCache[parsedResponse.symbol] = {
-        time: new Date().getTime(),
-        data: parsedResponse
-      }
-    }
-    res.json(futureResponse);
-  }).catch(e => {
-    res.status(500);
-    res.json(e);
-  })
+/* Stock History. query takes symbols */
+router.get('/stockhistory', (req, res) => {
+  var symbols = req.query.symbols;
+  var {client_id, client_secret, url} = vcapServices.stockHistory.credentials;
+  return _doGet(url + '/markets/history', {client_id: client_id, symbols: symbols}, res);
+});
+
+/* Sentiment. query takes symbol and/or entity */
+router.get('/sentiment', (req, res) => {
+  var {symbol, entity} = req.query;
+  var {client_id, client_secret, url} = vcapServices.stockSentiment.credentials;
+  return _doGet(url + '/sentiment/find', {client_id: client_id, symbol: symbol, entity: entity}, res);
 });
 
 /* Helper GET method for companylookup and stockprice similarities */
@@ -106,17 +72,6 @@ function _doGet(url, qs, res) {
     res.status(500);
     res.json(e);
   });
-}
-
-/* Helper method to remove anything older than 10m from the cache */
-function _pruneStockPriceCache() {
-  var currentTime = new Date().getTime();
-  for (var stock in _stockPriceCache) {
-    var cachedData = _stockPriceCache[stock];
-    if (currentTime - cachedData.time > 10*60*1000) {
-      delete _stockPriceCache[stock];
-    }
-  }
 }
 
 export default router;
