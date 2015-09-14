@@ -19,6 +19,7 @@ import Constants         from './constants/Constants';
 import CompaniesStore    from './stores/CompaniesStore';
 import StockDataStore    from './stores/StockDataStore';
 import NewsArticlesStore from './stores/NewsArticlesStore';
+import PageStateStore    from './stores/PageStateStore';
 import CompanyContainer  from './components/CompanyContainer';
 import StockVisualizer   from './components/StockVisualizer';
 import ArticleList       from './components/ArticleList';
@@ -61,6 +62,7 @@ class StockInsights extends React.Component {
     CompaniesStore.addChangeListener(this._onChange);
     StockDataStore.addChangeListener(this._onChange);
     NewsArticlesStore.addChangeListener(this._onChange);
+    PageStateStore.addChangeListener(this._onChange);
     // if we already have companies, request the stock data to populate
     // our visualizations
     if (this.state.companies.length) {
@@ -71,6 +73,7 @@ class StockInsights extends React.Component {
     CompaniesStore.removeChangeListener(this._onChange);
     StockDataStore.removeChangeListener(this._onChange);
     NewsArticlesStore.removeChangeListener(this._onChange);
+    PageStateStore.removeChangeListener(this._onChange);
   }
 
   /**
@@ -81,10 +84,10 @@ class StockInsights extends React.Component {
       companies: CompaniesStore.getCompanies(),
       potentialCompanies: CompaniesStore.getPotentialCompanies(),
       stockData: StockDataStore.getStockData(),
-      analysisColorModes: StockDataStore.getAnalysisColorModes(),
-      analysisSizeModes: StockDataStore.getAnalysisSizeModes(),
-      currentColorMode: StockDataStore.getCurrentAnalysisColorMode(),
-      currentSizeMode: StockDataStore.getCurrentAnalysisSizeMode(),
+      analysisColorModes: PageStateStore.getAnalysisColorModes(),
+      analysisSizeModes: PageStateStore.getAnalysisSizeModes(),
+      currentColorMode: PageStateStore.getCurrentAnalysisColorMode(),
+      currentSizeMode: PageStateStore.getCurrentAnalysisSizeMode(),
       selectedCompany: NewsArticlesStore.getSelectedCompany(),
       articles: NewsArticlesStore.getArticles()
     }
