@@ -38,7 +38,8 @@ function removeCompany (symbol) {
 function addArticles (newArticles, symbol) {
   _articleMap[symbol.toLowerCase()] = newArticles.map(a => ({
     title: a.title,
-    url: a.url
+    url: a.url,
+    relations: a.relations
   }));
 }
 function clearArticles () {

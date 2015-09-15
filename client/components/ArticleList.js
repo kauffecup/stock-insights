@@ -24,16 +24,25 @@ class Article extends React.Component {
   render() {
     var a = this.props.article;
     return (
-      <div className="article">
+      <li className="article">
         <a className="title-link" href={a.url} target="_blank">{a.title}</a>
-      </div>
+        <ul className="relations">{a.relations.map(r =>
+          <li className="relation">{r}</li>
+        )}</ul>
+      </li>
     );
   }
 }
 
 export default class ArticleList extends React.Component {
   render() {
-    var articles = this.props.articles.map(a => <Article article={a} />);
+    var articles = this.props.articles.sort((a1, a2) => {
+      var title1 = a1.title.toLowerCase();
+      var title2 = a2.title.toLowerCase();
+      if (title1 < title2) { return -1; }
+      else if (title1 > title2) {return 1; }
+      else { return 0; }
+    }).map(a => <Article article={a} />);
     var classes = classnames('article-list', {
       'has-article': !!this.props.selectedCompany
     });
