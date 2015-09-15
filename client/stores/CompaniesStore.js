@@ -21,11 +21,21 @@ import assign     from'object-assign';
 
 /** @type {String} The local storage key */
 const LOCAL_STORAGE_KEY = 'COMPANY_LOCAL_STORAGE';
-/** @type {Array.<Companies>} The array of companies initialized from local storage */
-var _companies = localStorage.getItem(LOCAL_STORAGE_KEY);
-_companies = _companies ? JSON.parse(_companies) : [];
 /** @type {Array.<Companies>} The array of potential companies (for autocomplete) */
 var _potentialCompanies = [];
+/** @type {Array.<Companies>} The array of companies initialized from url param or local storage */
+var _companies;
+var match = /[&?]symbols=([^&]+)/.exec(location.href);
+var urlCompanies = match && match[1].split(',');
+var setFromUrlParam = urlCompanies && urlCompanies.length;
+if (setFromUrlParam) {
+  _companies = urlCompanies.map(c => ({
+    symbol: c
+  }));
+} else {
+  _companies = localStorage.getItem(LOCAL_STORAGE_KEY);
+  _companies = _companies ? JSON.parse(_companies) : [];
+}
 
 /**
  * Add a company to our _companies array
@@ -57,7 +67,9 @@ function setPotentialCompanies (newPotentials) {
  * Helper method to store the companies in the browser's local storage
  */
 function _updateLocalStorage () {
-  localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(_companies));
+  if (!setFromUrlParam) {
+    localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(_companies));
+  }
 }
 
 /**

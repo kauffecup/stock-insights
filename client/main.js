@@ -15,6 +15,7 @@
 //------------------------------------------------------------------------------
 
 import React             from 'react';
+import classNames        from 'classnames';
 import Constants         from './constants/Constants';
 
 import CompaniesStore    from './stores/CompaniesStore';
@@ -48,8 +49,11 @@ class StockInsights extends React.Component {
    * Currently the app consists of a header and a CompanyContainer
    */
   render() {
+    var classes = classNames('stock-insights', {
+      embedded: this.state.isEmbedded
+    });
     return (
-      <div className="stock-insights">
+      <div className={classes}>
         <div className="stock-insights-title">
           <h1 className="stock-insights-title">Stock Insights</h1>
         </div>
@@ -109,6 +113,7 @@ class StockInsights extends React.Component {
       potentialCompanies: CompaniesStore.getPotentialCompanies(),
       stockData: StockDataStore.getStockData(),
       entityData: StockDataStore.getEntities(),
+      isEmbedded: PageStateStore.getEmbeddedMode(),
       analysisColorModes: PageStateStore.getAnalysisColorModes(),
       analysisSizeModes: PageStateStore.getAnalysisSizeModes(),
       currentColorMode: PageStateStore.getCurrentAnalysisColorMode(),

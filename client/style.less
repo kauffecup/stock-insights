@@ -307,4 +307,21 @@ button {
       }
     }
   }
+
+  // make things look different when it's embedded in another page
+  &.embedded {
+    // hide the header
+    .stock-insights-title { display: none; }
+    // make company state un-editable - hide close button, hide description
+    // toggler, hide ability to add a company
+    .company-container {
+      .company {
+        .company-description { display: none; }
+        .company-symbol { display: inline; }
+        .company-close { display: none; }
+      }
+      button { display: none; }
+      .company-searcher { display: none; }
+    }
+  }
 }

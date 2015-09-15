@@ -47,6 +47,11 @@ var _analysisSizeModes = [{
   id: '_am_size_52week'
 }];
 
+/** @type {Boolean} If we're running embedded or not. Right now determined by setting symbols in the URL */
+var _match = /[&?]symbols=([^&]+)/.exec(location.href);
+var _urlCompanies = _match && _match[1].split(',');
+var _isEmbedded = _urlCompanies && _urlCompanies.length;
+
 /**
  * Set a new selected color mode
  */
@@ -70,6 +75,10 @@ function toggleCondensedCompanies() {
  * stock data, color modes and size modes
  */
 var PageStateStore = assign({}, _Store, {
+  getEmbeddedMode: function () {
+    return !!_isEmbedded;
+  },
+
   getCondensedCompanies: function () {
     return _condensedCompanies;
   },
