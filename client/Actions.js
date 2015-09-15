@@ -59,8 +59,8 @@ export function getStockData(symbols) {
 /** Get the stock history data for a given array of companies */
 export function getStockHistory(symbols) {
   Dispatcher.dispatch({actionType: Constants.STOCK_HISTORY_LOADING, symbols: symbols});
-  stockHistory(symbols).then(history => {
-    Dispatcher.dispatch({actionType: Constants.STOCK_HISTORY_DATA, history: history});
+  stockHistory(symbols).then(histories => {
+    Dispatcher.dispatch({actionType: Constants.STOCK_HISTORY_DATA, histories: histories});
   });
 }
 
@@ -76,6 +76,7 @@ export function getSentiment(symbol, entity) {
 export function getNews(symbol) {
   symbol = symbol._id || symbol.symbol || symbol;
   Dispatcher.dispatch({actionType: Constants.NEWS_LOADING, symbol: symbol});
+  getStockHistory([symbol]);
   stockNews(symbol).then(news => {
     Dispatcher.dispatch({actionType: Constants.NEWS_DATA, news: news});
   });
