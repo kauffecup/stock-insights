@@ -27,24 +27,11 @@ var _condensedCompanies = false;
 var _selectedColorMode = '_am_color_change';
 /** @type {Array} The possible color modes - each has a label and id */
 var _analysisColorModes = [{
-  label: 'Change',
+  label: 'Today\'s Change',
   id: '_am_color_change'
 }, {
-  label: '52 Week',
+  label: 'Current Value Relative to 52 Week',
   id: '_am_color_52week'
-}];
-/** @type {String} The id for the current selected analysis mode */
-var _selectedSizeMode = '_am_size_value';
-/** @type {Array} The possible size modes - each has a label and id */
-var _analysisSizeModes = [{
-  label: 'Value',
-  id: '_am_size_value'
-}, {
-  label: 'Change',
-  id: '_am_size_change',
-}, {
-  label: '52 Week',
-  id: '_am_size_52week'
 }];
 
 /** @type {Boolean} If we're running embedded or not. Right now determined by setting symbols in the URL */
@@ -57,13 +44,6 @@ var _isEmbedded = _urlCompanies && _urlCompanies.length;
  */
 function setSelectedColorMode(newMode) {
   _selectedColorMode = newMode;
-}
-
-/**
- * Set a new selected size mode
- */
-function setSelectedSizeMode(newMode) {
-  _selectedSizeMode = newMode;
 }
 
 function toggleCondensedCompanies() {
@@ -90,18 +70,8 @@ var PageStateStore = assign({}, _Store, {
       return amr;
     }));
   },
-  getAnalysisSizeModes: function () {
-    return _analysisSizeModes.map((am => {
-      var amr = clone(am);
-      amr.selected = amr.id === _selectedSizeMode;
-      return amr;
-    }));
-  },
   getCurrentAnalysisColorMode: function () {
     return _selectedColorMode;
-  },
-  getCurrentAnalysisSizeMode: function () {
-    return _selectedSizeMode
   }
 });
 
@@ -116,15 +86,6 @@ Dispatcher.register(function(action) {
     case Constants.SWITCH_ANALYSIS_COLOR_MODE:
       if (action.id !== _selectedColorMode) {
         setSelectedColorMode(action.id);
-        PageStateStore.emitChange();
-      }
-      break;
-
-    // change the selected size mode
-    // only emit a change if something has changed
-    case Constants.SWITCH_ANALYSIS_SIZE_MODE:
-      if (action.id !== _selectedSizeMode) {
-        setSelectedSizeMode(action.id);
         PageStateStore.emitChange();
       }
       break;

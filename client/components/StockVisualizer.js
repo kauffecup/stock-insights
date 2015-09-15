@@ -36,12 +36,12 @@ var colorLegendChange = [
  * The color legend we will use when colors reflect the 52 week analysis
  */
 var colorLegend52 = [
-  // reds to yellows from dark to light
-  {color: "#9e0142", text: '↓ 52 Low'},  "#d53e4f", "#f46d43", "#fdae61", "#fee08b",
-  //neutral yellow
-  "#ffffbf",
-  // greens to blue from light to dark
-  "#e6f598", "#abdda4", "#66c2a5", "#3288bd", {color: "#5e4fa2", text: '↑ 52 High'}
+    // reds from dark to light
+  {color: "#67000d", text: '↓ 52 Low'},  "#a50f15", "#cb181d", "#ef3b2c", "#fb6a4a", "#fc9272", "#fcbba1", "#fee0d2",
+  //neutral grey
+  "#f0f0f0",
+  // blues from light to dark
+  "#deebf7", "#c6dbef", "#9ecae1", "#6baed6", "#4292c6", "#2171b5", '#08519c', {color: "#08306b", text: '↑ 52 High'}
 ];
 
 /**
@@ -62,10 +62,10 @@ export default class StockVisualizer extends React.Component {
    * a function to determine a stocks time value, produce an array
    * of data that can be consumed by ReactBubbleChart
    */
-  getData(colorFunc, sizeFunc) {
+  getData(colorFunc) {
     var data = this.props.stockData.map(s => {
       return {
-        value: sizeFunc(s),
+        value: s.last,
         _id: s.symbol,
         colorValue: colorFunc(s)
       }
@@ -84,15 +84,6 @@ export default class StockVisualizer extends React.Component {
       }));
     }
     return data;
-  }
-
-  /**
-   * Will be passed in to getData - extract the value of a stock
-   * returns last or close - if the market is closed last will be undefined,
-   * if the market is open close will be undefined
-   */
-  getValueAnalysis(s) {
-    return s.last || s.close;
   }
 
   /**
@@ -171,29 +162,17 @@ export default class StockVisualizer extends React.Component {
         max: 1
       }
     } else {
-      // first we identify which function to use to size our bubbles
-      switch(this.props.currentSizeMode) {
-        case '_am_size_value':
-          sizeFunc = this.getValueAnalysis;
-          break;
-        case '_am_size_change':
-          sizeFunc = this.getChangeAnalysis;
-          break;
-        case '_am_size_52week':
-          sizeFunc = this.getWeek52Analysis;
-          break;
-      }
       // then, depending on the color mode, get the actual data, color
       // domain, and color legend.
       switch(this.props.currentColorMode) {
         case '_am_color_change':
-          data = this.getData(this.getChangeAnalysis, sizeFunc);
+          data = this.getData(this.getChangeAnalysis);
           domain = this.getChangeDomain(data);
           legend = colorLegendChange;
           break;
 
         case '_am_color_52week':
-          data = this.getData(this.getWeek52Analysis, sizeFunc);
+          data = this.getData(this.getWeek52Analysis);
           domain = this.getWeek52Domain();
           legend = colorLegend52;
           break;

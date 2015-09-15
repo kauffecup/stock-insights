@@ -77,8 +77,7 @@ class StockInsights extends React.Component {
         {this.state.selectedCompanies.length ?
           <GraphTown histories={this.state.histories} />
           :
-          <AnalysisToggle analysisColorModes={this.state.analysisColorModes}
-            analysisSizeModes={this.state.analysisSizeModes} />
+          <AnalysisToggle analysisColorModes={this.state.analysisColorModes} />
         }
       </div>
     );
@@ -118,9 +117,7 @@ class StockInsights extends React.Component {
       entityData: StockDataStore.getEntities(),
       isEmbedded: PageStateStore.getEmbeddedMode(),
       analysisColorModes: PageStateStore.getAnalysisColorModes(),
-      analysisSizeModes: PageStateStore.getAnalysisSizeModes(),
       currentColorMode: PageStateStore.getCurrentAnalysisColorMode(),
-      currentSizeMode: PageStateStore.getCurrentAnalysisSizeMode(),
       condensedCompanies: PageStateStore.getCondensedCompanies(),
       selectedCompanies: NewsArticlesStore.getSelectedCompanies(),
       articles: NewsArticlesStore.getArticles(),

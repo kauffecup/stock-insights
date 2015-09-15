@@ -50,10 +50,6 @@ export default class AnalysisToggle extends React.Component {
           onChange={e => switchAnalysisColorMode(e.target.id)}
           analysisModes={this.props.analysisColorModes}
           name="Color" />
-        <AnalysisToggler className="size"
-          onChange={e => switchAnalysisSizeMode(e.target.id)}
-          analysisModes={this.props.analysisSizeModes}
-          name="Size" />
       </form>
     );
   }
