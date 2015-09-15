@@ -19,7 +19,6 @@
 @background-color: #f0f0f0;
 @secondary-text-color: #c1c1c1;
 
-@article-list-z: 1000;
 @stock-chiclets-z: 500;
 
 // get the page ready
@@ -171,9 +170,9 @@ button {
   .article-list {
     flex: 1;
     flex-direction: column;
-    z-index: @article-list-z;
     display: flex;
     position: relative;
+    overflow: hidden;
 
     .back {
       position: absolute;
@@ -212,7 +211,10 @@ button {
   }
 
   .analysis-toggle{
-    padding: 0 10%;
+    max-width: 600px;
+    width: 60%;
+    margin-right: auto;
+    margin-left: auto;
     display: flex;
 
     .radioset {
@@ -220,7 +222,6 @@ button {
       border: 0;
       display: flex;
       flex-wrap: wrap;
-      padding: 10px 20px 20px 20px;
 
       .title {
         margin-left: auto;
@@ -263,9 +264,9 @@ button {
       }
 
       label {
-        line-height: 30px;
         padding-bottom: 40px;
         display: block;
+        max-width: 150px;
 
         &::before,
         &::after {
@@ -323,6 +324,61 @@ button {
       }
       button { display: none; }
       .company-searcher { display: none; }
+    }
+  }
+}
+
+@media (orientation: portrait) {
+  .stock-insights {
+    .cool-stuff {
+      .stock-visualizer {
+        .bubble-legend { display: none; }
+      }
+    }
+  }
+}
+
+// tablet-ish
+@media (max-width: 1024px) {
+  h2 { font-size: 1.5em; }
+  body, button, input { font-size: 0.9em; }
+  .stock-insights {
+    // reduce size of title
+    .stock-insights-title {
+      height: 60px;
+    }
+    // only allow showing of symbols (and hide toggler)
+    .company-container {
+      padding: 10px;
+      .company {
+        .company-description { display: none; }
+        .company-symbol { display: inline; }
+      }
+      button { display: none; }
+      .company-searcher { width: 200px; }
+    }
+    // reduce height of graph
+    .graph-town {
+      height: 150px;
+    }
+  }
+}
+
+// iphone-ish
+@media (max-width: 736px) {
+  body, button, input { font-size: 0.85em; }
+  .stock-insights {
+    // reduce height of title yet again
+    .stock-insights-title {
+      height: 50px;
+    }
+    // hide legend the articles
+    .cool-stuff {
+      .article-list { display: none; }
+    }
+    // hide the toggle title
+    .analysis-toggle {
+      .title { display: none; }
     }
   }
 }
