@@ -33,6 +33,9 @@ import {
   getStockData
 } from './Actions';
 
+// make sure all es6 things work correctly in all browsers
+require('babel/polyfill');
+
 /**
  * The app entry point
  */
