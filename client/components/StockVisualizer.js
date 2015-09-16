@@ -16,6 +16,8 @@
 
 import React             from 'react';
 import ReactBubbleChart  from 'react-bubble-chart';
+import StockDataStore    from '../stores/StockDataStore';
+import PageStateStore    from '../stores/PageStateStore';
 import {
   getNews
 } from '../Actions';
@@ -57,13 +59,62 @@ var colorLegendEntity = [
 ];
 
 export default class StockVisualizer extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = this._getStateObj();
+    // need to initialize the function this way so that we have a reference
+    // to the arrow function. this way we can add/remove it properly
+    this._onChange = e => this.setState(this._getStateObj());
+  }
+
+  /**
+   * Render town.
+   */
+  render() {
+    var data, legend, domain, sizeFunc;
+    var isEntities = !!this.state.entityData.length;
+
+    if (isEntities) {
+      data = this.state.entityData;
+      legend = colorLegendEntity;
+      domain = {
+        min: -1,
+        max: 1
+      }
+    } else {
+      // then, depending on the color mode, get the actual data, color
+      // domain, and color legend.
+      switch(this.state.currentColorMode) {
+        case '_am_color_change':
+          data = this.getData(this.getChangeAnalysis);
+          domain = this.getChangeDomain(data);
+          legend = colorLegendChange;
+          break;
+
+        case '_am_color_52week':
+          data = this.getData(this.getWeek52Analysis);
+          domain = this.getWeek52Domain();
+          legend = colorLegend52;
+          break;
+      }
+    }
+    // now we make a bubble chart! yay!
+    return <ReactBubbleChart
+      className="stock-visualizer"
+      colorLegend={legend}
+      data={data}
+      onClick={isEntities ? null : getNews}
+      fixedDomain={domain}
+    />;
+  }
+
   /**
    * Given a function to determine a stocks color value, and
    * a function to determine a stocks time value, produce an array
    * of data that can be consumed by ReactBubbleChart
    */
   getData(colorFunc) {
-    var data = this.props.stockData.map(s => {
+    var data = this.state.stockData.map(s => {
       return {
         value: s.last,
         _id: s.symbol,
@@ -148,43 +199,21 @@ export default class StockVisualizer extends React.Component {
   }
 
   /**
-   * Render town.
+   * When mounting/unmounting add/remove change listeners to stores
    */
-  render() {
-    var data, legend, domain, sizeFunc;
-    var isEntities = !!this.props.entityData.length;
-
-    if (isEntities) {
-      data = this.props.entityData;
-      legend = colorLegendEntity;
-      domain = {
-        min: -1,
-        max: 1
-      }
-    } else {
-      // then, depending on the color mode, get the actual data, color
-      // domain, and color legend.
-      switch(this.props.currentColorMode) {
-        case '_am_color_change':
-          data = this.getData(this.getChangeAnalysis);
-          domain = this.getChangeDomain(data);
-          legend = colorLegendChange;
-          break;
-
-        case '_am_color_52week':
-          data = this.getData(this.getWeek52Analysis);
-          domain = this.getWeek52Domain();
-          legend = colorLegend52;
-          break;
-      }
+  componentDidMount() {
+    StockDataStore.addChangeListener(this._onChange);
+    PageStateStore.addChangeListener(this._onChange);
+  }
+  componentWillUnmount() {
+    StockDataStore.removeChangeListener(this._onChange);
+    PageStateStore.removeChangeListener(this._onChange);
+  }
+  _getStateObj() {
+    return {
+      stockData: StockDataStore.getStockData(),
+      entityData: StockDataStore.getEntities(),
+      currentColorMode: PageStateStore.getCurrentAnalysisColorMode()
     }
-    // now we make a bubble chart! yay!
-    return <ReactBubbleChart
-      className="stock-visualizer"
-      colorLegend={legend}
-      data={data}
-      onClick={isEntities ? null : getNews}
-      fixedDomain={domain}
-    />;
   }
 }

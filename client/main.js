@@ -17,9 +17,13 @@
 import React             from 'react';
 import classNames        from 'classnames';
 import Constants         from './constants/Constants';
+import {
+  Router,
+  Route,
+  IndexRoute
+} from 'react-router';
 
 import CompaniesStore    from './stores/CompaniesStore';
-import StockDataStore    from './stores/StockDataStore';
 import NewsArticlesStore from './stores/NewsArticlesStore';
 import PageStateStore    from './stores/PageStateStore';
 import StockHistoryStore from './stores/StockHistoryStore';
@@ -64,21 +68,7 @@ class StockInsights extends React.Component {
           potentialCompanies={this.state.potentialCompanies}
           condensed={this.state.condensedCompanies}
           selectedCompanies={this.state.selectedCompanies} />
-        <div className="cool-stuff">
-          <StockVisualizer stockData={this.state.stockData}
-            entityData={this.state.entityData}
-            currentColorMode={this.state.currentColorMode}
-            currentSizeMode={this.state.currentSizeMode} />
-          {!!this.state.selectedCompanies.length && 
-            <ArticleList selectedCompanies={this.state.selectedCompanies}
-              articles={this.state.articles} />
-          }
-        </div>
-        {this.state.selectedCompanies.length ?
-          <GraphTown histories={this.state.histories} />
-          :
-          <AnalysisToggle analysisColorModes={this.state.analysisColorModes} />
-        }
+        {this.props.children}
       </div>
     );
   }
@@ -88,7 +78,6 @@ class StockInsights extends React.Component {
    */
   componentDidMount() {
     CompaniesStore.addChangeListener(this._onChange);
-    StockDataStore.addChangeListener(this._onChange);
     NewsArticlesStore.addChangeListener(this._onChange);
     PageStateStore.addChangeListener(this._onChange);
     StockHistoryStore.addChangeListener(this._onChange);
@@ -100,7 +89,6 @@ class StockInsights extends React.Component {
   }
   componentWillUnmount() {
     CompaniesStore.removeChangeListener(this._onChange);
-    StockDataStore.removeChangeListener(this._onChange);
     NewsArticlesStore.removeChangeListener(this._onChange);
     PageStateStore.removeChangeListener(this._onChange);
     StockHistoryStore.removeChangeListener(this._onChange);
@@ -113,8 +101,6 @@ class StockInsights extends React.Component {
     return {
       companies: CompaniesStore.getCompanies(),
       potentialCompanies: CompaniesStore.getPotentialCompanies(),
-      stockData: StockDataStore.getStockData(),
-      entityData: StockDataStore.getEntities(),
       isEmbedded: PageStateStore.getEmbeddedMode(),
       analysisColorModes: PageStateStore.getAnalysisColorModes(),
       currentColorMode: PageStateStore.getCurrentAnalysisColorMode(),
@@ -127,4 +113,10 @@ class StockInsights extends React.Component {
 };
 
 React.initializeTouchEvents(true);
-React.render(<StockInsights />, document.body);
+React.render((
+  <Router>
+    <Route path="/" component={StockInsights}>
+      <IndexRoute component={StockVisualizer} />
+    </Route>
+  </Router>
+), document.body);
