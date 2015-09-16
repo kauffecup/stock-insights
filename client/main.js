@@ -36,6 +36,10 @@ import {
   getStockData
 } from './Actions';
 
+import {
+  setCompanies
+} from './URLActions';
+
 // make sure all es6 things work correctly in all browsers
 require('babel/polyfill');
 
@@ -117,12 +121,25 @@ class Insights extends React.Component {
   }
 }
 
+class CoolStuff extends React.Component {
+  render() {
+    return (
+      <div className="cool-stuff">
+        {this.props.children}
+      </div>
+    );
+  }
+}
+
 React.initializeTouchEvents(true);
 React.render((
   <Router>
     <Route path="/" component={StockInsights}>
       <IndexRoute component={AnalysisToggle} />
-      <Route path="companies/:ids" component={Insights} />
+      <Route path=":companies" component={CoolStuff}>
+        <IndexRoute component={AnalysisToggle} />
+        <Route path="symbols/:symbols" component={Insights} />
+      </Route>
     </Route>
   </Router>
 ), document.body);
