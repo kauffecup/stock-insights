@@ -31,7 +31,6 @@ import StockHistoryStore from './stores/StockHistoryStore';
 import CompanyContainer  from './components/CompanyContainer';
 import StockVisualizer   from './components/StockVisualizer';
 import ArticleList       from './components/ArticleList';
-import AnalysisToggle    from './components/AnalysisToggle';
 import GraphTown         from './components/GraphTown';
 import {
   getStockData
@@ -102,8 +101,6 @@ class StockInsights extends React.Component {
       companies: CompaniesStore.getCompanies(),
       potentialCompanies: CompaniesStore.getPotentialCompanies(),
       isEmbedded: PageStateStore.getEmbeddedMode(),
-      analysisColorModes: PageStateStore.getAnalysisColorModes(),
-      currentColorMode: PageStateStore.getCurrentAnalysisColorMode(),
       condensedCompanies: PageStateStore.getCondensedCompanies(),
       selectedCompanies: NewsArticlesStore.getSelectedCompanies(),
       articles: NewsArticlesStore.getArticles(),

@@ -14,7 +14,8 @@
 // limitations under the License.
 //------------------------------------------------------------------------------
 
-import React      from 'react';
+import React          from 'react';
+import PageStateStore from '../stores/PageStateStore';
 import {
   switchAnalysisColorMode,
   switchAnalysisSizeMode
@@ -43,14 +44,35 @@ class AnalysisToggler extends React.Component {
  * Create a toggler for color mode and size mode
  */
 export default class AnalysisToggle extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = this._getStateObj();
+    // need to initialize the function this way so that we have a reference
+    // to the arrow function. this way we can add/remove it properly
+    this._onChange = e => this.setState(this._getStateObj());
+  }
   render() {
     return (
       <form className="analysis-toggle">
         <AnalysisToggler className="color"
           onChange={e => switchAnalysisColorMode(e.target.id)}
-          analysisModes={this.props.analysisColorModes}
+          analysisModes={this.state.analysisColorModes}
           name="Color" />
       </form>
     );
+  }
+  /**
+   * When mounting/unmounting add/remove change listeners to stores
+   */
+  componentDidMount() {
+    PageStateStore.addChangeListener(this._onChange);
+  }
+  componentWillUnmount() {
+    PageStateStore.removeChangeListener(this._onChange);
+  }
+  _getStateObj() {
+    return {
+      analysisColorModes: PageStateStore.getAnalysisColorModes()
+    }
   }
 }
