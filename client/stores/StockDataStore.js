@@ -14,10 +14,11 @@
 // limitations under the License.
 //------------------------------------------------------------------------------
 
-import _Store     from './_Store';
-import Dispatcher from '../Dispatcher';
-import Constants  from '../constants/Constants';
-import assign     from 'object-assign';
+import _Store         from './_Store';
+import Dispatcher     from '../Dispatcher';
+import Constants      from '../constants/Constants';
+import assign         from 'object-assign';
+import PageStateStore from './PageStateStore';
 
 /** @type {Object} A map of symbols to data about that symbol */
 var _stockData = {};
@@ -140,8 +141,11 @@ Dispatcher.register(function(action) {
       break;
 
     case Constants.NEWS_DATA:
-      addEntities(action.news.news || action.news, action.news.symbol || action.symbol);
-      StockDataStore.emitChange();
+      var scs = PageStateStore.getSelectedCompanies();
+      if (scs.length && scs.indexOf(action.news.symbol > -1)) {
+        addEntities(action.news.news, action.news.symbol);
+        StockDataStore.emitChange();
+      }
       break;
 
     case Constants.CLOSE_ARTICLE_LIST:

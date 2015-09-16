@@ -14,16 +14,21 @@
 // limitations under the License.
 //------------------------------------------------------------------------------
 
-import _Store     from'./_Store';
-import Dispatcher from'../Dispatcher';
-import Constants  from'../constants/Constants';
-import assign     from'object-assign';
+import _Store         from './_Store';
+import Dispatcher     from '../Dispatcher';
+import Constants      from '../constants/Constants';
+import assign         from 'object-assign';
+import PageStateStore from './PageStateStore';
 
 var _stockHistoriesMap = {};
 
-function addHistories(histories) {
-  for (var symbol in histories) {
-    _stockHistoriesMap[symbol.toUpperCase()] = histories[symbol];
+function addHistories(histories, selectedCompanies) {
+  if (selectedCompanies.length) {
+    for (var symbol in histories) {
+      if (selectedCompanies.indexOf(symbol) > -1) {
+        _stockHistoriesMap[symbol.toUpperCase()] = histories[symbol];
+      }
+    }
   }
 }
 
@@ -53,7 +58,7 @@ var StockHistoryStore = assign({}, _Store, {
 Dispatcher.register(function(action) {
   switch(action.actionType) {
     case Constants.STOCK_HISTORY_DATA:
-      addHistories(action.histories);
+      addHistories(action.histories, PageStateStore.getSelectedCompanies());
       StockHistoryStore.emitChange();
       break;
 

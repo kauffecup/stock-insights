@@ -14,10 +14,11 @@
 // limitations under the License.
 //------------------------------------------------------------------------------
 
-import _Store     from'./_Store';
-import Dispatcher from'../Dispatcher';
-import Constants  from'../constants/Constants';
-import assign     from'object-assign';
+import _Store         from './_Store';
+import Dispatcher     from '../Dispatcher';
+import Constants      from '../constants/Constants';
+import assign         from 'object-assign';
+import PageStateStore from './PageStateStore';
 
 var _articleMap = {};
 
@@ -69,10 +70,11 @@ Dispatcher.register(function(action) {
     // when we get the articles, only set and emit if an article is
     // still selected. otherwise we know the window has been closed.
     case Constants.NEWS_DATA:
-      // if (_selectedCompanies.length && _selectedCompanies.indexOf(action.news.symbol > -1)) {
+      var scs = PageStateStore.getSelectedCompanies();
+      if (scs.length && scs.indexOf(action.news.symbol > -1)) {
         addArticles(action.news.news, action.news.symbol);
         NewsArticlesStore.emitChange();
-      // }
+      }
       break;
 
     // when closing the article list, clear the selected company and
