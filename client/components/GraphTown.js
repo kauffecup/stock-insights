@@ -38,6 +38,7 @@ export default class GraphTown extends React.Component {
       <div className="graph-town">
         <LineChart data={this.adaptData()}
           xAxisTickInterval={{unit: 'day', interval: 7}}
+          yAxisTickCount={4}
           width={React.findDOMNode(this).clientWidth}
           height={React.findDOMNode(this).clientHeight}
           legend={true}
