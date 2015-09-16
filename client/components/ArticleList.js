@@ -14,8 +14,9 @@
 // limitations under the License.
 //------------------------------------------------------------------------------
 
-import React      from 'react';
-import classnames from 'classnames';
+import React             from 'react';
+import classnames        from 'classnames';
+import NewsArticlesStore from '../stores/NewsArticlesStore';
 import {
   closeArticleList
 } from '../Actions';
@@ -35,25 +36,46 @@ class Article extends React.Component {
 }
 
 export default class ArticleList extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = this._getStateObj();
+    // need to initialize the function this way so that we have a reference
+    // to the arrow function. this way we can add/remove it properly
+    this._onChange = e => this.setState(this._getStateObj());
+  }
+
   render() {
-    var articles = this.props.articles.sort((a1, a2) => {
+    var articles = this.state.articles.sort((a1, a2) => {
       var title1 = a1.title.toLowerCase();
       var title2 = a2.title.toLowerCase();
       if (title1 < title2) { return -1; }
       else if (title1 > title2) {return 1; }
       else { return 0; }
     }).map(a => <Article article={a} />);
-    var classes = classnames('article-list', {
-      'has-article': !!this.props.selectedCompany
-    });
     return (
-      <div className={classes} onClick={e => e.stopPropagation()}>
+      <div className="article-list" onClick={e => e.stopPropagation()}>
         <button className="back" onClick={closeArticleList}>x</button>
-        <h2>{this.props.selectedCompanies.join(', ')}</h2>
+        <h2>{this.state.selectedCompanies.join(', ')}</h2>
         <ul className="the-articles">
           {articles}
         </ul>
       </div>
     );
+  }
+
+  /**
+   * When mounting/unmounting add/remove change listeners to stores
+   */
+  componentDidMount() {
+    NewsArticlesStore.addChangeListener(this._onChange);
+  }
+  componentWillUnmount() {
+    NewsArticlesStore.removeChangeListener(this._onChange);
+  }
+  _getStateObj() {
+    return {
+      selectedCompanies: NewsArticlesStore.getSelectedCompanies(),
+      articles: NewsArticlesStore.getArticles()
+    }
   }
 }

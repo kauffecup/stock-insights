@@ -16,7 +16,6 @@
 
 import React             from 'react';
 import ReactBubbleChart  from 'react-bubble-chart';
-import AnalysisToggle    from './AnalysisToggle';
 import StockDataStore    from '../stores/StockDataStore';
 import PageStateStore    from '../stores/PageStateStore';
 import {
@@ -78,10 +77,7 @@ export default class StockVisualizer extends React.Component {
     if (isEntities) {
       data = this.state.entityData;
       legend = colorLegendEntity;
-      domain = {
-        min: -1,
-        max: 1
-      }
+      domain = { min: -1, max: 1 };
     } else {
       // then, depending on the color mode, get the actual data, color
       // domain, and color legend.
@@ -101,14 +97,12 @@ export default class StockVisualizer extends React.Component {
     }
     // now we make a bubble chart! yay!
     return (
-      <div className="stock-visualizer">
-        <ReactBubbleChart
-          colorLegend={legend}
-          data={data}
-          onClick={isEntities ? null : getNews}
-          fixedDomain={domain} />
-        {isEntities ? null : <AnalysisToggle />}
-      </div>
+      <ReactBubbleChart
+        className="stock-visualizer"
+        colorLegend={legend}
+        data={data}
+        onClick={isEntities ? null : getNews}
+        fixedDomain={domain} />
     );
   }
 

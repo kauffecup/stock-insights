@@ -146,28 +146,23 @@ button {
     flex: 2;
     position: relative;
     display: flex;
-    flex-direction: column;
-    .bubble-chart-container {
-      flex: 1;
-      position: relative;
-      display: flex;
-      user-select: none;
-      justify-content: center;
-      overflow: hidden;
-      .bubble-chart-text {
-        .bubble-label {
-          text-align: center;
-          overflow: hidden;
-          cursor: pointer;
-          display: flex;
-          align-items: center;
-          justify-content: space-around;
-          border-radius: 50%;
-          will-change: left, top, height, width;
-          &:hover {
-            overflow: visible;
-            font-weight: bold;
-          }
+    user-select: none;
+    justify-content: center;
+    overflow: hidden;
+
+    .bubble-chart-text {
+      .bubble-label {
+        text-align: center;
+        overflow: hidden;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: space-around;
+        border-radius: 50%;
+        will-change: left, top, height, width;
+        &:hover {
+          overflow: visible;
+          font-weight: bold;
         }
       }
     }

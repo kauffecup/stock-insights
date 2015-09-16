@@ -26,10 +26,10 @@ import {
 import CompaniesStore    from './stores/CompaniesStore';
 import NewsArticlesStore from './stores/NewsArticlesStore';
 import PageStateStore    from './stores/PageStateStore';
-import StockHistoryStore from './stores/StockHistoryStore';
 
 import CompanyContainer  from './components/CompanyContainer';
 import StockVisualizer   from './components/StockVisualizer';
+import AnalysisToggle    from './components/AnalysisToggle';
 import ArticleList       from './components/ArticleList';
 import GraphTown         from './components/GraphTown';
 import {
@@ -67,6 +67,7 @@ class StockInsights extends React.Component {
           potentialCompanies={this.state.potentialCompanies}
           condensed={this.state.condensedCompanies}
           selectedCompanies={this.state.selectedCompanies} />
+        <StockVisualizer />
         {this.props.children}
       </div>
     );
@@ -79,7 +80,6 @@ class StockInsights extends React.Component {
     CompaniesStore.addChangeListener(this._onChange);
     NewsArticlesStore.addChangeListener(this._onChange);
     PageStateStore.addChangeListener(this._onChange);
-    StockHistoryStore.addChangeListener(this._onChange);
     // if we already have companies, request the stock data to populate
     // our visualizations
     if (this.state.companies.length) {
@@ -90,7 +90,6 @@ class StockInsights extends React.Component {
     CompaniesStore.removeChangeListener(this._onChange);
     NewsArticlesStore.removeChangeListener(this._onChange);
     PageStateStore.removeChangeListener(this._onChange);
-    StockHistoryStore.removeChangeListener(this._onChange);
   }
 
   /**
@@ -102,18 +101,28 @@ class StockInsights extends React.Component {
       potentialCompanies: CompaniesStore.getPotentialCompanies(),
       isEmbedded: PageStateStore.getEmbeddedMode(),
       condensedCompanies: PageStateStore.getCondensedCompanies(),
-      selectedCompanies: NewsArticlesStore.getSelectedCompanies(),
-      articles: NewsArticlesStore.getArticles(),
-      histories: StockHistoryStore.getStockHistories()
+      selectedCompanies: NewsArticlesStore.getSelectedCompanies()
     }
   }
 };
+
+class Insights extends React.Component {
+  render() {
+    return (
+      <div className="insights">
+        <ArticleList />
+        <GraphTown />
+      </div>
+    );
+  }
+}
 
 React.initializeTouchEvents(true);
 React.render((
   <Router>
     <Route path="/" component={StockInsights}>
-      <IndexRoute component={StockVisualizer} />
+      <IndexRoute component={AnalysisToggle} />
+      <Route path="companies/:ids" component={Insights} />
     </Route>
   </Router>
 ), document.body);

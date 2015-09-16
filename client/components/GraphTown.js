@@ -15,16 +15,25 @@
 //------------------------------------------------------------------------------
 
 import React       from 'react';
+import StockHistoryStore from '../stores/StockHistoryStore';
 import {LineChart} from 'react-d3/linechart';
 
 export default class GraphTown extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = this._getStateObj();
+    // need to initialize the function this way so that we have a reference
+    // to the arrow function. this way we can add/remove it properly
+    this._onChange = e => this.setState(this._getStateObj());
+  }
+
   adaptData() {
     var myData = [];
-    for (var symbol in this.props.histories) {
+    for (var symbol in this.state.histories) {
       myData.push({
         name: symbol,
         strokeWidth: 3,
-        values: this.props.histories[symbol].map(v => ({
+        values: this.state.histories[symbol].map(v => ({
           x: new Date(v.date),
           y: v.close
         }))
@@ -38,16 +47,34 @@ export default class GraphTown extends React.Component {
       <div className="graph-town">
         <LineChart data={this.adaptData()}
           xAxisTickInterval={{unit: 'day', interval: 7}}
-          width={React.findDOMNode(this).clientWidth}
-          height={React.findDOMNode(this).clientHeight}
+          width={this.state.width || 0}
+          height={this.state.height || 0}
           legend={true}
           viewBoxObject={{
             x: 0,
             y: 0,
-            height: React.findDOMNode(this).clientHeight,
-            width: React.findDOMNode(this).clientWidth
+            height: this.state.height || 0,
+            width: this.state.width || 0
           }} />
       </div>
     );
+  }
+    /**
+   * When mounting/unmounting add/remove change listeners to stores
+   */
+  componentDidMount() {
+    StockHistoryStore.addChangeListener(this._onChange);
+    this.setState({
+      width: React.findDOMNode(this).clientWidth,
+      height: React.findDOMNode(this).clientHeight
+    })
+  }
+  componentWillUnmount() {
+    StockHistoryStore.removeChangeListener(this._onChange);
+  }
+  _getStateObj() {
+    return {
+      histories: StockHistoryStore.getStockHistories()
+    }
   }
 }
