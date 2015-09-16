@@ -72,14 +72,20 @@ export function getSentiment(symbol, entity) {
   })
 }
 
-/** Get the articles for a given company */
+/** Get the articles for a given company. This also selects the company and gets its stock history. */
 export function getNews(symbol) {
   symbol = symbol._id || symbol.symbol || symbol;
-  Dispatcher.dispatch({actionType: Constants.NEWS_LOADING, symbol: symbol});
+  selectCompany(symbol);
   getStockHistory([symbol]);
+  Dispatcher.dispatch({actionType: Constants.NEWS_LOADING, symbol: symbol});
   stockNews(symbol).then(news => {
     Dispatcher.dispatch({actionType: Constants.NEWS_DATA, news: news});
   });
+}
+
+/* Select a company */
+export function selectCompany(symbol) {
+  Dispatcher.dispatch({actionType: Constants.SELECT_COMPANY, symbol: symbol});
 }
 
 /* Deselect a company */

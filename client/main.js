@@ -119,7 +119,7 @@ class StockInsights extends React.Component {
       analysisColorModes: PageStateStore.getAnalysisColorModes(),
       currentColorMode: PageStateStore.getCurrentAnalysisColorMode(),
       condensedCompanies: PageStateStore.getCondensedCompanies(),
-      selectedCompanies: NewsArticlesStore.getSelectedCompanies(),
+      selectedCompanies: PageStateStore.getSelectedCompanies(),
       articles: NewsArticlesStore.getArticles(),
       histories: StockHistoryStore.getStockHistories()
     }

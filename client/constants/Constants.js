@@ -21,6 +21,7 @@ export default keyMirror({
   COMPANY_DATA: null,
   ADD_COMPANY: null,
   REMOVE_COMPANY: null,
+  SELECT_COMPANY: null,
   DESELECT_COMPANY: null,
   CLEAR_POTENTIAL_COMPANIES: null,
   STOCK_PRICE_LOADING: null,

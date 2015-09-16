@@ -19,21 +19,13 @@ import Dispatcher from'../Dispatcher';
 import Constants  from'../constants/Constants';
 import assign     from'object-assign';
 
-var _selectedCompanies = [];
 var _articleMap = {};
 
 /**
  * Here are some setters
  */
-function selectCompany (company) {
-  _selectedCompanies.push(company);
-}
-function clearCompanies () {
-  _selectedCompanies = [];
-}
 function removeCompany (symbol) {
   delete _articleMap[symbol.toLowerCase()];
-  _selectedCompanies.splice(_selectedCompanies.indexOf(symbol), 1);
 }
 function addArticles (newArticles, symbol) {
   _articleMap[symbol.toLowerCase()] = newArticles.map(a => ({
@@ -59,9 +51,6 @@ function flattenArticles () {
  * themselves
  */
 var NewsArticlesStore = assign({}, _Store, {
-  getSelectedCompanies: function () {
-    return _selectedCompanies
-  },
   getArticles: function () {
     return flattenArticles();
   }
@@ -73,26 +62,22 @@ var NewsArticlesStore = assign({}, _Store, {
  */
 Dispatcher.register(function(action) {
   switch(action.actionType) {
-    // clear existing articles if we're about to load a new symbol
-    // only emit a change... if a change happened
+    // right now dont do anything. eventually we'll have some kind of loading state
     case Constants.NEWS_LOADING:
-        selectCompany(action.symbol);
-        NewsArticlesStore.emitChange();
       break;
 
     // when we get the articles, only set and emit if an article is
     // still selected. otherwise we know the window has been closed.
     case Constants.NEWS_DATA:
-      if (_selectedCompanies.length) {
-        addArticles(action.news.news || action.news, action.news.symbol || action.symbol);
+      // if (_selectedCompanies.length && _selectedCompanies.indexOf(action.news.symbol > -1)) {
+        addArticles(action.news.news, action.news.symbol);
         NewsArticlesStore.emitChange();
-      }
+      // }
       break;
 
     // when closing the article list, clear the selected company and
     // loaded articles
     case Constants.CLOSE_ARTICLE_LIST:
-      clearCompanies();
       clearArticles();
       NewsArticlesStore.emitChange();
       break;

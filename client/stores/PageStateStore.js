@@ -20,6 +20,8 @@ import Constants  from '../constants/Constants';
 import assign     from 'object-assign';
 import clone      from 'clone';
 
+var _selectedCompanies = [];
+
 /** @type {Boolean} When condensed, only display the ticker symbol */
 var _condensedCompanies = false;
 
@@ -45,9 +47,17 @@ var _isEmbedded = _urlCompanies && _urlCompanies.length;
 function setSelectedColorMode(newMode) {
   _selectedColorMode = newMode;
 }
-
 function toggleCondensedCompanies() {
   _condensedCompanies = !_condensedCompanies;
+}
+function selectCompany (company) {
+  _selectedCompanies.push(company);
+}
+function clearCompanies () {
+  _selectedCompanies = [];
+}
+function removeCompany (symbol) {
+  _selectedCompanies.splice(_selectedCompanies.indexOf(symbol), 1);
 }
 
 /**
@@ -72,6 +82,9 @@ var PageStateStore = assign({}, _Store, {
   },
   getCurrentAnalysisColorMode: function () {
     return _selectedColorMode;
+  },
+  getSelectedCompanies: function () {
+    return _selectedCompanies
   }
 });
 
@@ -93,6 +106,23 @@ Dispatcher.register(function(action) {
     // toggle the state of the company chiclets
     case Constants.TOGGLE_CONDENSED_COMPANIES:
       toggleCondensedCompanies();
+      PageStateStore.emitChange();
+      break;
+
+    case Constants.SELECT_COMPANY:
+      selectCompany(action.symbol);
+      PageStateStore.emitChange();
+      break;
+
+    case Constants.DESELECT_COMPANY:
+      removeCompany(action.symbol);
+      PageStateStore.emitChange();
+      break;
+
+    // when closing the article list, clear the selected company and
+    // loaded articles
+    case Constants.CLOSE_ARTICLE_LIST:
+      clearCompanies();
       PageStateStore.emitChange();
       break;
 
