@@ -20,41 +20,38 @@ import {
   getNews
 } from '../Actions';
 
-/**
- * The color legend we will use when colors reflect change
- */
-var colorLegendChange = [
-  // reds from dark to light
-  {color: "#67000d", text: '(-) Change'},  "#a50f15", "#cb181d", "#ef3b2c", "#fb6a4a", "#fc9272", "#fcbba1", "#fee0d2",
-  //neutral grey
-  "#f0f0f0",
-  // blues from light to dark
-  "#deebf7", "#c6dbef", "#9ecae1", "#6baed6", "#4292c6", "#2171b5", '#08519c', {color: "#08306b", text: '(+) Change'}
-];
-
-/**
- * The color legend we will use when colors reflect the 52 week analysis
- */
-var colorLegend52 = [
+function generateLegend(lowText, highText) {
+  return [
     // reds from dark to light
-  {color: "#67000d", text: '↓ 52 Low'},  "#a50f15", "#cb181d", "#ef3b2c", "#fb6a4a", "#fc9272", "#fcbba1", "#fee0d2",
-  //neutral grey
-  "#f0f0f0",
-  // blues from light to dark
-  "#deebf7", "#c6dbef", "#9ecae1", "#6baed6", "#4292c6", "#2171b5", '#08519c', {color: "#08306b", text: '↑ 52 High'}
-];
+    {color: "#67000d", textColor: '#fee0d2', text: lowText},
+    {color: "#a50f15", textColor: '#fee0d2'},
+    "#cb181d",
+    "#ef3b2c",
+    "#fb6a4a",
+    "#fc9272",
+    "#fcbba1",
+    "#fee0d2",
+    //neutral grey
+    "#f0f0f0",
+    // blues from light to dark
+    "#deebf7",
+    "#c6dbef",
+    "#9ecae1",
+    "#6baed6",
+    "#4292c6",
+    "#2171b5",
+    {color: '#08519c', textColor: '#deebf7'},
+    {color: "#08306b", textColor: '#deebf7', text: highText}
+  ];
+}
 
-/**
- * The color legend we will use when colors reflect change
- */
-var colorLegendEntity = [
-  // reds from dark to light
-  {color: "#67000d", text: '(-) Sentiment'},  "#a50f15", "#cb181d", "#ef3b2c", "#fb6a4a", "#fc9272", "#fcbba1", "#fee0d2",
-  //neutral grey
-  "#f0f0f0",
-  // blues from light to dark
-  "#deebf7", "#c6dbef", "#9ecae1", "#6baed6", "#4292c6", "#2171b5", '#08519c', {color: "#08306b", text: '(+) Sentiment'}
-];
+/** The color legend we will use when colors reflect change */
+var colorLegendChange = generateLegend('(-) Change', '(+) Change');
+/** The color legend we will use when colors reflect the 52 week analysis */
+var colorLegend52 = generateLegend('↓ 52 Low', '↑ 52 High');
+/** The color legend we will use when colors reflect change */
+var colorLegendEntity = generateLegend('(-) Sentiment', '(+) Sentiment');
+
 
 export default class StockVisualizer extends React.Component {
   /**
@@ -180,6 +177,8 @@ export default class StockVisualizer extends React.Component {
     }
     // now we make a bubble chart! yay!
     return <ReactBubbleChart
+      legend={true}
+      legendSpacing={0}
       className="stock-visualizer"
       colorLegend={legend}
       data={data}
