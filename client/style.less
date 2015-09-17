@@ -135,6 +135,18 @@ button {
     }
   }
 
+  .date-slider {
+    max-width: 600px;
+    width: 60%;
+    margin-right: auto;
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+    .date-slider-label {
+      width: 220px;
+    }
+  }
+
   .cool-stuff {
     flex: 1;
     position: relative;
@@ -391,5 +403,94 @@ button {
     .analysis-toggle {
       .title { display: none; }
     }
+  }
+}
+
+@thumb-radius: 2px;
+@thumb-height: 24px;
+@thumb-width: 12px;
+@thumb-border-width: 1px;
+@thumb-border-color: #fff;
+
+@track-width: 100%;
+@track-height: 5px;
+
+@track-radius: 5px;
+@contrast: 5%;
+
+.track() {
+  width: @track-width;
+  height: @track-height;
+  cursor: pointer;
+  animate: 0.2s;
+}
+
+.thumb() {
+  border: @thumb-border-width solid @thumb-border-color;
+  height: @thumb-height;
+  width: @thumb-width;
+  border-radius: @thumb-radius;
+  background: @accent-color;
+  cursor: pointer;
+}
+
+input[type=range] {
+  -webkit-appearance: none;
+  margin: @thumb-height/2 0;
+  width: @track-width;
+
+  &:focus {
+    outline: none;
+  }
+
+  &::-webkit-slider-runnable-track {
+    .track();
+    background: @secondary-text-color;
+    border-radius: @track-radius;
+  }
+  
+  &::-webkit-slider-thumb {
+    .thumb();
+    -webkit-appearance: none;
+    margin-top: ((@track-height) / 2) - (@thumb-height / 2);
+  }
+
+  &:focus::-webkit-slider-runnable-track {
+    background: lighten(@secondary-text-color, @contrast);
+  }
+
+  &::-moz-range-track {
+    .track();
+    background: @secondary-text-color;
+    border-radius: @track-radius;
+  }
+  &::-moz-range-thumb {
+     .thumb();
+  }
+
+  &::-ms-track {
+    .track(); 
+    background: transparent;
+    border-color: transparent;
+    border-width: @thumb-width 0;
+    color: transparent;
+  }
+
+  &::-ms-fill-lower {
+    background: darken(@secondary-text-color, @contrast);
+    border-radius: @track-radius*2;
+  }
+  &::-ms-fill-upper {
+    background: @secondary-text-color;
+    border-radius: @track-radius*2;
+  }
+  &::-ms-thumb {
+    .thumb();
+  }
+  &:focus::-ms-fill-lower {
+    background: @secondary-text-color;
+  }
+  &:focus::-ms-fill-upper {
+    background: lighten(@secondary-text-color, @contrast);
   }
 }

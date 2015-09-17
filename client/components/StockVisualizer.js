@@ -15,6 +15,8 @@
 //------------------------------------------------------------------------------
 
 import React             from 'react';
+import moment            from 'moment';
+import clone             from 'clone';
 import ReactBubbleChart  from 'react-bubble-chart';
 import {
   getNews
@@ -59,8 +61,8 @@ export default class StockVisualizer extends React.Component {
    * a function to determine a stocks time value, produce an array
    * of data that can be consumed by ReactBubbleChart
    */
-  getData(colorFunc) {
-    var data = this.props.stockData.map(s => {
+  getData(data, colorFunc) {
+    data = data.map(s => {
       return {
         value: s.last,
         _id: s.symbol,
@@ -159,17 +161,41 @@ export default class StockVisualizer extends React.Component {
         max: 1
       }
     } else {
+      var {currentDate, dateArr, historiesByDate, stockDataMap} = this.props;
+      var startOfCurrentDate = moment(currentDate).startOf('day');
+      var currentPos = dateArr.length;
+      for (var i = 0; i < dateArr.length; i++) {
+        if (moment(dateArr[i]).startOf('day').isSame(startOfCurrentDate)) {
+          currentPos = i;
+          break;
+        }
+      }
+      var data;
+      if (currentPos >= historiesByDate.length) {
+        data = this.props.stockData;
+      } else {
+        data = [];
+        var valueMap = historiesByDate[currentPos].valueMap;
+        for (var symbol in valueMap) {
+          var myData = clone(valueMap[symbol]);
+          myData['week_52_high'] = stockDataMap[symbol].week_52_high;
+          myData['week_52_low'] = stockDataMap[symbol].week_52_low;
+          myData['change'] = myData.close - myData.open;
+          myData['last'] = myData.close;
+          data.push(myData);
+        }
+      }
       // then, depending on the color mode, get the actual data, color
       // domain, and color legend.
       switch(this.props.currentColorMode) {
         case '_am_color_change':
-          data = this.getData(this.getChangeAnalysis);
+          data = this.getData(data, this.getChangeAnalysis);
           domain = this.getChangeDomain(data);
           legend = colorLegendChange;
           break;
 
         case '_am_color_52week':
-          data = this.getData(this.getWeek52Analysis);
+          data = this.getData(data, this.getWeek52Analysis);
           domain = this.getWeek52Domain();
           legend = colorLegend52;
           break;

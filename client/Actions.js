@@ -108,3 +108,8 @@ export function switchAnalysisColorMode(id) {
 export function toggleCondensedCompanies() {
   Dispatcher.dispatch({actionType: Constants.TOGGLE_CONDENSED_COMPANIES});
 }
+
+/** Change the date */
+export function setDate(date) {
+  Dispatcher.dispatch({actionType: Constants.SWITCH_DATE, date: date});
+}

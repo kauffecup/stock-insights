@@ -19,8 +19,13 @@ import Dispatcher from '../Dispatcher';
 import Constants  from '../constants/Constants';
 import assign     from 'object-assign';
 import clone      from 'clone';
+import moment     from 'moment';
 
 var _selectedCompanies = [];
+// initialize current date at today
+var _currentDate = moment();
+/** An array of moment dates */
+var _dateArr = [];
 
 /** @type {Boolean} When condensed, only display the ticker symbol */
 var _condensedCompanies = false;
@@ -29,10 +34,10 @@ var _condensedCompanies = false;
 var _selectedColorMode = '_am_color_change';
 /** @type {Array} The possible color modes - each has a label and id */
 var _analysisColorModes = [{
-  label: 'Today\'s Change',
+  label: 'Change',
   id: '_am_color_change'
 }, {
-  label: 'Current Value Relative to 52 Week',
+  label: 'Value Relative to 52 Week',
   id: '_am_color_52week'
 }];
 
@@ -50,14 +55,23 @@ function setSelectedColorMode(newMode) {
 function toggleCondensedCompanies() {
   _condensedCompanies = !_condensedCompanies;
 }
-function selectCompany (company) {
+function selectCompany(company) {
   _selectedCompanies.push(company);
 }
 function clearCompanies () {
   _selectedCompanies = [];
 }
-function removeCompany (symbol) {
+function removeCompany(symbol) {
   _selectedCompanies.splice(_selectedCompanies.indexOf(symbol), 1);
+}
+function setDates(histories) {
+  for (var symbol in histories) {
+    _dateArr = histories[symbol].map(h => moment(h.date));
+    break;
+  }
+}
+function setDate(newDate) {
+  _currentDate = newDate;
 }
 
 /**
@@ -85,6 +99,12 @@ var PageStateStore = assign({}, _Store, {
   },
   getSelectedCompanies: function () {
     return _selectedCompanies
+  },
+  getDate: function () {
+    return _currentDate;
+  },
+  getDateArr: function () {
+    return _dateArr;
   }
 });
 
@@ -101,6 +121,11 @@ Dispatcher.register(function(action) {
         setSelectedColorMode(action.id);
         PageStateStore.emitChange();
       }
+      break;
+
+    case Constants.STOCK_HISTORY_DATA:
+      setDates(action.histories);
+      PageStateStore.emitChange();
       break;
 
     // toggle the state of the company chiclets
@@ -123,6 +148,11 @@ Dispatcher.register(function(action) {
     // loaded articles
     case Constants.CLOSE_ARTICLE_LIST:
       clearCompanies();
+      PageStateStore.emitChange();
+      break;
+
+    case Constants.SWITCH_DATE:
+      setDate(action.date);
       PageStateStore.emitChange();
       break;
 

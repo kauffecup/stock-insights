@@ -75,10 +75,11 @@ export default class CompanySearcher extends React.Component {
   }
 
   /**
-   * When adding a company... add the company and then refocus the input
+   * When adding a company... add the company, clear and refocus the input
    */
   handleAdd(company) {
     addCompany(company);
+    this.setState({value: ''});
     this.refs.input.getDOMNode().focus();
   }
 

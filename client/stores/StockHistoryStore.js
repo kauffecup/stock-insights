@@ -34,14 +34,12 @@ function addHistories(histories) {
     if (_dateHistories.length) {
       for (var i = 0; i < _dateHistories.length; i++) {
         var daa = clone(dateArr[i]);
-        delete daa.symbol;
         delete daa.date;
         _dateHistories[i].valueMap[dateArr[i].symbol] = daa;
       }
     } else {
       _dateHistories = dateArr.map(a => {
         var aa = clone(a);
-        delete aa.symbol;
         delete aa.date;
         var valueMap = {};
         valueMap[a.symbol] = aa;

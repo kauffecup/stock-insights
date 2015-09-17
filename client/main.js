@@ -29,6 +29,8 @@ import StockVisualizer   from './components/StockVisualizer';
 import ArticleList       from './components/ArticleList';
 import AnalysisToggle    from './components/AnalysisToggle';
 import GraphTown         from './components/GraphTown';
+import DateSlider        from './components/DateSlider';
+
 import {
   getStockData,
   getStockHistory
@@ -65,11 +67,17 @@ class StockInsights extends React.Component {
           potentialCompanies={this.state.potentialCompanies}
           condensed={this.state.condensedCompanies}
           selectedCompanies={this.state.selectedCompanies} />
+        {!this.state.selectedCompanies.length &&
+          <DateSlider dateArr={this.state.dateArr} currentDate={this.state.currentDate} />
+        }
         <div className="cool-stuff">
           <StockVisualizer stockData={this.state.stockData}
             entityData={this.state.entityData}
             currentColorMode={this.state.currentColorMode}
-            currentSizeMode={this.state.currentSizeMode} />
+            dateArr={this.state.dateArr}
+            currentDate={this.state.currentDate}
+            historiesByDate={this.state.historiesByDate}
+            stockDataMap={this.state.stockDataMap} />
           {!!this.state.selectedCompanies.length && 
             <ArticleList selectedCompanies={this.state.selectedCompanies}
               articles={this.state.articles} />
@@ -118,13 +126,17 @@ class StockInsights extends React.Component {
       potentialCompanies: CompaniesStore.getPotentialCompanies(),
       stockData: StockDataStore.getStockData(),
       entityData: StockDataStore.getEntities(),
+      stockDataMap: StockDataStore.getStockDataMap(),
       isEmbedded: PageStateStore.getEmbeddedMode(),
+      currentDate: PageStateStore.getDate(),
+      dateArr: PageStateStore.getDateArr(),
       analysisColorModes: PageStateStore.getAnalysisColorModes(),
       currentColorMode: PageStateStore.getCurrentAnalysisColorMode(),
       condensedCompanies: PageStateStore.getCondensedCompanies(),
       selectedCompanies: PageStateStore.getSelectedCompanies(),
       articles: NewsArticlesStore.getArticles(),
-      histories: StockHistoryStore.getStockHistories()
+      histories: StockHistoryStore.getStockHistories(),
+      historiesByDate: StockHistoryStore.getHistoriesByDate()
     }
   }
 };

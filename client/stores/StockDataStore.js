@@ -119,6 +119,10 @@ var StockDataStore = assign({}, _Store, {
 
   getEntities: function () {
     return reduceEntityMap();
+  },
+
+  getStockDataMap: function () {
+    return _stockData;
   }
 });
 
