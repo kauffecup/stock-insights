@@ -45,7 +45,7 @@ class Company extends React.Component {
       <div className={classes} onClick={this.toggleSelected.bind(this)}>
         <span className="company-description">{c.description}</span>
         <span className="company-symbol">{c.symbol}</span>
-        <span className="company-close" onClick={removeCompany.bind(null, c)}>x</span>
+        <span className="company-close" onClick={e => {e.stopPropagation(); removeCompany(c);}}>x</span>
       </div>
     );
   }
