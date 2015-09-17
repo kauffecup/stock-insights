@@ -21,14 +21,16 @@ export default class GraphTown extends React.Component {
   adaptData() {
     var myData = [];
     for (var symbol in this.props.histories) {
-      myData.push({
-        name: symbol,
-        strokeWidth: 3,
-        values: this.props.histories[symbol].map(v => ({
-          x: new Date(v.date),
-          y: v.close
-        }))
-      });
+      if (this.props.selectedCompanies.indexOf(symbol) > -1) {
+        myData.push({
+          name: symbol,
+          strokeWidth: 3,
+          values: this.props.histories[symbol].map(v => ({
+            x: new Date(v.date),
+            y: v.close
+          }))
+        });
+      }
     }
     return myData;
   }

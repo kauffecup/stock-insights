@@ -30,7 +30,8 @@ import ArticleList       from './components/ArticleList';
 import AnalysisToggle    from './components/AnalysisToggle';
 import GraphTown         from './components/GraphTown';
 import {
-  getStockData
+  getStockData,
+  getStockHistory
 } from './Actions';
 
 // make sure all es6 things work correctly in all browsers
@@ -75,7 +76,7 @@ class StockInsights extends React.Component {
           }
         </div>
         {this.state.selectedCompanies.length ?
-          <GraphTown histories={this.state.histories} />
+          <GraphTown histories={this.state.histories} selectedCompanies={this.state.selectedCompanies} />
           :
           <AnalysisToggle analysisColorModes={this.state.analysisColorModes} />
         }
@@ -95,7 +96,9 @@ class StockInsights extends React.Component {
     // if we already have companies, request the stock data to populate
     // our visualizations
     if (this.state.companies.length) {
-      getStockData(this.state.companies.map(c => c.symbol));
+      var symbols = this.state.companies.map(c => c.symbol)
+      getStockData(symbols)
+      getStockHistory(symbols);
     }
   }
   componentWillUnmount() {

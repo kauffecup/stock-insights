@@ -41,6 +41,7 @@ export function clearPotentialCompanies() {
 export function addCompany(company) {
   Dispatcher.dispatch({actionType: Constants.ADD_COMPANY, company: company});
   company.symbol && getStockData(company.symbol);
+  company.symbol && getStockHistory([company.symbol]);
 }
 
 /** Remove a company */
@@ -76,7 +77,6 @@ export function getSentiment(symbol, entity) {
 export function getNews(symbol) {
   symbol = symbol._id || symbol.symbol || symbol;
   selectCompany(symbol);
-  getStockHistory([symbol]);
   Dispatcher.dispatch({actionType: Constants.NEWS_LOADING, symbol: symbol});
   stockNews(symbol).then(news => {
     Dispatcher.dispatch({actionType: Constants.NEWS_DATA, news: news});

@@ -14,61 +14,81 @@
 // limitations under the License.
 //------------------------------------------------------------------------------
 
-import _Store         from './_Store';
-import Dispatcher     from '../Dispatcher';
-import Constants      from '../constants/Constants';
-import assign         from 'object-assign';
-import PageStateStore from './PageStateStore';
+import _Store     from './_Store';
+import Dispatcher from '../Dispatcher';
+import Constants  from '../constants/Constants';
+import assign     from 'object-assign';
+import clone      from 'clone';
 
 var _stockHistoriesMap = {};
+var _dateHistories = [];
 
-function addHistories(histories, selectedCompanies) {
-  if (selectedCompanies.length) {
-    for (var symbol in histories) {
-      if (selectedCompanies.indexOf(symbol) > -1) {
-        _stockHistoriesMap[symbol.toUpperCase()] = histories[symbol];
+/**
+ * Build both the stock histories map and the date histories
+ * array from the server response.
+ */
+function addHistories(histories) {
+  for (var symbol in histories) {
+    var dateArr = histories[symbol];
+    _stockHistoriesMap[symbol.toUpperCase()] = dateArr;
+    if (_dateHistories.length) {
+      for (var i = 0; i < _dateHistories.length; i++) {
+        var daa = clone(dateArr[i]);
+        delete daa.symbol;
+        delete daa.date;
+        _dateHistories[i].valueMap[dateArr[i].symbol] = daa;
       }
+    } else {
+      _dateHistories = dateArr.map(a => {
+        var aa = clone(a);
+        delete aa.symbol;
+        delete aa.date;
+        var valueMap = {};
+        valueMap[a.symbol] = aa;
+        return {
+          date: a.date,
+          valueMap: valueMap
+        }
+      });
     }
   }
 }
 
-function removeHistory(symbol){
+function removeCompany(symbol) {
+  var symbol = symbol.symbol || symbol;
   delete _stockHistoriesMap[symbol.toUpperCase()];
-}
-
-function clearHistories() {
-  _stockHistoriesMap = {};
+  for (var i = 0; i < _dateHistories.length; i++) {
+    delete _dateHistories[i].valueMap[symbol.toUpperCase()];
+  }
 }
 
 /**
  * The store we'll be exporting. Contains getter methods for
- * whether or not to display the article list, and the articles
- * themselves
+ * the stock histories map and date array
  */
 var StockHistoryStore = assign({}, _Store, {
   getStockHistories: function () {
     return _stockHistoriesMap;
+  },
+  getHistoriesByDate: function () {
+    return _dateHistories;
   }
 });
 
 /**
  * Handle dispatched events.
- * Currently listens to NEWS_LOADING, NEWS_DATA, and CLOSE_ARTICLE_LIST
+ * Currently listens to STOCK_HISTORY_DATA and REMOVE_COMPANY
  */
 Dispatcher.register(function(action) {
   switch(action.actionType) {
     case Constants.STOCK_HISTORY_DATA:
-      addHistories(action.histories, PageStateStore.getSelectedCompanies());
+      addHistories(action.histories);
       StockHistoryStore.emitChange();
       break;
 
-    case Constants.CLOSE_ARTICLE_LIST:
-      clearHistories();
-      StockHistoryStore.emitChange();
-      break;
-
-    case Constants.DESELECT_COMPANY:
-      removeHistory(action.symbol);
+    // remove a company
+    case Constants.REMOVE_COMPANY:
+      removeCompany(action.company);
       StockHistoryStore.emitChange();
       break;
   }
