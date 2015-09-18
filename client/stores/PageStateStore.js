@@ -56,7 +56,9 @@ function toggleCondensedCompanies() {
   _condensedCompanies = !_condensedCompanies;
 }
 function selectCompany(company) {
-  _selectedCompanies.push(company);
+  if (_selectedCompanies.indexOf(company) === -1) {
+    _selectedCompanies.push(company);
+  }
 }
 function clearCompanies () {
   _selectedCompanies = [];
@@ -98,7 +100,7 @@ var PageStateStore = assign({}, _Store, {
     return _selectedColorMode;
   },
   getSelectedCompanies: function () {
-    return _selectedCompanies
+    return _selectedCompanies;
   },
   getDate: function () {
     return _currentDate;
@@ -135,8 +137,12 @@ Dispatcher.register(function(action) {
       break;
 
     case Constants.SELECT_COMPANY:
+      var currentNumberOfCompanies = _selectedCompanies.length;
       selectCompany(action.symbol);
-      PageStateStore.emitChange();
+      var newNumberOfCompanies = _selectedCompanies.length;
+      if (currentNumberOfCompanies !== newNumberOfCompanies) {
+        PageStateStore.emitChange();
+      }
       break;
 
     case Constants.DESELECT_COMPANY:
