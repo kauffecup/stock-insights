@@ -18,11 +18,52 @@ import _Store         from './_Store';
 import Dispatcher     from '../Dispatcher';
 import Constants      from '../constants/Constants';
 import assign         from 'object-assign';
+import clone          from 'clone';
 import PageStateStore from './PageStateStore';
 
 /** @type {Object} A map of symbols to data about that symbol */
 var _stockData = {};
 var _entityMap = {};
+var _stockHistoriesMap = {};
+var _dateHistories = [];
+
+/**
+ * Build both the stock histories map and the date histories
+ * array from the server response.
+ */
+function addHistories(histories) {
+  for (var symbol in histories) {
+    var dateArr = histories[symbol];
+    _stockHistoriesMap[symbol.toUpperCase()] = dateArr;
+    if (_dateHistories.length) {
+      for (var i = 0; i < _dateHistories.length; i++) {
+        var daa = clone(dateArr[i]);
+        delete daa.date;
+        _dateHistories[i].valueMap[dateArr[i].symbol] = daa;
+      }
+    } else {
+      _dateHistories = dateArr.map(a => {
+        var aa = clone(a);
+        delete aa.date;
+        var valueMap = {};
+        valueMap[a.symbol] = aa;
+        return {
+          date: a.date,
+          valueMap: valueMap
+        }
+      });
+    }
+  }
+}
+
+function removeCompany(symbol) {
+  var symbol = symbol.symbol || symbol;
+  delete _stockHistoriesMap[symbol.toUpperCase()];
+   delete _stockData[symbol];
+  for (var i = 0; i < _dateHistories.length; i++) {
+    delete _dateHistories[i].valueMap[symbol.toUpperCase()];
+  }
+}
 
 /**
  * Add stock data to our _stockData map
@@ -31,14 +72,6 @@ function addStockData(newData) {
   for (var data of newData) {
     _stockData[data.symbol] = data;
   }
-}
-
-/**
- * Remove a company from our _stockData map
- */
-function removeCompany(company) {
-  var symbol = company.symbol || company;
-  delete _stockData[symbol];
 }
 
 /**
@@ -123,6 +156,12 @@ var StockDataStore = assign({}, _Store, {
 
   getStockDataMap: function () {
     return _stockData;
+  },
+    getStockHistories: function () {
+    return _stockHistoriesMap;
+  },
+  getHistoriesByDate: function () {
+    return _dateHistories;
   }
 });
 
@@ -159,6 +198,11 @@ Dispatcher.register(function(action) {
 
     case Constants.DESELECT_COMPANY:
       removeCompanyEntities(action.symbol);
+      StockDataStore.emitChange();
+      break;
+
+    case Constants.STOCK_HISTORY_DATA:
+      addHistories(action.histories);
       StockDataStore.emitChange();
       break;
 
