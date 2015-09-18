@@ -22,9 +22,10 @@ import {
 
 export default class DateSlider extends React.Component {
   render() {
-    var {dateArr, currentDate} = this.props;
+    var {stockData, currentDate} = this.props;
     var startOfCurrentDate = moment(currentDate).startOf('day');
-    var currentPos = dateArr.length;
+    var dateArr = stockData.map(sd => sd.date);
+    var currentPos;
     for (var i = 0; i < dateArr.length; i++) {
       if (moment(dateArr[i]).startOf('day').isSame(startOfCurrentDate)) {
         currentPos = i;
@@ -38,10 +39,10 @@ export default class DateSlider extends React.Component {
           className="slider"
           type="range"
           min="0"
-          max={"" + dateArr.length}
+          max={"" + (dateArr.length-1)}
           value={currentPos}
           steps={dateArr.length}
-          onChange={e => setDate(moment(this.props.dateArr[parseInt(e.target.value)]))} />
+          onChange={e => setDate(moment(this.props.stockData[parseInt(e.target.value)].date))} />
       </div>
     );
   }

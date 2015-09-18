@@ -161,30 +161,16 @@ export default class StockVisualizer extends React.Component {
         max: 1
       }
     } else {
-      var {currentDate, dateArr, historiesByDate, stockDataMap} = this.props;
+      var {currentDate, stockData} = this.props;
       var startOfCurrentDate = moment(currentDate).startOf('day');
-      var currentPos = dateArr.length;
-      for (var i = 0; i < dateArr.length; i++) {
-        if (moment(dateArr[i]).startOf('day').isSame(startOfCurrentDate)) {
+      var currentPos = stockData.length;
+      for (var i = 0; i < stockData.length; i++) {
+        if (moment(stockData[i].date).startOf('day').isSame(startOfCurrentDate)) {
           currentPos = i;
           break;
         }
       }
-      var data;
-      if (currentPos >= historiesByDate.length) {
-        data = this.props.stockData;
-      } else {
-        data = [];
-        var valueMap = historiesByDate[currentPos].valueMap;
-        for (var symbol in valueMap) {
-          var myData = clone(valueMap[symbol]);
-          myData['week_52_high'] = stockDataMap[symbol].week_52_high;
-          myData['week_52_low'] = stockDataMap[symbol].week_52_low;
-          myData['change'] = myData.close - myData.open;
-          myData['last'] = myData.close;
-          data.push(myData);
-        }
-      }
+      var data = stockData[currentPos].data;
       // then, depending on the color mode, get the actual data, color
       // domain, and color legend.
       switch(this.props.currentColorMode) {

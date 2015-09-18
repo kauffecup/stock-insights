@@ -20,18 +20,59 @@ import Constants      from '../constants/Constants';
 import assign         from 'object-assign';
 import clone          from 'clone';
 import PageStateStore from './PageStateStore';
+import moment         from 'moment';
 
 /** @type {Object} A map of symbols to data about that symbol */
 var _stockData = {};
 var _entityMap = {};
 var _stockHistoriesMap = {};
 var _dateHistories = [];
+var _cachedFlatten;
+
+/**
+ * Add stock data to our _stockData map
+ */
+function addStockData(newData) {
+  _cachedFlatten = null;
+  for (var data of newData) {
+    _stockData[data.symbol] = data;
+  }
+}
+
+/**
+ * Clear our entity map
+ */
+function clearEntities() {
+  _entityMap = {};
+}
+
+/**
+ * Remove one symbol from our entity map
+ */
+function removeCompanyEntities(symbol) {
+  delete _entityMap[symbol.toUpperCase()];
+}
+
+/**
+ * Remove a company - Clean up all of our data structures
+ */
+function removeCompany(symbol) {
+  _cachedFlatten = null;
+  var symbol = symbol.symbol || symbol;
+  removeCompanyEntities(symbol);
+  delete _stockHistoriesMap[symbol.toUpperCase()];
+  delete _stockData[symbol];
+  for (var i = 0; i < _dateHistories.length; i++) {
+    delete _dateHistories[i].valueMap[symbol.toUpperCase()];
+  }
+}
 
 /**
  * Build both the stock histories map and the date histories
  * array from the server response.
  */
 function addHistories(histories) {
+  _cachedFlatten = null;
   for (var symbol in histories) {
     var dateArr = histories[symbol];
     _stockHistoriesMap[symbol.toUpperCase()] = dateArr;
@@ -56,33 +97,51 @@ function addHistories(histories) {
   }
 }
 
-function removeCompany(symbol) {
-  var symbol = symbol.symbol || symbol;
-  delete _stockHistoriesMap[symbol.toUpperCase()];
-   delete _stockData[symbol];
-  for (var i = 0; i < _dateHistories.length; i++) {
-    delete _dateHistories[i].valueMap[symbol.toUpperCase()];
-  }
-}
-
 /**
- * Add stock data to our _stockData map
- */
-function addStockData(newData) {
-  for (var data of newData) {
-    _stockData[data.symbol] = data;
-  }
-}
-
-/**
- * Return the contents of our _stockData map as an array
+ * Return the contents of our _stockData map and _dateHistories
+ * array as one flattened array sorted by date containing objects
+ * with a date property and data array.
  */
 function flattenStockData() {
-  var stockData = [];
-  for (var symbol in _stockData) {
-    stockData.push(_stockData[symbol]);
+  if (_cachedFlatten) return _cachedFlatten;
+  var stockDateArray = [];
+  // step 1
+  for (var i = 0; i < _dateHistories.length; i++) {
+    var data = [];
+    var valueMap = _dateHistories[i].valueMap;
+    for (var symbol in valueMap) {
+      var sd = _stockData[symbol];
+      var v = valueMap[symbol];
+      data.push({
+        week_52_high: sd.week_52_high,
+        week_52_low: sd.week_52_low,
+        change: v.close - v.open,
+        symbol: symbol,
+        last: v.close
+      });
+    }
+    stockDateArray.push({
+      date: moment(_dateHistories[i].date),
+      data: data
+    });
   }
-  return stockData;
+  // step 2
+  var data = [];
+  for (var symbol in _stockData) {
+    var v = _stockData[symbol];
+    data.push({
+      week_52_high: v.week_52_high,
+      week_52_low: v.week_52_low,
+      change: v.change,
+      symbol: v.symbol,
+      last: v.last
+    });
+  }
+  stockDateArray.push({
+    date: moment().startOf('day'),
+    data: data
+  });
+  return _cachedFlatten = stockDateArray;
 }
 
 /**
@@ -109,7 +168,7 @@ function addEntities(articles, symbol) {
       entityMap[cased].push(multiplier * score);
     }
   }
-  _entityMap[symbol.toLowerCase()] = entityMap;
+  _entityMap[symbol.toUpperCase()] = entityMap;
 }
 
 function reduceEntityMap() {
@@ -124,21 +183,12 @@ function reduceEntityMap() {
       }
     }
   }
-
   var entities = [];
   for (var text in entityMap) {
     var __entities = entityMap[text];
     entities.push({_id: text, value: __entities.length, colorValue: __entities.reduce((s, it) => s+it, 0)/__entities.length})
   }
   return entities.sort((e1, e2) => e2.value - e1.value).slice(0, 50);
-}
-
-function clearEntities() {
-  _entityMap = {};
-}
-
-function removeCompanyEntities(symbol) {
-  delete _entityMap[symbol.toLowerCase()];
 }
 
 /**
@@ -149,19 +199,11 @@ var StockDataStore = assign({}, _Store, {
   getStockData: function () {
     return flattenStockData();
   },
-
   getEntities: function () {
     return reduceEntityMap();
   },
-
-  getStockDataMap: function () {
-    return _stockData;
-  },
-    getStockHistories: function () {
+  getStockHistories: function () {
     return _stockHistoriesMap;
-  },
-  getHistoriesByDate: function () {
-    return _dateHistories;
   }
 });
 

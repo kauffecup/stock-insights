@@ -24,8 +24,6 @@ import moment     from 'moment';
 var _selectedCompanies = [];
 // initialize current date at today
 var _currentDate = moment();
-/** An array of moment dates */
-var _dateArr = [];
 
 /** @type {Boolean} When condensed, only display the ticker symbol */
 var _condensedCompanies = false;
@@ -66,12 +64,6 @@ function clearCompanies () {
 function removeCompany(symbol) {
   _selectedCompanies.splice(_selectedCompanies.indexOf(symbol), 1);
 }
-function setDates(histories) {
-  for (var symbol in histories) {
-    _dateArr = histories[symbol].map(h => moment(h.date));
-    break;
-  }
-}
 function setDate(newDate) {
   _currentDate = newDate;
 }
@@ -104,9 +96,6 @@ var PageStateStore = assign({}, _Store, {
   },
   getDate: function () {
     return _currentDate;
-  },
-  getDateArr: function () {
-    return _dateArr;
   }
 });
 
@@ -123,11 +112,6 @@ Dispatcher.register(function(action) {
         setSelectedColorMode(action.id);
         PageStateStore.emitChange();
       }
-      break;
-
-    case Constants.STOCK_HISTORY_DATA:
-      setDates(action.histories);
-      PageStateStore.emitChange();
       break;
 
     // toggle the state of the company chiclets

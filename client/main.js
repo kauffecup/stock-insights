@@ -62,21 +62,20 @@ class StockInsights extends React.Component {
         <div className="stock-insights-title">
           <h1 className="stock-insights-title">Stock Insights</h1>
         </div>
-        <CompanyContainer companies={this.state.companies}
+        <CompanyContainer
+          companies={this.state.companies}
           potentialCompanies={this.state.potentialCompanies}
           condensed={this.state.condensedCompanies}
           selectedCompanies={this.state.selectedCompanies} />
         {!this.state.selectedCompanies.length &&
-          <DateSlider dateArr={this.state.dateArr} currentDate={this.state.currentDate} />
+          <DateSlider stockData={this.state.stockData} currentDate={this.state.currentDate} />
         }
         <div className="cool-stuff">
-          <StockVisualizer stockData={this.state.stockData}
+          <StockVisualizer
+            stockData={this.state.stockData}
             entityData={this.state.entityData}
             currentColorMode={this.state.currentColorMode}
-            dateArr={this.state.dateArr}
-            currentDate={this.state.currentDate}
-            historiesByDate={this.state.historiesByDate}
-            stockDataMap={this.state.stockDataMap} />
+            currentDate={this.state.currentDate} />
           {!!this.state.selectedCompanies.length && 
             <ArticleList selectedCompanies={this.state.selectedCompanies}
               articles={this.state.articles} />
@@ -123,12 +122,9 @@ class StockInsights extends React.Component {
       potentialCompanies: CompaniesStore.getPotentialCompanies(),
       stockData: StockDataStore.getStockData(),
       entityData: StockDataStore.getEntities(),
-      stockDataMap: StockDataStore.getStockDataMap(),
       histories: StockDataStore.getStockHistories(),
-      historiesByDate: StockDataStore.getHistoriesByDate(),
       isEmbedded: PageStateStore.getEmbeddedMode(),
       currentDate: PageStateStore.getDate(),
-      dateArr: PageStateStore.getDateArr(),
       analysisColorModes: PageStateStore.getAnalysisColorModes(),
       currentColorMode: PageStateStore.getCurrentAnalysisColorMode(),
       condensedCompanies: PageStateStore.getCondensedCompanies(),
