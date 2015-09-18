@@ -112,13 +112,16 @@ function flattenStockData() {
     for (var symbol in valueMap) {
       var sd = _stockData[symbol];
       var v = valueMap[symbol];
-      data.push({
-        week_52_high: sd.week_52_high,
-        week_52_low: sd.week_52_low,
+      var myData = {
         change: v.close - v.open,
         symbol: symbol,
         last: v.close
-      });
+      }
+      if (sd) {
+        myData.week_52_high = sd.week_52_high;
+        myData.week_52_low = sd.week_52_low;
+      }
+      data.push(myData);
     }
     stockDateArray.push({
       date: moment(_dateHistories[i].date),

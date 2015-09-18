@@ -150,9 +150,10 @@ export default class StockVisualizer extends React.Component {
    * Render town.
    */
   render() {
-    var data, legend, domain, sizeFunc;
-    var isEntities = !!this.props.entityData.length;
+    var {entityData, stockData, currentDate, currentColorMode} = this.props;
+    var isEntities = !!entityData.length;
 
+    var data, legend, domain, sizeFunc;
     if (isEntities) {
       data = this.props.entityData;
       legend = colorLegendEntity;
@@ -161,19 +162,17 @@ export default class StockVisualizer extends React.Component {
         max: 1
       }
     } else {
-      var {currentDate, stockData} = this.props;
       var startOfCurrentDate = moment(currentDate).startOf('day');
-      var currentPos = stockData.length;
-      for (var i = 0; i < stockData.length; i++) {
+      var currentPos;
+      for (var i = 0; i < stockData.length && typeof currentPos === 'undefined'; i++) {
         if (moment(stockData[i].date).startOf('day').isSame(startOfCurrentDate)) {
           currentPos = i;
-          break;
         }
       }
       var data = stockData[currentPos].data;
       // then, depending on the color mode, get the actual data, color
       // domain, and color legend.
-      switch(this.props.currentColorMode) {
+      switch(currentColorMode) {
         case '_am_color_change':
           data = this.getData(data, this.getChangeAnalysis);
           domain = this.getChangeDomain(data);
