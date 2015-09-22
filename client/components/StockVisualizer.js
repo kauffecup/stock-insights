@@ -54,6 +54,27 @@ var colorLegend52 = generateLegend('↓ 52 Low', '↑ 52 High');
 /** The color legend we will use when colors reflect change */
 var colorLegendEntity = generateLegend('(-) Sentiment', '(+) Sentiment');
 
+/** Configuration for the tooltip */
+var tooltipProps = [{
+  css: 'symbol',
+  prop: '_id'
+}, {
+  css: 'value',
+  prop: 'value',
+  display: 'Last Value'
+}, {
+  css: 'change',
+  prop: 'change',
+  display: 'Change'
+}, {
+  css: 'fiftytwo-high',
+  prop: 'week_52_high',
+  display: 'Week 52 High'
+}, {
+  css: 'fiftytwo-low',
+  prop: 'week_52_low',
+  display: 'Week 52 Low'
+}];
 
 export default class StockVisualizer extends React.Component {
   /**
@@ -64,9 +85,12 @@ export default class StockVisualizer extends React.Component {
   getData(data, colorFunc) {
     data = data.map(s => {
       return {
-        value: s.last,
+        value: s.last.toFixed(2),
         _id: s.symbol,
-        colorValue: colorFunc(s)
+        colorValue: colorFunc(s),
+        change: this.getChangeAnalysis(s),
+        week_52_high: s.week_52_high,
+        week_52_low: s.week_52_low
       }
     }).sort((s1, s2) => s2.value - s1.value);
 
@@ -89,7 +113,7 @@ export default class StockVisualizer extends React.Component {
    * Will be passed in to getData - extract the change of a stock
    */
   getChangeAnalysis(s) {
-    return s.change;
+    return s.change.toFixed(2);
   }
 
   /**
@@ -152,6 +176,7 @@ export default class StockVisualizer extends React.Component {
   render() {
     var {entityData, stockData, currentDate, currentColorMode} = this.props;
     var isEntities = !!entityData.length;
+    var tooltip = !isEntities;
 
     var data, legend, domain, sizeFunc;
     if (isEntities) {
@@ -195,6 +220,8 @@ export default class StockVisualizer extends React.Component {
       data={data}
       onClick={isEntities ? null : getNews}
       fixedDomain={domain}
+      tooltip={tooltip}
+      tooltipProps={tooltipProps}
     />;
   }
 }
