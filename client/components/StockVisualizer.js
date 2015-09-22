@@ -131,7 +131,7 @@ export default class StockVisualizer extends React.Component {
     if (!high && !low) {
       return 0.5;
     } else {
-      return (high - now) / (high - low);
+      return 1 - ((high - now) / (high - low));
     }
   }
 
