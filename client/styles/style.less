@@ -14,12 +14,7 @@
 // limitations under the License.
 //------------------------------------------------------------------------------
 
-@accent-color: #4292c6;
-@accent-color2: #08306b;
-@background-color: #f0f0f0;
-@secondary-text-color: #969696;
-
-@stock-chiclets-z: 500;
+@import './constants.less';
 
 // get the page ready
 * { outline: none; box-sizing: border-box; }
@@ -245,98 +240,6 @@ button {
     margin-right: auto;
     margin-left: auto;
     display: flex;
-
-    .radioset {
-      flex: 1;
-      border: 0;
-      display: flex;
-      flex-wrap: wrap;
-
-      .title {
-        margin-left: auto;
-        margin-right: auto;
-      }
-
-      ul {
-        display: flex;
-        justify-content: space-around;
-        text-align: center;
-        position: relative;
-        flex: 1 100%;
-
-        &::before {
-          content: '';
-          position: absolute;
-          top: 60%;
-          left: 0;
-          right: 0;
-          height: 6px;
-          margin-top: -3px;
-          background: @secondary-text-color;
-        }
-      }
-
-      li {
-        display: inline-block;
-        position: relative;
-      }
-
-      [type="radio"] {
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        opacity: 0;
-        z-index: 1;
-        -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
-      }
-
-      label {
-        padding-bottom: 40px;
-        display: block;
-        max-width: 150px;
-
-        &::before,
-        &::after {
-          content: '';
-          position: absolute;
-          left: 50%;
-          top: 60%;
-          border-radius: 50%;
-        }
-
-        &::before {
-          width: 20px;
-          height: 20px;
-          margin: -10px 0 0 -10px;
-          border: 0 solid @secondary-text-color;
-          background: @secondary-text-color;
-          transform: scale( 0.7 );
-        }
-
-        &::after {
-          width: 10px;
-          height: 10px;
-          margin: -5px 0 0 -5px;
-          background: #fff;
-          transform: scale( 0 );
-          opacity: 0;
-        }
-      }
-
-      :checked {
-        + label {
-          &::before {
-            transform: scale( 1 );
-          }
-          &::after {
-            transform: scale( 1 );
-            opacity: 1;
-          }
-        }
-      }
-    }
   }
 
   // make things look different when it's embedded in another page
@@ -409,94 +312,5 @@ button {
     .analysis-toggle {
       .title { display: none; }
     }
-  }
-}
-
-@thumb-radius: 2px;
-@thumb-height: 24px;
-@thumb-width: 12px;
-@thumb-border-width: 1px;
-@thumb-border-color: #fff;
-
-@track-width: 100%;
-@track-height: 5px;
-
-@track-radius: 5px;
-@contrast: 5%;
-
-.track() {
-  width: @track-width;
-  height: @track-height;
-  cursor: pointer;
-  animate: 0.2s;
-}
-
-.thumb() {
-  border: @thumb-border-width solid @thumb-border-color;
-  height: @thumb-height;
-  width: @thumb-width;
-  border-radius: @thumb-radius;
-  background: @accent-color;
-  cursor: pointer;
-}
-
-input[type=range] {
-  -webkit-appearance: none;
-  margin: @thumb-height/2 0;
-  width: @track-width;
-
-  &:focus {
-    outline: none;
-  }
-
-  &::-webkit-slider-runnable-track {
-    .track();
-    background: @secondary-text-color;
-    border-radius: @track-radius;
-  }
-  
-  &::-webkit-slider-thumb {
-    .thumb();
-    -webkit-appearance: none;
-    margin-top: ((@track-height) / 2) - (@thumb-height / 2);
-  }
-
-  &:focus::-webkit-slider-runnable-track {
-    background: lighten(@secondary-text-color, @contrast);
-  }
-
-  &::-moz-range-track {
-    .track();
-    background: @secondary-text-color;
-    border-radius: @track-radius;
-  }
-  &::-moz-range-thumb {
-     .thumb();
-  }
-
-  &::-ms-track {
-    .track(); 
-    background: transparent;
-    border-color: transparent;
-    border-width: @thumb-width 0;
-    color: transparent;
-  }
-
-  &::-ms-fill-lower {
-    background: darken(@secondary-text-color, @contrast);
-    border-radius: @track-radius*2;
-  }
-  &::-ms-fill-upper {
-    background: @secondary-text-color;
-    border-radius: @track-radius*2;
-  }
-  &::-ms-thumb {
-    .thumb();
-  }
-  &:focus::-ms-fill-lower {
-    background: @secondary-text-color;
-  }
-  &:focus::-ms-fill-upper {
-    background: lighten(@secondary-text-color, @contrast);
   }
 }

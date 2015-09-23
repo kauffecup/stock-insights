@@ -1,0 +1,94 @@
+//------------------------------------------------------------------------------
+// Copyright IBM Corp. 2015
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//    http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+//------------------------------------------------------------------------------
+
+@import './constants.less';
+
+.track() {
+  width: @track-width;
+  height: @track-height;
+  cursor: pointer;
+  animate: 0.2s;
+}
+
+.thumb() {
+  border: @thumb-border-width solid @thumb-border-color;
+  height: @thumb-height;
+  width: @thumb-width;
+  border-radius: @thumb-radius;
+  background: @accent-color;
+  cursor: pointer;
+}
+
+input[type=range] {
+  -webkit-appearance: none;
+  margin: @thumb-height/2 0;
+  width: @track-width;
+
+  &:focus {
+    outline: none;
+  }
+
+  &::-webkit-slider-runnable-track {
+    .track();
+    background: @secondary-text-color;
+    border-radius: @track-radius;
+  }
+  
+  &::-webkit-slider-thumb {
+    .thumb();
+    -webkit-appearance: none;
+    margin-top: ((@track-height) / 2) - (@thumb-height / 2);
+  }
+
+  &:focus::-webkit-slider-runnable-track {
+    background: lighten(@secondary-text-color, @contrast);
+  }
+
+  &::-moz-range-track {
+    .track();
+    background: @secondary-text-color;
+    border-radius: @track-radius;
+  }
+  &::-moz-range-thumb {
+     .thumb();
+  }
+
+  &::-ms-track {
+    .track(); 
+    background: transparent;
+    border-color: transparent;
+    border-width: @thumb-width 0;
+    color: transparent;
+  }
+
+  &::-ms-fill-lower {
+    background: darken(@secondary-text-color, @contrast);
+    border-radius: @track-radius*2;
+  }
+  &::-ms-fill-upper {
+    background: @secondary-text-color;
+    border-radius: @track-radius*2;
+  }
+  &::-ms-thumb {
+    .thumb();
+  }
+  &:focus::-ms-fill-lower {
+    background: @secondary-text-color;
+  }
+  &:focus::-ms-fill-upper {
+    background: lighten(@secondary-text-color, @contrast);
+  }
+}

@@ -10,6 +10,7 @@ var less = require('gulp-less');
 var postcss = require('gulp-postcss');
 var autoprefixer = require('autoprefixer');
 var csswring = require('csswring');
+var concatCss = require('gulp-concat-css');
 
 var path = {
   OUT: 'bundle.js',
@@ -43,6 +44,7 @@ gulp.task('browserify', function () {
 gulp.task('less', function () {
   return gulp.src('./client/**/*.less')
     .pipe(less())
+    .pipe(concatCss('style.css'))
     .pipe(postcss([
       autoprefixer(),
       csswring.postcss
@@ -54,7 +56,7 @@ gulp.task('less', function () {
  * In dev mode, watch for changes in client code and Less and
  * rebuild bundle.js or style.css when these happen
  */
-gulp.task('dev', function () {
+gulp.task('dev', ['less'], function () {
   gulp.watch(['./client/**/**.less'], ['less']);
 
   var watcher  = watchify(browserify({
