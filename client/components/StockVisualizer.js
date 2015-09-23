@@ -61,7 +61,7 @@ var tooltipProps = [{
 }, {
   css: 'value',
   prop: 'value',
-  display: 'Last Value'
+  display: 'Value'
 }, {
   css: 'change',
   prop: 'change',
