@@ -75,6 +75,7 @@ gulp.task('build-server', () => {
  */
 gulp.task('node-dev', ['build-server'], () => {
   nodeDev('server/lib/app.js', ['--all-deps'], []);
+  gulp.watch(['./server/src/**/*.js', './server/src/**/*.json'], ['build-server']);
 });
 
 /**
@@ -84,7 +85,6 @@ gulp.task('node-dev', ['build-server'], () => {
  */
 gulp.task('dev', ['less', 'node-dev'], () => {
   gulp.watch(['./client/**/**.less'], ['less']);
-  gulp.watch(['./server/src/**/*.js', './server/src/**/*.json'], ['build-server']);
   gulp.watch('./public/index.html').on('change', browserSync.reload);
 
   var watcher  = watchify(browserify({
