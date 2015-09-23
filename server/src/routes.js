@@ -15,7 +15,6 @@
 //------------------------------------------------------------------------------
 
 import express      from 'express';
-import path         from 'path';
 import Promise      from 'bluebird';
 import vcapServices from './vcapServices';
 var router = express.Router();

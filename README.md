@@ -52,12 +52,12 @@ Then you only need to run:
 ```sh
 npm install
 npm run dev
-npm start
 ```
 
 Running `npm run dev` kicks off the `gulp dev` task, which in turn kicks off a
 `watchify` on your client-side JS that will rebuild every time you save, and
-also watches all `.less` files and compiles those when you save.
-
-`npm start` kicks off a `babel-node` process on `server/app.js`. This allows us
-to write the server code in ES6.
+also watches all `.less` files and compiles those when you save. It also kicks
+off browserSync which will inject all of your css changes without needing to
+reload the page, and will reload the page every time you change a client-side
+.js file. This will also kick off the dev server - every time you change a
+server side .js file, the server will automatically restart.

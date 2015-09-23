@@ -1,4 +1,5 @@
 import gulp         from 'gulp';
+import gutil        from 'gulp-util';
 import browserify   from 'browserify';
 import watchify     from 'watchify';
 import source       from 'vinyl-source-stream';
@@ -11,6 +12,9 @@ import postcss      from 'gulp-postcss';
 import autoprefixer from 'autoprefixer';
 import csswring     from 'csswring';
 import concatCss    from 'gulp-concat-css';
+import browserSync  from 'browser-sync';
+import babel        from 'gulp-babel';
+import nodeDev      from 'node-dev';
 
 var path = {
   OUT: 'bundle.js',
@@ -50,14 +54,38 @@ gulp.task('less', () =>
       csswring.postcss
     ]))
     .pipe(gulp.dest(path.DEST))
+    .pipe(browserSync.stream())
 );
 
 /**
- * In dev mode, watch for changes in client code and Less and
- * rebuild bundle.js or style.css when these happen
+ * Transpile the server code from es6 -> es5 and move it
+ * from src folder to lib folder
  */
-gulp.task('dev', ['less'], () => {
+gulp.task('build-server', () => {
+  gulp.src('./server/src/**/*.json')
+    .pipe(gulp.dest('./server/lib'))
+  return gulp.src('./server/src/**/*.js')
+    .pipe(babel())
+    .pipe(gulp.dest('./server/lib'))
+});
+
+/**
+ * Kick off a node-dev "watch" for automatic server restarts
+ * when server files change
+ */
+gulp.task('node-dev', ['build-server'], () => {
+  nodeDev('server/lib/app.js', ['--all-deps'], []);
+});
+
+/**
+ * In dev mode, watch for changes in client code and Less and
+ * rebuild bundle.js or style.css when these happen. Connect browserSync
+ * to the node server.
+ */
+gulp.task('dev', ['less', 'node-dev'], () => {
   gulp.watch(['./client/**/**.less'], ['less']);
+  gulp.watch(['./server/src/**/*.js', './server/src/**/*.json'], ['build-server']);
+  gulp.watch('./public/index.html').on('change', browserSync.reload);
 
   var watcher  = watchify(browserify({
     entries: [path.ENTRY_POINT],
@@ -68,11 +96,27 @@ gulp.task('dev', ['less'], () => {
     fullPaths: true
   }));
 
-  return watcher.on('update', function () {
+  var port = process.env.PORT || 3000;
+  browserSync({
+    proxy: 'localhost:' + port,
+    port: port + 1
+  });
+
+  return watcher.on('update', () => {
     watcher.bundle()
+      .on('error', function (err) {
+        gutil.log(err.message);
+        gutil.log(err);
+      })
       .pipe(source(path.OUT))
       .pipe(gulp.dest(path.DEST))
+      .pipe(browserSync.stream());
   }).bundle()
+    .on('error', function (err) {
+      gutil.log(err.message);
+      this.emit('end');
+    })
     .pipe(source(path.OUT))
-    .pipe(gulp.dest(path.DEST));
+    .pipe(gulp.dest(path.DEST))
+    .pipe(browserSync.stream());
 });

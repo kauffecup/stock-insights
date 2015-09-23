@@ -1,6 +1,7 @@
 node_modules/*
 public/bundle.js
 public/*.css
-server/VCAP_SERVICES.json
+server/lib/*
+server/**/VCAP_SERVICES.json
 *.sublime*
 *.log
