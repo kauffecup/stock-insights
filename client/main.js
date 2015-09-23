@@ -65,6 +65,7 @@ class StockInsights extends React.Component {
         <CompanyContainer
           companies={this.state.companies}
           potentialCompanies={this.state.potentialCompanies}
+          loadingStatus={this.state.potentialCompaniesLoading}
           condensed={this.state.condensedCompanies}
           selectedCompanies={this.state.selectedCompanies} />
         {!this.state.selectedCompanies.length &&
@@ -120,6 +121,7 @@ class StockInsights extends React.Component {
     return {
       companies: CompaniesStore.getCompanies(),
       potentialCompanies: CompaniesStore.getPotentialCompanies(),
+      potentialCompaniesLoading: CompaniesStore.getLoadingStatus(),
       stockData: StockDataStore.getStockData(),
       entityData: StockDataStore.getEntities(),
       histories: StockDataStore.getStockHistories(),

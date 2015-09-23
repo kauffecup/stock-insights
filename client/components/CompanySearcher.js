@@ -14,7 +14,8 @@
 // limitations under the License.
 //------------------------------------------------------------------------------
 
-import React from 'react';
+import React     from 'react';
+import Constants from '../constants/Constants';
 import {
   addCompany,
   searchCompany,
@@ -42,7 +43,11 @@ export default class CompanySearcher extends React.Component {
    * As the user's typing debounce a searchCompany call by 300ms.
    */
   handleChange(event) {
-    this.setState({value: event.target.value});
+    var value = event.target.value;
+    this.setState({value: value});
+    if (!value) {
+      clearPotentialCompanies();
+    }
     this._searchTimeout && clearTimeout(this._searchTimeout);
     this._searchTimeout = setTimeout(() => {
       if (this.state.value.length > 1) {
@@ -70,6 +75,7 @@ export default class CompanySearcher extends React.Component {
   handleClear(event) {
     if (!React.findDOMNode(this).contains(event.target) &&
       !event.target.classList.contains('potential-company')) {
+      this.setState({value: ''});
       clearPotentialCompanies();
     }
   }
@@ -87,23 +93,38 @@ export default class CompanySearcher extends React.Component {
    * It's render time.
    */
   render() {
+    var {potentialCompanies, loadingStatus, companies} = this.props;
+    var value = this.state.value;
     // some potential companies magic. goes through these steps:
     // 1. filter out companies that match the current value. this allows us to immediately
     //    filter down the list as the user's typing and network requests may/may not be happening
     //    in the background. makes it feel snappier
     // 2. filter out companies that have already been added by the user
     // 3. limit the results to 15. this prevents the page feeling sluggish
-    var value = this.state.value;
     const regex = new RegExp('^' + value, 'i');
-    var potentialCompanies = this.props.potentialCompanies.filter(pC => (
+    potentialCompanies = potentialCompanies.filter(pC =>
       value ? regex.test(pC.description) : false
-    )).filter(pc => (
-      !this.props.companies.some(c => (c.description === pc.description) && (c.symbol === pc.symbol))
-    )).map(pC =>
+    ).filter(pc =>
+      !companies.some(c => (c.description === pc.description) && (c.symbol === pc.symbol))
+    ).map(pC =>
       <li className="potential-company" onClick={this.handleAdd.bind(this, pC)} key={pC.symbol}>
         {pC.description + ' (' + pC.symbol + ')'}
       </li>
     ).slice(0, 15);
+
+    // if we're cleared or there's nothing in the input, don't display anything in the dropdown
+    if (loadingStatus === Constants.POTENTIAL_STATUS_CLEAR || !value) {
+      potentialCompanies = null;
+    // if we're loading and don't have any companies loaded already, show the loading message
+    } else if (loadingStatus === Constants.POTENTIAL_STATUS_LOADING && !potentialCompanies.length) {
+      potentialCompanies = <li className="potential-company">Loading...</li>;
+    // otherwise we've gotten stuff back, if we don't have anythin' show the no results message
+    } else if (!potentialCompanies.length) {
+      potentialCompanies = <li className="potential-company">No results</li>;
+    }
+    // if none of these cases were hit, we proceed on as usual with our potential companies array
+
+
     // once we've done our magic, go on with rendering as normal
     return (
       <div className="company-searcher" onFocus={this.handleFocus.bind(this)}>

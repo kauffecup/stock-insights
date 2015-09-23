@@ -106,7 +106,7 @@ gulp.task('dev', ['less', 'node-dev'], () => {
     watcher.bundle()
       .on('error', function (err) {
         gutil.log(err.message);
-        gutil.log(err);
+        this.emit('end');
       })
       .pipe(source(path.OUT))
       .pipe(gulp.dest(path.DEST))

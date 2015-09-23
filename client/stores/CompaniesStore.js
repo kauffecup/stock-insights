@@ -25,6 +25,10 @@ const LOCAL_STORAGE_KEY = 'COMPANY_LOCAL_STORAGE';
 var _potentialCompanies = [];
 /** @type {Array.<Companies>} The array of companies initialized from url param or local storage */
 var _companies;
+/** @type {Boolean} Whether or not we're loading potential companies */
+var _loadingStatus = Constants.POTENTIAL_STATUS_CLEAR;
+
+/** Configure the companies either from the url or from local storage */
 var match = /[&?]symbols=([^&]+)/.exec(location.href);
 var urlCompanies = match && match[1].split(',');
 var setFromUrlParam = urlCompanies && urlCompanies.length;
@@ -40,7 +44,7 @@ if (setFromUrlParam) {
 /**
  * Add a company to our _companies array
  */
-function addCompany (newCompany) {
+function addCompany(newCompany) {
   _companies.push(newCompany);
   _updateLocalStorage();
 }
@@ -48,11 +52,15 @@ function addCompany (newCompany) {
 /**
  * Remove a company from our _companies array
  */
-function removeCompany (company) {
+function removeCompany(company) {
   _companies = _companies.filter(c => (
     c !== company
   ));
   _updateLocalStorage();
+}
+
+function setLoadingStatus(newStatus) {
+  _loadingStatus = newStatus;
 }
 
 /**
@@ -81,7 +89,7 @@ function _clearLocalStorage () {
 
 /**
  * The store we'll be exporting. Contains getter methods for
- * companies and potential companies.
+ * companies, potential companies, and loading status.
  */
 var CompaniesStore = assign({}, _Store, {
   getCompanies: function () {
@@ -90,6 +98,10 @@ var CompaniesStore = assign({}, _Store, {
 
   getPotentialCompanies: function () {
     return _potentialCompanies;
+  },
+
+  getLoadingStatus: function () {
+    return _loadingStatus;
   }
 });
 
@@ -100,19 +112,24 @@ var CompaniesStore = assign({}, _Store, {
  */
 Dispatcher.register(function(action) {
   switch(action.actionType) {
+    // set the loading status... when we're uh... loading
+    case Constants.COMPANIES_LOADING:
+      setLoadingStatus(Constants.POTENTIAL_STATUS_LOADING);
+      CompaniesStore.emitChange();
+      break;
+
     // when we get the company data, set our potential companies
     case Constants.COMPANY_DATA:
+      setLoadingStatus(Constants.POTENTIAL_STATUS_RECEIVED);
       setPotentialCompanies(action.companies);
       CompaniesStore.emitChange();
       break;
 
-    // clear the potential companies. only do so if they're
-    // not already empty
+    // clear the potential companies
     case Constants.CLEAR_POTENTIAL_COMPANIES:
-      if (_potentialCompanies.length) {
-        setPotentialCompanies([]);
-        CompaniesStore.emitChange();
-      }
+      setLoadingStatus(Constants.POTENTIAL_STATUS_CLEAR);
+      setPotentialCompanies([]);
+      CompaniesStore.emitChange();
       break;
 
     // add a company
