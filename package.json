@@ -3,7 +3,8 @@
   "version": "0.0.1",
   "private": true,
   "scripts": {
-    "start": "gulp build-server; node server/lib/app.js",
+    "start": "node server/lib/app.js",
+    "build-server": "gulp build-server",
     "build": "gulp build",
     "dev": "gulp dev"
   },
