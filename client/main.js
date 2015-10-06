@@ -76,7 +76,8 @@ class StockInsights extends React.Component {
             stockData={this.state.stockData}
             entityData={this.state.entityData}
             currentColorMode={this.state.currentColorMode}
-            currentDate={this.state.currentDate} />
+            currentDate={this.state.currentDate}
+            histories={this.state.histories} />
           {!!this.state.selectedCompanies.length && 
             <ArticleList selectedCompanies={this.state.selectedCompanies}
               articles={this.state.articles} />

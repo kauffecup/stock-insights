@@ -17,6 +17,8 @@
 import React             from 'react';
 import moment            from 'moment';
 import clone             from 'clone';
+import d3                from 'd3';
+import dimple            from 'dimple';
 import ReactBubbleChart  from 'react-bubble-chart';
 import {
   getNews
@@ -171,6 +173,54 @@ export default class StockVisualizer extends React.Component {
   }
 
   /**
+   * This function is called on mouseover of a bubble. It's passed the dom node of the tooltip,
+   * the d3 data object, and the stroke color. We use these 3 things to graph a dimple bar series
+   * in the tooltip
+   */
+  tooltipFunc(tooltipNode, d, stroke) {
+    // first we format the data from the correct symbol
+    var myData = [];
+    this.props.histories[d._id].map(v => {
+      myData.push({
+        symbol: d._id,
+        date: v.date,
+        close: v.close
+      });
+    });
+
+    // find the svg element in the tooltip - if it isnt there, create one
+    var svg = d3.select(tooltipNode).select('svg');
+    svg = svg && svg.length && svg[0] && svg[0][0] ? svg : d3.select(tooltipNode).append('svg');
+    svg.attr('width', 200)
+      .attr('height', 40);
+
+    // remove everything from the current chart and create a new chart
+    if (this.tipChart) {
+      svg.selectAll('*').remove();
+    }
+    this.tipChart = new dimple.chart(svg, myData, '100%', '100%');
+
+    // configure the axis - x for date, y for close value
+    var x = this.tipChart.addCategoryAxis('x', 'date');
+    x.addOrderRule('date');
+    x.hidden = true;
+    var y = this.tipChart.addMeasureAxis('y', 'close');
+    y.hidden = true
+    var myNums = myData.map(d => d.close);
+    y.overrideMin = Math.min(...myNums);
+    y.overrideMax = Math.max(...myNums);
+
+    // set up the series and its color
+    var series = this.tipChart.addSeries('symbol', dimple.plot.bar);
+    this.tipChart.setBounds(0, 0, '100%','100%');
+    this.tipChart.assignColor(d._id, stroke, stroke, 1);
+    series.barGap = 0.6;
+
+    // now we draw!
+    this.tipChart.draw();
+  }
+
+  /**
    * Render town.
    */
   render() {
@@ -222,6 +272,7 @@ export default class StockVisualizer extends React.Component {
       fixedDomain={domain}
       tooltip={tooltip}
       tooltipProps={tooltipProps}
+      tooltipFunc={this.tooltipFunc.bind(this)}
     />;
   }
 }
