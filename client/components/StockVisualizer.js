@@ -178,6 +178,7 @@ export default class StockVisualizer extends React.Component {
    * in the tooltip
    */
   tooltipFunc(tooltipNode, d, stroke) {
+    if (!this.props.histories || !this.props.histories[d._id]) return;
     // first we format the data from the correct symbol
     var myData = [];
     this.props.histories[d._id].map(v => {
