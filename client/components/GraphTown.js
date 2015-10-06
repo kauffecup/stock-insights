@@ -14,34 +14,57 @@
 // limitations under the License.
 //------------------------------------------------------------------------------
 
-import React       from 'react';
-import {LineChart} from 'react-d3/linechart';
+import React  from 'react';
+import dimple from 'dimple';
+
+const DRAW_TIME = 400;
 
 export default class GraphTown extends React.Component {
-  /** Initialize the height to be 200 and width to 1500? this gets overriden immediately */
-  constructor(props) {
-    super(props);
-    this.state = {height: 200, width: 1500};
+  render() {
+    return <div className="graph-town"></div>;
   }
 
-  /** render town */
-  render() {
-    return (
-      <div className="graph-town">
-        <LineChart data={this.adaptData()}
-          xAxisTickInterval={{unit: 'day', interval: 7}}
-          yAxisTickCount={4}
-          width={this.state.width}
-          height={this.state.height}
-          legend={true}
-          viewBoxObject={{
-            x: 0,
-            y: 0,
-            height: this.state.height,
-            width: this.state.width
-          }} />
-      </div>
-    );
+  /** Configure our dimple chart */
+  componentDidMount() {
+    this.handleResize = (e => this._handleResize(e));
+    window.addEventListener('resize', this.handleResize);
+    this.adaptData();
+
+    // intialize the svg and chart with proper sizes
+    var svg = dimple.newSvg(React.findDOMNode(this), '100%', '100%');
+    this.lineChart = new dimple.chart(svg, this.data);
+    this.lineChart.setBounds(30, 14, '100%,-40', '100%,-34');
+
+    // intialize the axis
+    this.x = this.lineChart.addTimeAxis('x', 'date', "%Y-%m-%d", '%b %d');
+    this.y = this.lineChart.addMeasureAxis('y', 'close');
+    this.y.ticks = 7;
+    this.updateAxis();
+
+    // initialize the series lines
+    var lines = this.lineChart.addSeries('symbol', dimple.plot.line);
+    lines.lineMarkers = true;
+
+    // initialize the legend
+    this.legend = this.lineChart.addLegend(60, 5, '100%,-50', 20, "right");
+
+    // lessss go
+    this.lineChart.draw(DRAW_TIME);
+  }
+
+  /** When our props change, update the graphs data and min/max axis stuff */
+  componentDidUpdate() {
+    this.adaptData();
+    this.lineChart.data = this.data;
+    this.updateAxis();
+    this.lineChart.draw(DRAW_TIME);
+  }
+
+  /** Set the min and max of the axis based on our graphs data */
+  updateAxis() {
+    var myNums = this.data.map(d => d.close);
+    this.y.overrideMin = Math.min(...myNums);
+    this.y.overrideMax = Math.max(...myNums);
   }
 
   /** Adapt the histories map in to an array just the way we want it */
@@ -49,38 +72,24 @@ export default class GraphTown extends React.Component {
     var myData = [];
     for (var symbol in this.props.histories) {
       if (this.props.selectedCompanies.indexOf(symbol) > -1) {
-        myData.push({
-          name: symbol,
-          strokeWidth: 3,
-          values: this.props.histories[symbol].map(v => ({
-            x: new Date(v.date),
-            y: v.close
-          }))
+        this.props.histories[symbol].map(v => {
+          myData.push({
+            symbol: symbol,
+            date: v.date,
+            close: v.close
+          });
         });
       }
     }
-    return myData;
+    this.data = myData;
   }
 
-  /** Measure our dom node and set the state */
-  updateSize() {
-    this.setState({height: React.findDOMNode(this).clientHeight, width: React.findDOMNode(this).clientWidth});
-  }
-  /** When we mount, intialize resize handler */
-  componentDidMount() {
-    this.handleResize = (e => this._handleResize(e));
-    window.addEventListener('resize', this.handleResize);
-    this.updateSize();
-  }
-  /** When we're peacing out, remove the handler */
-  componentWillUnmount() {
-    window.removeEventListener('resize', this.handleResize);
-  }
-    /** On a debounce, adjust the size of our graph area and then update the chart */
+  /** when we resize update our bounds, im not really too sure why this doesnt happen
+    * automatically because we're using percents... but oh well maybe one day i'll fix it */
   _handleResize(e) {
     this.__resizeTimeout && clearTimeout(this.__resizeTimeout);
     this.__resizeTimeout = setTimeout(() => {
-      this.updateSize();
+      this.lineChart.setBounds(30, 14, '100%,-40', '100%,-34');
       delete this.__resizeTimeout;
     }, 200);
   }
