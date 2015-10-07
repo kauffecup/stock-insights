@@ -38,5 +38,6 @@ export default keyMirror({
   CLOSE_ARTICLE_LIST: null,
   SWITCH_ANALYSIS_COLOR_MODE: null,
   TOGGLE_CONDENSED_COMPANIES: null,
-  SWITCH_DATE: null
+  SWITCH_DATE: null,
+  STRING_DATA: null
 });

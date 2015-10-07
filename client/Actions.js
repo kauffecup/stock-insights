@@ -21,7 +21,8 @@ import {
   stockPrice,
   stockNews,
   stockHistory,
-  sentiment
+  sentiment,
+  strings
 } from './requester'
 
 /** Search for companies */
@@ -112,4 +113,11 @@ export function toggleCondensedCompanies() {
 /** Change the date */
 export function setDate(date) {
   Dispatcher.dispatch({actionType: Constants.SWITCH_DATE, date: date});
+}
+
+/** Get the globalized strings */
+export function getStrings() {
+  strings().then(strings => {
+    Dispatcher.dispatch({actionType: Constants.STRING_DATA, strings: strings});
+  });
 }

@@ -32,7 +32,8 @@ import DateSlider        from './components/DateSlider';
 
 import {
   getStockData,
-  getStockHistory
+  getStockHistory,
+  getStrings
 } from './Actions';
 
 // make sure all es6 things work correctly in all browsers
@@ -96,6 +97,7 @@ class StockInsights extends React.Component {
    * When mounting/unmounting add/remove change listeners to stores
    */
   componentDidMount() {
+    getStrings();
     CompaniesStore.addChangeListener(this._onChange);
     StockDataStore.addChangeListener(this._onChange);
     NewsArticlesStore.addChangeListener(this._onChange);

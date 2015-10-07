@@ -57,6 +57,14 @@ export function sentiment(symbol, entity) {
 }
 
 /**
+ * Hit the strings endpoint with no query.
+ * Return a promise that resolves with the response.
+ */
+export function strings() {
+  return _queryHelper('/strings', {});
+}
+
+/**
  * Helper method that handles promise creation, resolution
  * and rejection for a given endpoint and query.
  */
