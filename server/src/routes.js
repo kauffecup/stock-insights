@@ -15,15 +15,33 @@
 //------------------------------------------------------------------------------
 
 import express      from 'express';
+import path         from 'path';
 import Promise      from 'bluebird';
+import gaas         from 'gaas';
+import locale       from 'locale';
 import vcapServices from './vcapServices';
-var router = express.Router();
-var request = Promise.promisify(require('request'));
-Promise.promisifyAll(request);
 
-/* GET home page. */
-router.get('/', (req, res) => {
-  res.render('index');
+var router = express.Router();
+var gaasClient = gaas.getClient({credentials: vcapServices.globalization.credentials});
+var gaasStock = Promise.promisifyAll(gaasClient.project('stockinsights'));
+var request = Promise.promisifyAll(require('request'));
+
+var supportedLocales = new locale.Locales([
+  'en', 'zh-Hant', 'zh-Hans', 'fr', 'de', 'it', 'ja', 'pt', 'es'
+]);
+
+/* GET strings. */
+router.get('/strings', (req, res) => {
+  var locales = new locale.Locales(req.headers['accept-language']);
+  var best = locales.best(supportedLocales);
+  gaasStock.getResourceDataAsync({
+    languageID: best.code
+  }).then(([{data}, body]) => {
+    res.json(data);
+  }).catch(e => {
+    res.status(500);
+    res.json(e);
+  });
 });
 
 /* Company Lookup. query takes company */

@@ -46,6 +46,8 @@ for (var service in vcapServices) {
   } else if (service.indexOf('Stock Sentiment') > -1) {
     vcapServices.stockSentiment = vcapServices[service][0];
     delete vcapServices[service];
+  } else if (service.indexOf('IBM Globalization') > -1) {
+    vcapServices.globalization = vcapServices[service][0];
   }
 }
 
