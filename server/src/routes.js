@@ -31,17 +31,27 @@ var supportedLocales = new locale.Locales([
 ]);
 
 /* GET strings. */
+var stringCache = {};
 router.get('/strings', (req, res) => {
   var locales = new locale.Locales(req.headers['accept-language']);
-  var best = locales.best(supportedLocales);
-  gaasStock.getResourceDataAsync({
-    languageID: best.code
-  }).then(([{data}, body]) => {
-    res.json(data);
-  }).catch(e => {
-    res.status(500);
-    res.json(e);
-  });
+  var langCode = locales.best(supportedLocales).code;
+  // first we check our cache - if there return immediately
+  if (stringCache[langCode]) {
+    res.json(stringCache[langCode]);
+  // otherwise we're gonna go off to the globalization service
+  // once we get the new data object, we hold on to it for quicker
+  // second requests
+  } else {
+    gaasStock.getResourceDataAsync({
+      languageID: langCode
+    }).then(([{data}, body]) => {
+      stringCache[langCode] = data;
+      res.json(data);
+    }).catch(e => {
+      res.status(500);
+      res.json(e);
+    });
+  }
 });
 
 /* Company Lookup. query takes company */
