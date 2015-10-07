@@ -29,11 +29,11 @@ class AnalysisToggler extends React.Component {
       <div className={"radioset " + this.props.classname} onChange={this.props.onChange}>
         <ul>{this.props.analysisModes.map(am =>
           <li key={am.id}>
-            <input type="radio" name={"radio" + this.props.name} id={am.id} checked={am.selected} />
+            <input type="radio" name={"radio" + this.props.classname} id={am.id} checked={am.selected} />
             <label>{am.label}</label>
           </li>
         )}</ul>
-        <div className="title">{this.props.name + " of bubbles"}</div>
+        <div className="title">{this.props.name}</div>
       </div>
     );
   }
@@ -49,7 +49,7 @@ export default class AnalysisToggle extends React.Component {
         <AnalysisToggler className="color"
           onChange={e => switchAnalysisColorMode(e.target.id)}
           analysisModes={this.props.analysisColorModes}
-          name="Color" />
+          name={this.props.strings.bubbleColor} />
       </form>
     );
   }

@@ -49,35 +49,6 @@ function generateLegend(lowText, highText) {
   ];
 }
 
-/** The color legend we will use when colors reflect change */
-var colorLegendChange = generateLegend('(-) Change', '(+) Change');
-/** The color legend we will use when colors reflect the 52 week analysis */
-var colorLegend52 = generateLegend('↓ 52 Low', '↑ 52 High');
-/** The color legend we will use when colors reflect change */
-var colorLegendEntity = generateLegend('(-) Sentiment', '(+) Sentiment');
-
-/** Configuration for the tooltip */
-var tooltipProps = [{
-  css: 'symbol',
-  prop: '_id'
-}, {
-  css: 'value',
-  prop: 'value',
-  display: 'Value'
-}, {
-  css: 'change',
-  prop: 'change',
-  display: 'Change'
-}, {
-  css: 'fiftytwo-high',
-  prop: 'week_52_high',
-  display: 'Week 52 High'
-}, {
-  css: 'fiftytwo-low',
-  prop: 'week_52_low',
-  display: 'Week 52 Low'
-}];
-
 export default class StockVisualizer extends React.Component {
   /**
    * Given a function to determine a stocks color value, and
@@ -229,10 +200,31 @@ export default class StockVisualizer extends React.Component {
     var isEntities = !!entityData.length;
     var tooltip = !isEntities;
 
+    var tooltipProps = [{
+      css: 'symbol',
+      prop: '_id'
+    }, {
+      css: 'value',
+      prop: 'value',
+      display: this.props.strings.value
+    }, {
+      css: 'change',
+      prop: 'change',
+      display: this.props.strings.change
+    }, {
+      css: 'fiftytwo-high',
+      prop: 'week_52_high',
+      display: this.props.strings.week52High
+    }, {
+      css: 'fiftytwo-low',
+      prop: 'week_52_low',
+      display: this.props.strings.week52Low
+    }];
+
     var data, legend, domain, sizeFunc;
     if (isEntities) {
       data = this.props.entityData;
-      legend = colorLegendEntity;
+      legend = generateLegend(`(-) ${this.props.strings.sentiment || ''}`, `(+) ${this.props.strings.sentiment || ''}`);
       domain = {
         min: -1,
         max: 1
@@ -252,13 +244,13 @@ export default class StockVisualizer extends React.Component {
         case '_am_color_change':
           data = this.getData(data, this.getChangeAnalysis);
           domain = this.getChangeDomain(data);
-          legend = colorLegendChange;
+          legend = generateLegend(`(-) ${this.props.strings.change || ''}`, `(+) ${this.props.strings.change || ''}`);
           break;
 
         case '_am_color_52week':
           data = this.getData(data, this.getWeek52Analysis);
           domain = this.getWeek52Domain();
-          legend = colorLegend52;
+          legend = generateLegend(`↓ ${this.props.strings.fiftyTwoLow || ''}`, `↑ ${this.props.strings.fiftyTwoHigh || ''}`);
           break;
       }
     }

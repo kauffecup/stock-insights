@@ -117,10 +117,10 @@ export default class CompanySearcher extends React.Component {
       potentialCompanies = null;
     // if we're loading and don't have any companies loaded already, show the loading message
     } else if (loadingStatus === Constants.POTENTIAL_STATUS_LOADING && !potentialCompanies.length) {
-      potentialCompanies = <li className="potential-company">Loading...</li>;
+      potentialCompanies = <li className="potential-company">{this.props.strings.loading}</li>;
     // otherwise we've gotten stuff back, if we don't have anythin' show the no results message
     } else if (!potentialCompanies.length) {
-      potentialCompanies = <li className="potential-company">No results</li>;
+      potentialCompanies = <li className="potential-company">{this.props.strings.noResults}</li>;
     }
     // if none of these cases were hit, we proceed on as usual with our potential companies array
 
@@ -132,7 +132,7 @@ export default class CompanySearcher extends React.Component {
           value={value}
           list="potential-companies"
           onChange={this.handleChange.bind(this)}
-          placeholder="search for companies..."
+          placeholder={this.props.strings.companySearch}
           ref="input" />
         <ul className="potential-companies">{potentialCompanies}</ul>
       </div>

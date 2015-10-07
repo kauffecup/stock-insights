@@ -61,14 +61,15 @@ class StockInsights extends React.Component {
     return (
       <div className={classes}>
         <div className="stock-insights-title">
-          <h1 className="stock-insights-title">Stock Insights</h1>
+          <h1 className="stock-insights-title">{this.state.strings.stockInsights}</h1>
         </div>
         <CompanyContainer
           companies={this.state.companies}
           potentialCompanies={this.state.potentialCompanies}
           loadingStatus={this.state.potentialCompaniesLoading}
           condensed={this.state.condensedCompanies}
-          selectedCompanies={this.state.selectedCompanies} />
+          selectedCompanies={this.state.selectedCompanies}
+          strings={this.state.strings} />
         {!this.state.selectedCompanies.length &&
           <DateSlider stockData={this.state.stockData} currentDate={this.state.currentDate} />
         }
@@ -78,7 +79,8 @@ class StockInsights extends React.Component {
             entityData={this.state.entityData}
             currentColorMode={this.state.currentColorMode}
             currentDate={this.state.currentDate}
-            histories={this.state.histories} />
+            histories={this.state.histories}
+            strings={this.state.strings} />
           {!!this.state.selectedCompanies.length && 
             <ArticleList selectedCompanies={this.state.selectedCompanies}
               articles={this.state.articles} />
@@ -87,7 +89,7 @@ class StockInsights extends React.Component {
         {this.state.selectedCompanies.length ?
           <GraphTown histories={this.state.histories} selectedCompanies={this.state.selectedCompanies} />
           :
-          <AnalysisToggle analysisColorModes={this.state.analysisColorModes} />
+          <AnalysisToggle analysisColorModes={this.state.analysisColorModes} strings={this.state.strings} />
         }
       </div>
     );
@@ -128,6 +130,7 @@ class StockInsights extends React.Component {
       stockData: StockDataStore.getStockData(),
       entityData: StockDataStore.getEntities(),
       histories: StockDataStore.getStockHistories(),
+      strings: PageStateStore.getStrings(),
       isEmbedded: PageStateStore.getEmbeddedMode(),
       currentDate: PageStateStore.getDate(),
       analysisColorModes: PageStateStore.getAnalysisColorModes(),

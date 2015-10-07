@@ -70,7 +70,7 @@ export default class CompanyContainer extends React.Component {
           <Company company={c} key={c.symbol} condensed={this.props.condensed} selected={!!selected[c.symbol]} />
         )}
         {this.props.companies.length ? <button onClick={toggleCondensedCompanies}>
-          {this.props.condensed ? "Show" : "Hide Company Names"}
+          {this.props.condensed ? this.props.strings.showNames : this.props.strings.hideNames}
         </button> : null}
         <CompanySearcher {...this.props} />
       </div>

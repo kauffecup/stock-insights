@@ -21,6 +21,7 @@ import assign     from 'object-assign';
 import clone      from 'clone';
 import moment     from 'moment';
 
+var _strings = {};
 var _selectedCompanies = [];
 // initialize current date at today
 var _currentDate = moment();
@@ -30,14 +31,6 @@ var _condensedCompanies = false;
 
 /** @type {String} The id for the current selected color mode */
 var _selectedColorMode = '_am_color_change';
-/** @type {Array} The possible color modes - each has a label and id */
-var _analysisColorModes = [{
-  label: 'Change',
-  id: '_am_color_change'
-}, {
-  label: 'Value Relative to 52 Week',
-  id: '_am_color_52week'
-}];
 
 /** @type {Boolean} If we're running embedded or not. Right now determined by setting symbols in the URL */
 var _match = /[&?]symbols=([^&]+)/.exec(location.href);
@@ -67,6 +60,9 @@ function removeCompany(symbol) {
 function setDate(newDate) {
   _currentDate = newDate;
 }
+function setStrings(newStrings) {
+  _strings = newStrings;
+}
 
 /**
  * The store we'll be exporting. Contains getter methods for
@@ -82,6 +78,13 @@ var PageStateStore = assign({}, _Store, {
   },
 
   getAnalysisColorModes: function () {
+    var _analysisColorModes = [{
+      label: _strings.change,
+      id: '_am_color_change'
+    }, {
+      label: _strings.valueRelative,
+      id: '_am_color_52week'
+    }];
     return _analysisColorModes.map((am => {
       var amr = clone(am);
       amr.selected = amr.id === _selectedColorMode;
@@ -96,6 +99,9 @@ var PageStateStore = assign({}, _Store, {
   },
   getDate: function () {
     return _currentDate;
+  },
+  getStrings: function () {
+    return _strings;
   }
 });
 
@@ -143,6 +149,11 @@ Dispatcher.register(function(action) {
 
     case Constants.SWITCH_DATE:
       setDate(action.date);
+      PageStateStore.emitChange();
+      break;
+
+    case Constants.STRING_DATA:
+      setStrings(action.strings);
       PageStateStore.emitChange();
       break;
 
