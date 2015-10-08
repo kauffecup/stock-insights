@@ -63,9 +63,11 @@ router.get('/companylookup', (req, res) => {
 
 /* Stock News. query takes symbol */
 router.get('/stocknews', (req, res) => {
+  var locales = new locale.Locales(req.headers['accept-language']);
+  var langCode = locales.best(supportedLocales).code;
   var symbol = req.query.symbol;
   var {client_id, client_secret, url} = vcapServices.stockPrice.credentials;
-  return _doGet(url + '/news/find', {client_id: client_id, symbol: symbol, language: req.headers['accept-language']}, res);
+  return _doGet(url + '/news/find', {client_id: client_id, symbol: symbol, language: langCode}, res);
 });
 
 /* Stock Price. query takes symbols */
@@ -147,12 +149,14 @@ router.get('/demo/negative', (req, res) => {
 
 /** Get an array of entities w/ average sentiment sorted by count about a company */
 router.get('/demo/entities', (req, res) => {
+  var locales = new locale.Locales(req.headers['accept-language']);
+  var langCode = locales.best(supportedLocales).code;
   var symbols = req.query.symbol || req.query.symbols;
   var {client_id, client_secret, url} = vcapServices.stockSentiment.credentials;
   symbols = symbols.split(',');
   var promArr = [];
   for (var i = 0; i < symbols.length; i++) {
-    promArr.push(request.getAsync({url: url + '/news/find', qs: {client_id: client_id, symbol: symbols[i], language: req.headers['accept-language']}}));
+    promArr.push(request.getAsync({url: url + '/news/find', qs: {client_id: client_id, symbol: symbols[i], language: langCode}}));
   }
   Promise.all(promArr).then(dataArr => {
     // step 1: map
@@ -199,9 +203,11 @@ router.get('/demo/entities', (req, res) => {
 
 /** Get an array of articles + relations for a company */
 router.get('/demo/articles', (req, res) => {
+  var locales = new locale.Locales(req.headers['accept-language']);
+  var langCode = locales.best(supportedLocales).code;
   var symbol = req.query.symbol;
   var {client_id, client_secret, url} = vcapServices.stockSentiment.credentials;
-    request.getAsync({url: url + '/news/find', qs: {client_id: client_id, symbol: symbol, language: req.headers['accept-language']}}).then(([response, body]) => {
+    request.getAsync({url: url + '/news/find', qs: {client_id: client_id, symbol: symbol, language: langCode}}).then(([response, body]) => {
     var parsedResponse = typeof body === 'string' ? JSON.parse(body) : body;
     res.json(parsedResponse.news.map(n => ({
       title: n.title,
