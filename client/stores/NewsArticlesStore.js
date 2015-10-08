@@ -71,7 +71,7 @@ Dispatcher.register(function(action) {
     // still selected. otherwise we know the window has been closed.
     case Constants.NEWS_DATA:
       var scs = PageStateStore.getSelectedCompanies();
-      if (scs.length && scs.indexOf(action.news.symbol) > -1) {
+      if (scs.length && scs.indexOf(action.news.symbol.toUpperCase()) > -1) {
         addArticles(action.news.news, action.news.symbol);
         NewsArticlesStore.emitChange();
       }
