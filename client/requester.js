@@ -36,8 +36,8 @@ export function stockPrice(symbols) {
  * Hit the stocknews endpoint with the proper query.
  * Return a promise that resolves with the response.
  */
-export function stockNews(symbol) {
-  return _queryHelper('/stocknews', {symbol: symbol});
+export function stockNews(symbol, language) {
+  return _queryHelper('/stocknews', {symbol: symbol, language: language});
 }
 
 /**
@@ -60,8 +60,8 @@ export function sentiment(symbol, entity) {
  * Hit the strings endpoint with no query.
  * Return a promise that resolves with the response.
  */
-export function strings() {
-  return _queryHelper('/strings', {});
+export function strings(language) {
+  return _queryHelper('/strings', {language: language});
 }
 
 /**

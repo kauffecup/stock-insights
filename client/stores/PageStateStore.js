@@ -41,6 +41,10 @@ var _matchTake2 = /[&?]articles=([^&]+)/.exec(location.href);
 var _urlSelected = _matchTake2 && _matchTake2[1].split(',');
 var _selectedCompanies = _urlSelected || [];
 
+/** @type {string} can force a language by specifying it in the url */
+var _matchTake3 = /[&?]language=([^&]+)/.exec(location.href);
+var _language = _matchTake3 && _matchTake3[1];
+
 /**
  * Set a new selected color mode
  */
@@ -106,6 +110,9 @@ var PageStateStore = assign({}, _Store, {
   },
   getStrings: function () {
     return _strings;
+  },
+  getLanguage: function () {
+    return _language;
   }
 });
 

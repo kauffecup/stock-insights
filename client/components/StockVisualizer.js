@@ -261,7 +261,7 @@ export default class StockVisualizer extends React.Component {
       className="stock-visualizer"
       colorLegend={legend}
       data={data}
-      onClick={isEntities ? null : getNews}
+      onClick={isEntities ? null : getNews.bind(null, this.props.language)}
       fixedDomain={domain}
       tooltip={tooltip}
       tooltipProps={tooltipProps}

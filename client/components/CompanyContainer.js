@@ -33,7 +33,7 @@ class Company extends React.Component {
     if (this.props.selected) {
       deselectCompany(this.props.company);
     } else {
-      getNews(this.props.company);
+      getNews(this.props.language, this.props.company);
     }
   }
   render() {
@@ -67,7 +67,7 @@ export default class CompanyContainer extends React.Component {
     return (
       <div className={classes}>
         {this.props.companies.map(c =>
-          <Company company={c} key={c.symbol} condensed={this.props.condensed} selected={!!selected[c.symbol]} />
+          <Company company={c} key={c.symbol} condensed={this.props.condensed} selected={!!selected[c.symbol]} language={this.props.language} />
         )}
         {this.props.companies.length ? <button onClick={toggleCondensedCompanies}>
           {this.props.condensed ? this.props.strings.showNames : this.props.strings.hideNames}

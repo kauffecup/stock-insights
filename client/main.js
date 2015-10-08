@@ -70,7 +70,8 @@ class StockInsights extends React.Component {
           loadingStatus={this.state.potentialCompaniesLoading}
           condensed={this.state.condensedCompanies}
           selectedCompanies={this.state.selectedCompanies}
-          strings={this.state.strings} />
+          strings={this.state.strings}
+          language={this.state.language} />
         {!this.state.selectedCompanies.length &&
           <DateSlider stockData={this.state.stockData} currentDate={this.state.currentDate} />
         }
@@ -81,7 +82,8 @@ class StockInsights extends React.Component {
             currentColorMode={this.state.currentColorMode}
             currentDate={this.state.currentDate}
             histories={this.state.histories}
-            strings={this.state.strings} />
+            strings={this.state.strings}
+            language={this.state.language} />
           {!!this.state.selectedCompanies.length && 
             <ArticleList selectedCompanies={this.state.selectedCompanies}
               articles={this.state.articles} />
@@ -100,7 +102,7 @@ class StockInsights extends React.Component {
    * When mounting/unmounting add/remove change listeners to stores
    */
   componentDidMount() {
-    getStrings();
+    getStrings(this.state.language);
     CompaniesStore.addChangeListener(this._onChange);
     StockDataStore.addChangeListener(this._onChange);
     NewsArticlesStore.addChangeListener(this._onChange);
@@ -109,7 +111,7 @@ class StockInsights extends React.Component {
     // nah mean nah mean?
     if (this.state.selectedCompanies.length) {
       for (var company of this.state.selectedCompanies) {
-        getNews(company);
+        getNews(this.state.language, company);
       }
     } 
     // if we already have companies, request the stock data to populate
@@ -139,6 +141,7 @@ class StockInsights extends React.Component {
       entityData: StockDataStore.getEntities(),
       histories: StockDataStore.getStockHistories(),
       strings: PageStateStore.getStrings(),
+      language: PageStateStore.getLanguage(),
       isEmbedded: PageStateStore.getEmbeddedMode(),
       currentDate: PageStateStore.getDate(),
       analysisColorModes: PageStateStore.getAnalysisColorModes(),

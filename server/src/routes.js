@@ -33,8 +33,9 @@ var supportedLocales = new locale.Locales([
 /* GET strings. */
 var stringCache = {};
 router.get('/strings', (req, res) => {
+  // if a language is specified in the request, prioritize that
   var locales = new locale.Locales(req.headers['accept-language']);
-  var langCode = locales.best(supportedLocales).code;
+  var langCode = req.query.language || locales.best(supportedLocales).code;
   // first we check our cache - if there return immediately
   if (stringCache[langCode]) {
     res.json(stringCache[langCode]);
@@ -63,8 +64,9 @@ router.get('/companylookup', (req, res) => {
 
 /* Stock News. query takes symbol */
 router.get('/stocknews', (req, res) => {
+  // if a language is specified in the request, prioritize that
   var locales = new locale.Locales(req.headers['accept-language']);
-  var langCode = locales.best(supportedLocales).code;
+  var langCode = req.query.language || locales.best(supportedLocales).code;
   var symbol = req.query.symbol;
   var {client_id, client_secret, url} = vcapServices.stockPrice.credentials;
   return _doGet(url + '/news/find', {client_id: client_id, symbol: symbol, language: langCode}, res);

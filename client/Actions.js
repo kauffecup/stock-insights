@@ -75,11 +75,11 @@ export function getSentiment(symbol, entity) {
 }
 
 /** Get the articles for a given company. This also selects the company and gets its stock history. */
-export function getNews(symbol) {
+export function getNews(language, symbol) {
   symbol = symbol._id || symbol.symbol || symbol;
   selectCompany(symbol);
   Dispatcher.dispatch({actionType: Constants.NEWS_LOADING, symbol: symbol});
-  stockNews(symbol).then(news => {
+  stockNews(symbol, language).then(news => {
     Dispatcher.dispatch({actionType: Constants.NEWS_DATA, news: news});
   });
 }
@@ -116,8 +116,8 @@ export function setDate(date) {
 }
 
 /** Get the globalized strings */
-export function getStrings() {
-  strings().then(strings => {
+export function getStrings(language) {
+  strings(language).then(strings => {
     Dispatcher.dispatch({actionType: Constants.STRING_DATA, strings: strings});
   });
 }
