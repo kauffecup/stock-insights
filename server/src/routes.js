@@ -109,7 +109,7 @@ function _doGet(url, qs, res) {
 
 /** Get stocks with positive change from a list of symbols, sorted by change */
 router.get('/demo/positive', (req, res) => {
-  var symbols = req.query.symbols;
+  var symbols = req.query.symbols || req.query.symbol;
   var {client_id, client_secret, url} = vcapServices.stockPrice.credentials;
   request.getAsync({url: url + '/markets/quote', qs: {client_id: client_id, symbols: symbols}}).then(([response, body]) => {
     var parsedResponse = typeof body === 'string' ? JSON.parse(body) : body;
@@ -129,7 +129,7 @@ router.get('/demo/positive', (req, res) => {
 
 /** Get stocks with negative change from a list of symbols, sorted by change */
 router.get('/demo/negative', (req, res) => {
-  var symbols = req.query.symbols;
+  var symbols = req.query.symbols || req.query.symbol;
   var {client_id, client_secret, url} = vcapServices.stockPrice.credentials;
   request.getAsync({url: url + '/markets/quote', qs: {client_id: client_id, symbols: symbols}}).then(([response, body]) => {
     var parsedResponse = typeof body === 'string' ? JSON.parse(body) : body;
@@ -147,13 +147,16 @@ router.get('/demo/negative', (req, res) => {
   });
 });
 
-/** Get an array of entities w/ average sentiment sorted by count about a company */
+/** Get an array of entities w/ average sentiment sorted by count about a company or list of companies */
 router.get('/demo/entities', (req, res) => {
+  // if the user passes in a language, use that otherwise get it from the request header
   var locales = new locale.Locales(req.headers['accept-language']);
-  var langCode = locales.best(supportedLocales).code;
-  var symbols = req.query.symbol || req.query.symbols;
+  var langCode = req.query.language || locales.best(supportedLocales).code;
   var {client_id, client_secret, url} = vcapServices.stockSentiment.credentials;
+  // companies can be in symbol or symbols field
+  var symbols = req.query.symbol || req.query.symbols;
   symbols = symbols.split(',');
+  // request time! make a request for each company
   var promArr = [];
   for (var i = 0; i < symbols.length; i++) {
     promArr.push(request.getAsync({url: url + '/news/find', qs: {client_id: client_id, symbol: symbols[i], language: langCode}}));
@@ -201,19 +204,34 @@ router.get('/demo/entities', (req, res) => {
   });
 });
 
-/** Get an array of articles + relations for a company */
+/** Get an array of articles + relations for a company or list of companies */
 router.get('/demo/articles', (req, res) => {
+  // if the user passes in a language, use that otherwise get it from the request header
   var locales = new locale.Locales(req.headers['accept-language']);
-  var langCode = locales.best(supportedLocales).code;
-  var symbol = req.query.symbol;
+  var langCode = req.query.language || locales.best(supportedLocales).code;
   var {client_id, client_secret, url} = vcapServices.stockSentiment.credentials;
-    request.getAsync({url: url + '/news/find', qs: {client_id: client_id, symbol: symbol, language: langCode}}).then(([response, body]) => {
-    var parsedResponse = typeof body === 'string' ? JSON.parse(body) : body;
-    res.json(parsedResponse.news.map(n => ({
-      title: n.title,
-      url: n.url,
-      relations: n.relations
-    })));
+  // companies can be in symbol or symbols field
+  var symbols = req.query.symbol || req.query.symbols;
+  symbols = symbols.split(',');
+  // request time! make a request for each company
+  var promArr = [];
+  for (var i = 0; i < symbols.length; i++) {
+    promArr.push(request.getAsync({url: url + '/news/find', qs: {client_id: client_id, symbol: symbols[i], language: langCode}}));
+  }
+  // once they're all done, iterate over make our array of news articles
+  Promise.all(promArr).then(dataArr => {
+    var myNews = [];
+    for (var [response, body] of dataArr) {
+      var parsedResponse = typeof body === 'string' ? JSON.parse(body) : body;
+      myNews = myNews.concat(parsedResponse.news.map(n => ({
+        title: n.title,
+        url: n.url,
+        relations: n.relations,
+        date: n.date
+      })));
+    }
+    // sort by date and return
+    res.json(myNews.sort((n1, n2) => n2.date > n1.date));
   }).catch(e => {
     res.status(500);
     res.json(e);
