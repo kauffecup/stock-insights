@@ -230,7 +230,7 @@ Dispatcher.register(function(action) {
 
     case Constants.NEWS_DATA:
       var scs = PageStateStore.getSelectedCompanies();
-      if (scs.length && scs.indexOf(action.news.symbol) > -1) {
+      if (scs.length && scs.indexOf(action.news.symbol.toUpperCase()) > -1) {
         addEntities(action.news.news, action.news.symbol);
         StockDataStore.emitChange();
       }
