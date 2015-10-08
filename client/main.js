@@ -33,7 +33,8 @@ import DateSlider        from './components/DateSlider';
 import {
   getStockData,
   getStockHistory,
-  getStrings
+  getStrings,
+  getNews
 } from './Actions';
 
 // make sure all es6 things work correctly in all browsers
@@ -104,6 +105,13 @@ class StockInsights extends React.Component {
     StockDataStore.addChangeListener(this._onChange);
     NewsArticlesStore.addChangeListener(this._onChange);
     PageStateStore.addChangeListener(this._onChange);
+    // if we already have selected companies, request their articles to populate
+    // nah mean nah mean?
+    if (this.state.selectedCompanies.length) {
+      for (var company of this.state.selectedCompanies) {
+        getNews(company);
+      }
+    } 
     // if we already have companies, request the stock data to populate
     // our visualizations
     if (this.state.companies.length) {

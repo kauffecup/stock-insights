@@ -22,7 +22,6 @@ import clone      from 'clone';
 import moment     from 'moment';
 
 var _strings = {};
-var _selectedCompanies = [];
 // initialize current date at today
 var _currentDate = moment();
 
@@ -36,6 +35,11 @@ var _selectedColorMode = '_am_color_change';
 var _match = /[&?]symbols=([^&]+)/.exec(location.href);
 var _urlCompanies = _match && _match[1].split(',');
 var _isEmbedded = _urlCompanies && _urlCompanies.length;
+
+/** @type {Array} The companies that are selected. Initialized blank unless passed in via URL */
+var _matchTake2 = /[&?]articles=([^&]+)/.exec(location.href);
+var _urlSelected = _matchTake2 && _matchTake2[1].split(',');
+var _selectedCompanies = _urlSelected || [];
 
 /**
  * Set a new selected color mode
