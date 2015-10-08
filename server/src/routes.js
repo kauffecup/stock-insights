@@ -27,7 +27,7 @@ var gaasStock = Promise.promisifyAll(gaasClient.project('stockinsights'));
 var request = Promise.promisifyAll(require('request'));
 
 var supportedLocales = new locale.Locales([
-  'en', 'zh-Hant', 'zh-Hans', 'fr', 'de', 'it', 'ja', 'pt', 'es'
+  'en', 'zh-Hant', 'zh-Hans', 'fr', 'de', 'it', 'ja', 'pt-br', 'es'
 ]);
 
 /* GET strings. */
