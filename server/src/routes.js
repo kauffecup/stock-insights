@@ -147,29 +147,36 @@ router.get('/demo/negative', (req, res) => {
 
 /** Get an array of entities w/ average sentiment sorted by count about a company */
 router.get('/demo/entities', (req, res) => {
-  var symbol = req.query.symbol;
+  var symbols = req.query.symbol || req.query.symbols;
   var {client_id, client_secret, url} = vcapServices.stockSentiment.credentials;
-    request.getAsync({url: url + '/news/find', qs: {client_id: client_id, symbol: symbol}}).then(([response, body]) => {
-    var parsedResponse = typeof body === 'string' ? JSON.parse(body) : body;
+  symbols = symbols.split(',');
+  var promArr = [];
+  for (var i = 0; i < symbols.length; i++) {
+    promArr.push(request.getAsync({url: url + '/news/find', qs: {client_id: client_id, symbol: symbols[i]}}));
+  }
+  Promise.all(promArr).then(dataArr => {
     // step 1: map
     var entityMap = {};
-    for (var article of parsedResponse.news) {
-      for (var {score, sentiment, text} of article.entities) {
-        var cased = text.replace(/\w*/g, txt =>
-          txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase()
-        );
-        var multiplier;
-        if (sentiment === 'positive') {
-          multiplier = 1;
-        } else if (sentiment === 'negative') {
-          multiplier = -1;
-        } else if (sentiment === 'neutral') {
-          multiplier = 0;
+    for (var [response, body] of dataArr) {
+      var parsedResponse = typeof body === 'string' ? JSON.parse(body) : body;
+      for (var article of parsedResponse.news) {
+        for (var {score, sentiment, text} of article.entities) {
+          var cased = text.replace(/\w*/g, txt =>
+            txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase()
+          );
+          var multiplier;
+          if (sentiment === 'positive') {
+            multiplier = 1;
+          } else if (sentiment === 'negative') {
+            multiplier = -1;
+          } else if (sentiment === 'neutral') {
+            multiplier = 0;
+          }
+          if (!entityMap[cased]) {
+            entityMap[cased] = [];
+          }
+          entityMap[cased].push(multiplier * score);
         }
-        if (!entityMap[cased]) {
-          entityMap[cased] = [];
-        }
-        entityMap[cased].push(multiplier * score);
       }
     }
     // step 2: reduce
