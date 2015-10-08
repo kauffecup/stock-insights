@@ -65,7 +65,7 @@ router.get('/companylookup', (req, res) => {
 router.get('/stocknews', (req, res) => {
   var symbol = req.query.symbol;
   var {client_id, client_secret, url} = vcapServices.stockPrice.credentials;
-  return _doGet(url + '/news/find', {client_id: client_id, symbol: symbol}, res);
+  return _doGet(url + '/news/find', {client_id: client_id, symbol: symbol, language: req.headers['accept-language']}, res);
 });
 
 /* Stock Price. query takes symbols */
@@ -152,7 +152,7 @@ router.get('/demo/entities', (req, res) => {
   symbols = symbols.split(',');
   var promArr = [];
   for (var i = 0; i < symbols.length; i++) {
-    promArr.push(request.getAsync({url: url + '/news/find', qs: {client_id: client_id, symbol: symbols[i]}}));
+    promArr.push(request.getAsync({url: url + '/news/find', qs: {client_id: client_id, symbol: symbols[i], language: req.headers['accept-language']}}));
   }
   Promise.all(promArr).then(dataArr => {
     // step 1: map
@@ -201,7 +201,7 @@ router.get('/demo/entities', (req, res) => {
 router.get('/demo/articles', (req, res) => {
   var symbol = req.query.symbol;
   var {client_id, client_secret, url} = vcapServices.stockSentiment.credentials;
-    request.getAsync({url: url + '/news/find', qs: {client_id: client_id, symbol: symbol}}).then(([response, body]) => {
+    request.getAsync({url: url + '/news/find', qs: {client_id: client_id, symbol: symbol, language: req.headers['accept-language']}}).then(([response, body]) => {
     var parsedResponse = typeof body === 'string' ? JSON.parse(body) : body;
     res.json(parsedResponse.news.map(n => ({
       title: n.title,
