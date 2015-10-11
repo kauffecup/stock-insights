@@ -39,6 +39,15 @@ import {
 
 // make sure all es6 things work correctly in all browsers
 require('babel/polyfill');
+// load in locales so we can force it if we need to
+// require('moment/locale/en');
+// require('moment/locale/zh');
+require('moment/locale/fr');
+require('moment/locale/de');
+require('moment/locale/it');
+require('moment/locale/ja');
+require('moment/locale/pt-br');
+require('moment/locale/es');
 
 /**
  * The app entry point
@@ -73,7 +82,7 @@ class StockInsights extends React.Component {
           strings={this.state.strings}
           language={this.state.language} />
         {!this.state.selectedCompanies.length &&
-          <DateSlider stockData={this.state.stockData} currentDate={this.state.currentDate} />
+          <DateSlider stockData={this.state.stockData} currentDate={this.state.currentDate} language={this.state.language} />
         }
         <div className="cool-stuff">
           <StockVisualizer

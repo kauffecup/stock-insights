@@ -22,7 +22,7 @@ import {
 
 export default class DateSlider extends React.Component {
   render() {
-    var {stockData, currentDate} = this.props;
+    var {stockData, currentDate, language} = this.props;
     var startOfCurrentDate = moment(currentDate).startOf('day');
     var dateArr = stockData.map(sd => sd.date);
     var currentPos;
@@ -34,7 +34,9 @@ export default class DateSlider extends React.Component {
     }
     return (
       <div className="date-slider">
-        <div className="date-slider-label">{this.props.currentDate.format("dddd, MMM Do")}</div>
+        <div className="date-slider-label">{
+          language ? currentDate.locale(language).format("dddd, MMM Do") : currentDate.format("dddd, MMM Do")
+        }</div>
         <input
           className="slider"
           type="range"
