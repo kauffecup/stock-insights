@@ -35,7 +35,7 @@ export default class DateSlider extends React.Component {
     return (
       <div className="date-slider">
         <div className="date-slider-label">{
-          language ? currentDate.locale(language).format("dddd, MMM Do") : currentDate.format("dddd, MMM Do")
+          language ? currentDate.locale(language).format("LL") : currentDate.format("dddd, MMM Do")
         }</div>
         <input
           className="slider"
