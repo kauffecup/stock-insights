@@ -68,6 +68,9 @@ class StockInsights extends React.Component {
     var classes = classNames('stock-insights', {
       embedded: this.state.isEmbedded
     });
+    var showDateSlider = !this.state.selectedCompanies.length || this.state.forceBubbles;
+    var showGraph = this.state.selectedCompanies.length;
+    var showArticles = this.state.selectedCompanies.length;
     return (
       <div className={classes}>
         <div className="stock-insights-title">
@@ -81,7 +84,7 @@ class StockInsights extends React.Component {
           selectedCompanies={this.state.selectedCompanies}
           strings={this.state.strings}
           language={this.state.language} />
-        {!this.state.selectedCompanies.length &&
+        {showDateSlider &&
           <DateSlider stockData={this.state.stockData} currentDate={this.state.currentDate} language={this.state.language} />
         }
         <div className="cool-stuff">
@@ -92,13 +95,14 @@ class StockInsights extends React.Component {
             currentDate={this.state.currentDate}
             histories={this.state.histories}
             strings={this.state.strings}
-            language={this.state.language} />
+            language={this.state.language}
+            forceBubbles={this.state.forceBubbles} />
           {!!this.state.selectedCompanies.length && 
             <ArticleList selectedCompanies={this.state.selectedCompanies}
               articles={this.state.articles} />
           }
         </div>
-        {this.state.selectedCompanies.length ?
+        {showGraph ?
           <GraphTown histories={this.state.histories} selectedCompanies={this.state.selectedCompanies} />
           :
           <AnalysisToggle analysisColorModes={this.state.analysisColorModes} strings={this.state.strings} />
@@ -153,6 +157,7 @@ class StockInsights extends React.Component {
       language: PageStateStore.getLanguage(),
       isEmbedded: PageStateStore.getEmbeddedMode(),
       currentDate: PageStateStore.getDate(),
+      forceBubbles: PageStateStore.getForceBubbles(),
       analysisColorModes: PageStateStore.getAnalysisColorModes(),
       currentColorMode: PageStateStore.getCurrentAnalysisColorMode(),
       condensedCompanies: PageStateStore.getCondensedCompanies(),

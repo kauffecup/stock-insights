@@ -45,6 +45,10 @@ var _selectedCompanies = _urlSelected || [];
 var _matchTake3 = /[&?]language=([^&]+)/.exec(location.href);
 var _language = _matchTake3 && _matchTake3[1];
 
+/** @type {boolean} if we want to see the articles and the stock color bubbles */
+var _matchTake4 = /[&?]forcebubbles=([^&]+)/.exec(location.href);
+var _forceBubbles = _matchTake4 && (_matchTake4[1] === 'true' || _matchTake4[1] === '1');
+
 /**
  * Set a new selected color mode
  */
@@ -113,6 +117,9 @@ var PageStateStore = assign({}, _Store, {
   },
   getLanguage: function () {
     return _language;
+  },
+  getForceBubbles: function () {
+    return _forceBubbles;
   }
 });
 
