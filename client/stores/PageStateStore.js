@@ -49,6 +49,12 @@ var _language = _matchTake3 && _matchTake3[1];
 var _matchTake4 = /[&?]forcebubbles=([^&]+)/.exec(location.href);
 var _forceBubbles = _matchTake4 && (_matchTake4[1] === 'true' || _matchTake4[1] === '1');
 
+// let the hackery commence, if there are symbols specified and forcebubbles is true,
+// select all of them by default
+if (_forceBubbles && _urlCompanies.length) {
+  _selectedCompanies = _urlCompanies;
+}
+
 /**
  * Set a new selected color mode
  */
