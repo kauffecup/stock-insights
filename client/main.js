@@ -15,6 +15,8 @@
 //------------------------------------------------------------------------------
 
 import React             from 'react';
+// import fs                from 'fs';
+// import path              from 'path';
 import classNames        from 'classnames';
 import Constants         from './constants/Constants';
 
@@ -36,6 +38,11 @@ import {
   getStrings,
   getNews
 } from './Actions';
+
+// get our inline-able svg
+var fs = require('fs');
+var path = require('path');
+var IBMsvg = fs.readFileSync(path.resolve(__dirname, './IBM.svg'));
 
 // make sure all es6 things work correctly in all browsers
 require('babel/polyfill');
@@ -74,7 +81,9 @@ class StockInsights extends React.Component {
     return (
       <div className={classes}>
         <div className="stock-insights-title">
+          <div className="da-logo" dangerouslySetInnerHTML={{__html: IBMsvg}}></div>
           <h1 className="stock-insights-title">{this.state.strings.stockInsights}</h1>
+          <a href="http://www.ibm.com/smarterplanet/us/en/ibmwatson/developercloud/" target="_blank">Built with IBM Watson</a>
         </div>
         <CompanyContainer
           companies={this.state.companies}

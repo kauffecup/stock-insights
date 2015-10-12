@@ -34,6 +34,7 @@ gulp.task('browserify', () => {
   process.env['NODE_ENV'] = 'production';
   return browserify(path.ENTRY_POINT)
     .transform(babelify.configure())
+    .transform('brfs')
     .transform(envify({ NODE_ENV: 'production' }))
     .bundle()
     .pipe(source(path.OUT))  // gives streaming vinyl file object
@@ -89,7 +90,7 @@ gulp.task('dev', ['less', 'node-dev'], () => {
 
   var watcher  = watchify(browserify({
     entries: [path.ENTRY_POINT],
-    transform: [babelify],
+    transform: [babelify, 'brfs'],
     debug: true,
     cache: {},
     packageCache: {},

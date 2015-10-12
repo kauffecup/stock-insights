@@ -63,9 +63,32 @@ button {
     height: 80px;
     color: #fff;
     background-color: @accent-color;
-    text-indent: 30px;
+    text-indent: 10px;
     display: flex;
     align-items: center;
+
+    h1 {
+      flex: 1;
+    }
+
+    .da-logo {
+      svg {
+        // original dimensions were 400x1000
+        height: 30px;
+        width: 87.5px;
+        fill: #fff;
+      }
+    }
+
+    a {
+      margin-right: 40px;
+      &:visited, &:link {
+        color: #fff;
+      }
+      &:hover, &:active {
+        color: #fff;
+      }
+    }
   }
 
   .company-container {
