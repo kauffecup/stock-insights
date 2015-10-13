@@ -41,14 +41,6 @@ export function stockNews(symbol, language) {
 }
 
 /**
- * Hit the stockhistory endpoint with the proper query.
- * Return a promise that resolves with the response.
- */
-export function stockHistory(symbols) {
-  return _queryHelper('/stockhistory', {symbols: symbols});
-}
-
-/**
  * Hit the sentiment endpoint with the proper query.
  * Return a promise that resolves with the response.
  */

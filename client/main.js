@@ -15,8 +15,6 @@
 //------------------------------------------------------------------------------
 
 import React             from 'react';
-// import fs                from 'fs';
-// import path              from 'path';
 import classNames        from 'classnames';
 import Constants         from './constants/Constants';
 
@@ -34,7 +32,6 @@ import DateSlider        from './components/DateSlider';
 
 import {
   getStockData,
-  getStockHistory,
   getStrings,
   getNews
 } from './Actions';
@@ -102,7 +99,7 @@ class StockInsights extends React.Component {
             entityData={this.state.entityData}
             currentColorMode={this.state.currentColorMode}
             currentDate={this.state.currentDate}
-            histories={this.state.histories}
+            dataMap={this.state.stockDataMap}
             strings={this.state.strings}
             language={this.state.language}
             forceBubbles={this.state.forceBubbles} />
@@ -112,7 +109,7 @@ class StockInsights extends React.Component {
           }
         </div>
         {showGraph ?
-          <GraphTown histories={this.state.histories} selectedCompanies={this.state.selectedCompanies} />
+          <GraphTown dataMap={this.state.stockDataMap} selectedCompanies={this.state.selectedCompanies} />
           :
           <AnalysisToggle analysisColorModes={this.state.analysisColorModes} strings={this.state.strings} />
         }
@@ -140,8 +137,7 @@ class StockInsights extends React.Component {
     // our visualizations
     if (this.state.companies.length) {
       var symbols = this.state.companies.map(c => c.symbol)
-      getStockData(symbols)
-      getStockHistory(symbols);
+      getStockData(symbols);
     }
   }
   componentWillUnmount() {
@@ -160,8 +156,8 @@ class StockInsights extends React.Component {
       potentialCompanies: CompaniesStore.getPotentialCompanies(),
       potentialCompaniesLoading: CompaniesStore.getLoadingStatus(),
       stockData: StockDataStore.getStockData(),
+      stockDataMap: StockDataStore.getDataMap(),
       entityData: StockDataStore.getEntities(),
-      histories: StockDataStore.getStockHistories(),
       strings: PageStateStore.getStrings(),
       language: PageStateStore.getLanguage(),
       isEmbedded: PageStateStore.getEmbeddedMode(),

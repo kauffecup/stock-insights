@@ -149,14 +149,14 @@ export default class StockVisualizer extends React.Component {
    * in the tooltip
    */
   tooltipFunc(tooltipNode, d, stroke) {
-    if (!this.props.histories || !this.props.histories[d._id]) return;
+    if (!this.props.dataMap || !this.props.dataMap[d._id]) return;
     // first we format the data from the correct symbol
     var myData = [];
-    this.props.histories[d._id].map(v => {
+    this.props.dataMap[d._id].map(v => {
       myData.push({
         symbol: d._id,
         date: v.date,
-        close: v.close
+        close: v.last
       });
     });
 
@@ -237,7 +237,7 @@ export default class StockVisualizer extends React.Component {
           currentPos = i;
         }
       }
-      var data = stockData[currentPos].data;
+      var data = typeof currentPos === 'undefined' ? [] : stockData[currentPos].data;
       // then, depending on the color mode, get the actual data, color
       // domain, and color legend.
       switch(currentColorMode) {

@@ -75,15 +75,48 @@ router.get('/stocknews', (req, res) => {
 /* Stock Price. query takes symbols */
 router.get('/stockprice', (req, res) => {
   var symbols = req.query.symbols;
-  var {client_id, client_secret, url} = vcapServices.stockPrice.credentials;
-  return _doGet(url + '/markets/quote', {client_id: client_id, symbols: symbols}, res);
-});
 
-/* Stock History. query takes symbols */
-router.get('/stockhistory', (req, res) => {
-  var symbols = req.query.symbols;
-  var {client_id, client_secret, url} = vcapServices.stockHistory.credentials;
-  return _doGet(url + '/markets/history', {client_id: client_id, symbols: symbols}, res);
+  var {client_id: client_id1, client_secret: client_secret1, url: url1} = vcapServices.stockPrice.credentials;
+  var {client_id: client_id2, client_secret: client_secret2, url: url2} = vcapServices.stockHistory.credentials;
+
+  var pricePromise   = request.getAsync({url: url1 + '/markets/quote',   qs: {client_id: client_id1, symbols: symbols}});
+  var historyPromise = request.getAsync({url: url1 + '/markets/history', qs: {client_id: client_id2, symbols: symbols}});
+
+  Promise.join(pricePromise, historyPromise, ([pR, pB], [hR, hB]) => {
+    pB = typeof pB === 'string' ? JSON.parse(pB) : pB;
+    hB = typeof hB === 'string' ? JSON.parse(hB) : hB;
+
+    var priceMap = {};
+    for (var price of pB) {
+      priceMap[price.symbol] = price;
+    }
+
+    for (var symbol in hB) {
+      var price = priceMap[symbol];
+      hB[symbol] = hB[symbol].map(h => ({
+        change: h.close - h.open,
+        symbol: symbol,
+        last: h.close,
+        date: h.date,
+        week_52_high: price.week_52_high,
+        week_52_low: price.week_52_low
+      }));
+      var d = new Date();
+      hB[symbol].push({
+        change: price.change,
+        symbol: symbol,
+        last: price.last,
+        date: '' + d.getUTCFullYear() + '-' + (d.getUTCMonth() + 1) + '-' + d.getUTCDate(),
+        week_52_high: price.week_52_high,
+        week_52_low: price.week_52_low
+      });
+    }
+
+    res.json(hB);
+  }).catch(e => {
+    res.status(500);
+    res.json(e);
+  });
 });
 
 /* Sentiment. query takes symbol and/or entity */

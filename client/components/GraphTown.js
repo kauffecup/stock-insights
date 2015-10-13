@@ -37,7 +37,7 @@ export default class GraphTown extends React.Component {
 
     // intialize the axis
     this.x = this.lineChart.addTimeAxis('x', 'date', "%Y-%m-%d", '%b %d');
-    this.y = this.lineChart.addMeasureAxis('y', 'close');
+    this.y = this.lineChart.addMeasureAxis('y', 'last');
     this.y.ticks = 7;
     this.updateAxis();
 
@@ -62,21 +62,21 @@ export default class GraphTown extends React.Component {
 
   /** Set the min and max of the axis based on our graphs data */
   updateAxis() {
-    var myNums = this.data.map(d => d.close);
+    var myNums = this.data.map(d => d.last);
     this.y.overrideMin = Math.min(...myNums);
     this.y.overrideMax = Math.max(...myNums);
   }
 
-  /** Adapt the histories map in to an array just the way we want it */
+  /** Adapt the data map in to an array just the way we want it */
   adaptData() {
     var myData = [];
-    for (var symbol in this.props.histories) {
+    for (var symbol in this.props.dataMap) {
       if (this.props.selectedCompanies.indexOf(symbol) > -1) {
-        this.props.histories[symbol].map(v => {
+        this.props.dataMap[symbol].map(v => {
           myData.push({
             symbol: symbol,
             date: v.date,
-            close: v.close
+            last: v.last
           });
         });
       }

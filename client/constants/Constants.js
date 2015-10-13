@@ -29,8 +29,6 @@ export default keyMirror({
   CLEAR_POTENTIAL_COMPANIES: null,
   STOCK_PRICE_LOADING: null,
   STOCK_PRICE_DATA: null,
-  STOCK_HISTORY_LOADING: null,
-  STOCK_HISTORY_DATA: null,
   NEWS_LOADING: null,
   NEWS_DATA: null,
   SENTIMENT_LOADING: null,

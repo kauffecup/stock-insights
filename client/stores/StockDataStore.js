@@ -25,17 +25,13 @@ import moment         from 'moment';
 /** @type {Object} A map of symbols to data about that symbol */
 var _stockData = {};
 var _entityMap = {};
-var _stockHistoriesMap = {};
-var _dateHistories = [];
-var _cachedFlatten;
 
 /**
  * Add stock data to our _stockData map
  */
 function addStockData(newData) {
-  _cachedFlatten = null;
-  for (var data of newData) {
-    _stockData[data.symbol] = data;
+  for (var symbol in newData) {
+    _stockData[symbol] = newData[symbol];
   }
 }
 
@@ -57,94 +53,46 @@ function removeCompanyEntities(symbol) {
  * Remove a company - Clean up all of our data structures
  */
 function removeCompany(symbol) {
-  _cachedFlatten = null;
   var symbol = symbol.symbol || symbol;
   removeCompanyEntities(symbol);
-  delete _stockHistoriesMap[symbol.toUpperCase()];
   delete _stockData[symbol];
-  for (var i = 0; i < _dateHistories.length; i++) {
-    delete _dateHistories[i].valueMap[symbol.toUpperCase()];
-  }
 }
 
 /**
- * Build both the stock histories map and the date histories
- * array from the server response.
- */
-function addHistories(histories) {
-  _cachedFlatten = null;
-  for (var symbol in histories) {
-    var dateArr = histories[symbol];
-    _stockHistoriesMap[symbol.toUpperCase()] = dateArr;
-    if (_dateHistories.length) {
-      for (var i = 0; i < _dateHistories.length; i++) {
-        var daa = clone(dateArr[i]);
-        delete daa.date;
-        _dateHistories[i].valueMap[dateArr[i].symbol] = daa;
-      }
-    } else {
-      _dateHistories = dateArr.map(a => {
-        var aa = clone(a);
-        delete aa.date;
-        var valueMap = {};
-        valueMap[a.symbol] = aa;
-        return {
-          date: a.date,
-          valueMap: valueMap
-        }
-      });
-    }
-  }
-}
-
-/**
- * Return the contents of our _stockData map and _dateHistories
- * array as one flattened array sorted by date containing objects
- * with a date property and data array.
+ * Return the contents of our _stockData map as one flattened array
+ * sorted by date containing objects with a date property and data array.
  */
 function flattenStockData() {
-  if (_cachedFlatten) return _cachedFlatten;
   var stockDateArray = [];
-  // step 1
-  for (var i = 0; i < _dateHistories.length; i++) {
-    var data = [];
-    var valueMap = _dateHistories[i].valueMap;
-    for (var symbol in valueMap) {
-      var sd = _stockData[symbol];
-      var v = valueMap[symbol];
-      var myData = {
-        change: v.close - v.open,
-        symbol: symbol,
-        last: v.close
-      }
-      if (sd) {
-        myData.week_52_high = sd.week_52_high;
-        myData.week_52_low = sd.week_52_low;
-      }
-      data.push(myData);
-    }
-    stockDateArray.push({
-      date: moment(_dateHistories[i].date),
-      data: data
-    });
-  }
-  // step 2
-  var data = [];
   for (var symbol in _stockData) {
-    var v = _stockData[symbol];
-    data.push({
-      week_52_high: v.week_52_high,
-      week_52_low: v.week_52_low,
-      change: v.change,
-      symbol: v.symbol,
-      last: v.last
-    });
+    var dateArr = _stockData[symbol];
+    if (stockDateArray.length) {
+      for (var i = 0; i < dateArr.length; i++) {
+        var d = dateArr[i];
+        stockDateArray[i].data.push({
+          week_52_high: d.week_52_high,
+          week_52_low: d.week_52_low,
+          change: d.change,
+          symbol: d.symbol,
+          last: d.last,
+          date: moment(d.date)
+        });
+      }
+    } else {
+      stockDateArray = dateArr.map(d => ({
+        date: moment(d.date),
+        data: [{
+          week_52_high: d.week_52_high,
+          week_52_low: d.week_52_low,
+          change: d.change,
+          symbol: d.symbol,
+          last: d.last,
+          date: moment(d.date)
+        }]
+      }))
+    }
   }
-  stockDateArray.push({
-    date: moment().startOf('day'),
-    data: data
-  });
-  return _cachedFlatten = stockDateArray;
+  return stockDateArray;
 }
 
 /**
@@ -205,8 +153,8 @@ var StockDataStore = assign({}, _Store, {
   getEntities: function () {
     return reduceEntityMap();
   },
-  getStockHistories: function () {
-    return _stockHistoriesMap;
+  getDataMap: function () {
+    return _stockData;
   }
 });
 
@@ -243,11 +191,6 @@ Dispatcher.register(function(action) {
 
     case Constants.DESELECT_COMPANY:
       removeCompanyEntities(action.symbol);
-      StockDataStore.emitChange();
-      break;
-
-    case Constants.STOCK_HISTORY_DATA:
-      addHistories(action.histories);
       StockDataStore.emitChange();
       break;
 

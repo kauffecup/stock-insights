@@ -20,7 +20,6 @@ import {
   companyLookup,
   stockPrice,
   stockNews,
-  stockHistory,
   sentiment,
   strings
 } from './requester'
@@ -42,7 +41,6 @@ export function clearPotentialCompanies() {
 export function addCompany(company) {
   Dispatcher.dispatch({actionType: Constants.ADD_COMPANY, company: company});
   company.symbol && getStockData(company.symbol);
-  company.symbol && getStockHistory([company.symbol]);
 }
 
 /** Remove a company */
@@ -55,14 +53,6 @@ export function getStockData(symbols) {
   Dispatcher.dispatch({actionType: Constants.STOCK_PRICE_LOADING, symbols: symbols});
   stockPrice(symbols).then(data => {
     Dispatcher.dispatch({actionType: Constants.STOCK_PRICE_DATA, data: data});
-  });
-}
-
-/** Get the stock history data for a given array of companies */
-export function getStockHistory(symbols) {
-  Dispatcher.dispatch({actionType: Constants.STOCK_HISTORY_LOADING, symbols: symbols});
-  stockHistory(symbols).then(histories => {
-    Dispatcher.dispatch({actionType: Constants.STOCK_HISTORY_DATA, histories: histories});
   });
 }
 
