@@ -86,11 +86,18 @@ router.get('/stockprice', (req, res) => {
     pB = typeof pB === 'string' ? JSON.parse(pB) : pB;
     hB = typeof hB === 'string' ? JSON.parse(hB) : hB;
 
+    // build a map of symbol -> price objects
     var priceMap = {};
     for (var price of pB) {
       priceMap[price.symbol] = price;
     }
 
+    // if all of the current change values are falsy, we'll want to use yesterday's
+    var usePreviousChangeValues = pB.every(p => !p.change);
+
+    // iterate over the history map and convert to expected data type
+    // additionallyalally, add today's price values to the array in one nice
+    // happy array family
     for (var symbol in hB) {
       var price = priceMap[symbol];
       hB[symbol] = hB[symbol].map(h => ({
@@ -102,8 +109,9 @@ router.get('/stockprice', (req, res) => {
         week_52_low: price.week_52_low
       }));
       var d = new Date();
+      var previousSymbol = hB[symbol][hB[symbol].length-1];
       hB[symbol].push({
-        change: price.change,
+        change: usePreviousChangeValues ? previousSymbol.change : price.change,
         symbol: symbol,
         last: price.last,
         date: '' + d.getUTCFullYear() + '-' + (d.getUTCMonth() + 1) + '-' + d.getUTCDate(),
@@ -111,9 +119,9 @@ router.get('/stockprice', (req, res) => {
         week_52_low: price.week_52_low
       });
     }
-
     res.json(hB);
   }).catch(e => {
+    console.error(e);
     res.status(500);
     res.json(e);
   });
