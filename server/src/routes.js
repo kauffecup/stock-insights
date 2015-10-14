@@ -153,18 +153,36 @@ function _doGet(url, qs, res) {
 /** Get stocks with positive change from a list of symbols, sorted by change */
 router.get('/demo/positive', (req, res) => {
   var symbols = req.query.symbols || req.query.symbol;
-  var {client_id, client_secret, url} = vcapServices.stockPrice.credentials;
-  request.getAsync({url: url + '/markets/quote', qs: {client_id: client_id, symbols: symbols}}).then(([response, body]) => {
-    var parsedResponse = typeof body === 'string' ? JSON.parse(body) : body;
-    res.json(parsedResponse.filter(s => s.change > 0)
-      .sort((s1, s2) => s2.change - s1.change)
-      .map(s => ({
-        change: s.change,
-        symbol: s.symbol,
-        description: s.description,
-        value: s.value
-      })));
+
+  var {client_id: client_id1, client_secret: client_secret1, url: url1} = vcapServices.stockPrice.credentials;
+  var {client_id: client_id2, client_secret: client_secret2, url: url2} = vcapServices.stockHistory.credentials;
+
+  var pricePromise   = request.getAsync({url: url1 + '/markets/quote',   qs: {client_id: client_id1, symbols: symbols}});
+  var historyPromise = request.getAsync({url: url1 + '/markets/history', qs: {client_id: client_id2, symbols: symbols}});
+
+  Promise.join(pricePromise, historyPromise, ([pR, pB], [hR, hB]) => {
+    pB = typeof pB === 'string' ? JSON.parse(pB) : pB;
+    hB = typeof hB === 'string' ? JSON.parse(hB) : hB;
+
+    // if all of the current change values are falsy, we'll want to use yesterday's
+    var usePreviousChangeValues = pB.every(p => !p.change);
+
+    var prevSymbolMap = {};
+    for (var symbol in hB) {
+      var prevSymbol = hB[symbol][hB[symbol].length-1];
+      prevSymbolMap[symbol] = prevSymbol.close - prevSymbol.open;
+    }
+
+    res.json(pB.map(s => ({
+      change: usePreviousChangeValues ? prevSymbolMap[s.symbol] : s.change,
+      symbol: s.symbol,
+      description: s.description,
+      value: s.value
+    }))
+    .filter(s => s.change > 0)
+    .sort((s1, s2) => s2.change - s1.change));
   }).catch(e => {
+    console.error(e);
     res.status(500);
     res.json(e);
   });
@@ -173,18 +191,36 @@ router.get('/demo/positive', (req, res) => {
 /** Get stocks with negative change from a list of symbols, sorted by change */
 router.get('/demo/negative', (req, res) => {
   var symbols = req.query.symbols || req.query.symbol;
-  var {client_id, client_secret, url} = vcapServices.stockPrice.credentials;
-  request.getAsync({url: url + '/markets/quote', qs: {client_id: client_id, symbols: symbols}}).then(([response, body]) => {
-    var parsedResponse = typeof body === 'string' ? JSON.parse(body) : body;
-    res.json(parsedResponse.filter(s => s.change < 0)
-      .sort((s1, s2) => s1.change - s2.change)
-      .map(s => ({
-        change: s.change,
-        symbol: s.symbol,
-        description: s.description,
-        value: s.value
-      })));
+
+  var {client_id: client_id1, client_secret: client_secret1, url: url1} = vcapServices.stockPrice.credentials;
+  var {client_id: client_id2, client_secret: client_secret2, url: url2} = vcapServices.stockHistory.credentials;
+
+  var pricePromise   = request.getAsync({url: url1 + '/markets/quote',   qs: {client_id: client_id1, symbols: symbols}});
+  var historyPromise = request.getAsync({url: url1 + '/markets/history', qs: {client_id: client_id2, symbols: symbols}});
+
+  Promise.join(pricePromise, historyPromise, ([pR, pB], [hR, hB]) => {
+    pB = typeof pB === 'string' ? JSON.parse(pB) : pB;
+    hB = typeof hB === 'string' ? JSON.parse(hB) : hB;
+
+    // if all of the current change values are falsy, we'll want to use yesterday's
+    var usePreviousChangeValues = pB.every(p => !p.change);
+
+    var prevSymbolMap = {};
+    for (var symbol in hB) {
+      var prevSymbol = hB[symbol][hB[symbol].length-1];
+      prevSymbolMap[symbol] = prevSymbol.close - prevSymbol.open;
+    }
+
+    res.json(pB.map(s => ({
+      change: usePreviousChangeValues ? prevSymbolMap[s.symbol] : s.change,
+      symbol: s.symbol,
+      description: s.description,
+      value: s.value
+    }))
+    .filter(s => s.change < 0)
+    .sort((s1, s2) => s1.change - s2.change));
   }).catch(e => {
+    console.error(e);
     res.status(500);
     res.json(e);
   });
