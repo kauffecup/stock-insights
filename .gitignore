@@ -3,5 +3,6 @@ public/bundle.js
 public/*.css
 server/lib/*
 server/**/VCAP_SERVICES.json
+server/**/ENV_VARS.json
 *.sublime*
 *.log

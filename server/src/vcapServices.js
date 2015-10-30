@@ -14,6 +14,8 @@
 // limitations under the License.
 //------------------------------------------------------------------------------
 
+import objectAssign from 'object-assign';
+
 var vcapServices;
 // if running in Bluemix, use the environment variables
 if (process.env.VCAP_SERVICES) {
@@ -26,6 +28,15 @@ if (process.env.VCAP_SERVICES) {
     console.error(e);
   }
 }
+
+var envVars = {
+  BYPASS_URL: process.env.BYPASS_URL,
+  BYPASS_UN: process.env.BYPASS_UN,
+  BYPASS_PW: process.env.BYPASS_PW
+};
+try {
+  envVars = require('./ENV_VARS.json')
+} catch (e) {}
 
 // the keys are complex, for example: `Company Lookup v1 : Sandbox 55e768c90cf2722940e66db9 prod`
 // iterate over the keys and convert to companyLookup, stockPrice, stockNews, stockHistory, and
@@ -51,4 +62,4 @@ for (var service in vcapServices) {
   }
 }
 
-export default vcapServices;
+export default objectAssign(envVars, vcapServices);
