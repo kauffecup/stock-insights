@@ -68,7 +68,7 @@ router.get('/stocknews', (req, res) => {
   var locales = new locale.Locales(req.headers['accept-language']);
   var langCode = req.query.language || locales.best(supportedLocales).code;
   var symbol = req.query.symbol;
-  var {client_id, client_secret, url} = vcapServices.stockPrice.credentials;
+  var {client_id, client_secret, url} = vcapServices.stockNews.credentials;
   return _doGet(url + '/news/find', {client_id: client_id, symbol: symbol, language: langCode}, res);
 });
 
@@ -80,11 +80,11 @@ router.get('/stockprice', (req, res) => {
   var {client_id: client_id2, client_secret: client_secret2, url: url2} = vcapServices.stockHistory.credentials;
 
   var pricePromise   = request.getAsync({url: url1 + '/markets/quote',   qs: {client_id: client_id1, symbols: symbols}});
-  var historyPromise = request.getAsync({url: url1 + '/markets/history', qs: {client_id: client_id2, symbols: symbols}});
+  var historyPromise = request.getAsync({url: url2 + '/markets/history', qs: {client_id: client_id2, symbols: symbols}});
 
   Promise.join(pricePromise, historyPromise, ([pR, pB], [hR, hB]) => {
-    pB = typeof pB === 'string' ? JSON.parse(pB) : pB;
-    hB = typeof hB === 'string' ? JSON.parse(hB) : hB;
+    pB = (!!pB && typeof pB === 'string') ? JSON.parse(pB) : pB;
+    hB = (!!hB && typeof hB === 'string') ? JSON.parse(hB) : hB;
 
     // build a map of symbol -> price objects
     var priceMap = {};
@@ -137,7 +137,7 @@ router.get('/sentiment', (req, res) => {
 /* Helper GET method for companylookup and stockprice similarities */
 function _doGet(url, qs, res) {
   return request.getAsync({url: url, qs: qs}).then(([response, body]) => {
-    var parsedResponse = typeof body === 'string' ? JSON.parse(body) : body;
+    var parsedResponse = (!!body && typeof body === 'string') ? JSON.parse(body) : body;
     parsedResponse.httpCode && res.status(parseInt(parsedResponse.httpCode));
     res.json(parsedResponse);
   }).catch(e => {
@@ -161,8 +161,8 @@ router.get('/demo/positive', (req, res) => {
   var historyPromise = request.getAsync({url: url1 + '/markets/history', qs: {client_id: client_id2, symbols: symbols}});
 
   Promise.join(pricePromise, historyPromise, ([pR, pB], [hR, hB]) => {
-    pB = typeof pB === 'string' ? JSON.parse(pB) : pB;
-    hB = typeof hB === 'string' ? JSON.parse(hB) : hB;
+    pB = (!!pB && typeof pB === 'string') ? JSON.parse(pB) : pB;
+    hB = (!!hB && typeof hB === 'string') ? JSON.parse(hB) : hB;
 
     // if all of the current change values are falsy, we'll want to use yesterday's
     var usePreviousChangeValues = pB.every(p => !p.change);
@@ -196,11 +196,11 @@ router.get('/demo/negative', (req, res) => {
   var {client_id: client_id2, client_secret: client_secret2, url: url2} = vcapServices.stockHistory.credentials;
 
   var pricePromise   = request.getAsync({url: url1 + '/markets/quote',   qs: {client_id: client_id1, symbols: symbols}});
-  var historyPromise = request.getAsync({url: url1 + '/markets/history', qs: {client_id: client_id2, symbols: symbols}});
+  var historyPromise = request.getAsync({url: url2 + '/markets/history', qs: {client_id: client_id2, symbols: symbols}});
 
   Promise.join(pricePromise, historyPromise, ([pR, pB], [hR, hB]) => {
-    pB = typeof pB === 'string' ? JSON.parse(pB) : pB;
-    hB = typeof hB === 'string' ? JSON.parse(hB) : hB;
+    pB = (!!pB && typeof pB === 'string') ? JSON.parse(pB) : pB;
+    hB = (!!hB && typeof hB === 'string') ? JSON.parse(hB) : hB;
 
     // if all of the current change values are falsy, we'll want to use yesterday's
     var usePreviousChangeValues = pB.every(p => !p.change);
@@ -238,7 +238,7 @@ router.get('/demo/entities', (req, res) => {
   request.getAsync({url: url + '/news/find', qs: {
     client_id: client_id, symbols: symbols, language: langCode, elimit: 50, alimit: 0
   }}).then(([eaRequest, eaBody]) => {
-    eaBody = typeof eaBody === 'string' ? JSON.parse(eaBody) : eaBody;
+    eaBody = (!!eaBody && typeof eaBody === 'string') ? JSON.parse(eaBody) : eaBody;
     res.json(eaBody.entities);
   }).catch(e => {
     res.status(500);
@@ -258,7 +258,7 @@ router.get('/demo/articles', (req, res) => {
   request.getAsync({url: url + '/news/find', qs: {
     client_id: client_id, symbols: symbols, language: langCode, elimit: 50, alimit: 0
   }}).then(([eaRequest, eaBody]) => {
-    eaBody = typeof eaBody === 'string' ? JSON.parse(eaBody) : eaBody;
+    eaBody = (!!eaBody && typeof eaBody === 'string') ? JSON.parse(eaBody) : eaBody;
     res.json(eaBody.articles);
   }).catch(e => {
     res.status(500);
