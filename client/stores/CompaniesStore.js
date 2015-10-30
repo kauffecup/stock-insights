@@ -59,18 +59,6 @@ function removeCompany(company) {
   _updateLocalStorage();
 }
 
-function setLoadingStatus(newStatus) {
-  _loadingStatus = newStatus;
-}
-
-/**
- * After we get our server response, populate the potential companies
- * for the autocomplete drop down
- */
-function setPotentialCompanies (newPotentials) {
-  _potentialCompanies = newPotentials;
-}
-
 /**
  * Helper method to store the companies in the browser's local storage
  */
@@ -114,21 +102,21 @@ Dispatcher.register(function(action) {
   switch(action.actionType) {
     // set the loading status... when we're uh... loading
     case Constants.COMPANIES_LOADING:
-      setLoadingStatus(Constants.POTENTIAL_STATUS_LOADING);
+      _loadingStatus = Constants.POTENTIAL_STATUS_LOADING;
       CompaniesStore.emitChange();
       break;
 
     // when we get the company data, set our potential companies
     case Constants.COMPANY_DATA:
-      setLoadingStatus(Constants.POTENTIAL_STATUS_RECEIVED);
-      setPotentialCompanies(action.companies);
+      _loadingStatus = Constants.POTENTIAL_STATUS_RECEIVED;
+      _potentialCompanies = action.companies;
       CompaniesStore.emitChange();
       break;
 
     // clear the potential companies
     case Constants.CLEAR_POTENTIAL_COMPANIES:
-      setLoadingStatus(Constants.POTENTIAL_STATUS_CLEAR);
-      setPotentialCompanies([]);
+      _loadingStatus = Constants.POTENTIAL_STATUS_CLEAR;
+      _potentialCompanies = [];
       CompaniesStore.emitChange();
       break;
 

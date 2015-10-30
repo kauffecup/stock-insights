@@ -19,12 +19,11 @@ import Dispatcher     from '../Dispatcher';
 import Constants      from '../constants/Constants';
 import assign         from 'object-assign';
 import clone          from 'clone';
-import PageStateStore from './PageStateStore';
 import moment         from 'moment';
 
 /** @type {Object} A map of symbols to data about that symbol */
+var _entities = [];
 var _stockData = {};
-var _entityMap = {};
 
 /**
  * Add stock data to our _stockData map
@@ -39,14 +38,7 @@ function addStockData(newData) {
  * Clear our entity map
  */
 function clearEntities() {
-  _entityMap = {};
-}
-
-/**
- * Remove one symbol from our entity map
- */
-function removeCompanyEntities(symbol) {
-  delete _entityMap[symbol.toUpperCase()];
+  _entities = [];
 }
 
 /**
@@ -54,7 +46,6 @@ function removeCompanyEntities(symbol) {
  */
 function removeCompany(symbol) {
   var symbol = symbol.symbol || symbol;
-  removeCompanyEntities(symbol);
   delete _stockData[symbol];
 }
 
@@ -96,50 +87,14 @@ function flattenStockData() {
 }
 
 /**
- * 
+ * Map the entities into a format consumable by the react chart
  */
-function addEntities(articles, symbol) {
-  var entityMap = {};
-  for (var article of articles) {
-    for (var {score, sentiment, text} of article.entities) {
-      var cased = text.replace(/\w*/g, txt =>
-        txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase()
-      );
-      var multiplier;
-      if (sentiment === 'positive') {
-        multiplier = 1;
-      } else if (sentiment === 'negative') {
-        multiplier = -1;
-      } else if (sentiment === 'neutral') {
-        multiplier = 0;
-      }
-      if (!entityMap[cased]) {
-        entityMap[cased] = [];
-      }
-      entityMap[cased].push(multiplier * score);
-    }
-  }
-  _entityMap[symbol.toUpperCase()] = entityMap;
-}
-
-function reduceEntityMap() {
-  var entityMap = {};
-  for (var symbol in _entityMap) {
-    var _smallMap = _entityMap[symbol];
-    for (var entity in _smallMap) {
-      if (entityMap[entity]) {
-        entityMap[entity].concat(_smallMap[entity])
-      } else {
-        entityMap[entity] = _smallMap[entity];
-      }
-    }
-  }
-  var entities = [];
-  for (var text in entityMap) {
-    var __entities = entityMap[text];
-    entities.push({_id: text, value: __entities.length, colorValue: __entities.reduce((s, it) => s+it, 0)/__entities.length})
-  }
-  return entities.sort((e1, e2) => e2.value - e1.value).slice(0, 50);
+function addEntities(entities) {
+  _entities = entities.map(e => ({
+    _id: e.text,
+    value: e.count,
+    colorValue: e.averageSentiment
+  }))
 }
 
 /**
@@ -151,7 +106,7 @@ var StockDataStore = assign({}, _Store, {
     return flattenStockData();
   },
   getEntities: function () {
-    return reduceEntityMap();
+    return _entities;
   },
   getDataMap: function () {
     return _stockData;
@@ -177,11 +132,8 @@ Dispatcher.register(function(action) {
       break;
 
     case Constants.NEWS_DATA:
-      var scs = PageStateStore.getSelectedCompanies();
-      if (scs.length && scs.indexOf(action.news.symbol.toUpperCase()) > -1) {
-        addEntities(action.news.news, action.news.symbol);
-        StockDataStore.emitChange();
-      }
+      addEntities(action.news.entities);
+      StockDataStore.emitChange();
       break;
 
     case Constants.CLOSE_ARTICLE_LIST:
@@ -190,7 +142,7 @@ Dispatcher.register(function(action) {
       break;
 
     case Constants.DESELECT_COMPANY:
-      removeCompanyEntities(action.symbol);
+      _entities = [];
       StockDataStore.emitChange();
       break;
 

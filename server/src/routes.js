@@ -234,49 +234,12 @@ router.get('/demo/entities', (req, res) => {
   var {client_id, client_secret, url} = vcapServices.stockSentiment.credentials;
   // companies can be in symbol or symbols field
   var symbols = req.query.symbol || req.query.symbols;
-  symbols = symbols.split(',');
-  // request time! make a request for each company
-  var promArr = [];
-  for (var i = 0; i < symbols.length; i++) {
-    promArr.push(request.getAsync({url: url + '/news/find', qs: {client_id: client_id, symbol: symbols[i], language: langCode}}));
-  }
-  Promise.all(promArr).then(dataArr => {
-    // step 1: map
-    var entityMap = {};
-    for (var [response, body] of dataArr) {
-      var parsedResponse = typeof body === 'string' ? JSON.parse(body) : body;
-      for (var article of parsedResponse.news) {
-        for (var {score, sentiment, text} of article.entities) {
-          var cased = text.replace(/\w*/g, txt =>
-            txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase()
-          );
-          var multiplier;
-          if (sentiment === 'positive') {
-            multiplier = 1;
-          } else if (sentiment === 'negative') {
-            multiplier = -1;
-          } else if (sentiment === 'neutral') {
-            multiplier = 0;
-          }
-          if (!entityMap[cased]) {
-            entityMap[cased] = [];
-          }
-          entityMap[cased].push(multiplier * score);
-        }
-      }
-    }
-    // step 2: reduce
-    var entities = [];
-    for (var text in entityMap) {
-      var __entities = entityMap[text];
-      entities.push({
-        text: text,
-        count: __entities.length,
-        averageSentiment: __entities.reduce((s, it) => s+it, 0)/__entities.length
-      })
-    }
-    // step 3: party
-    res.json(entities.sort((e1, e2) => e2.count - e1.count));
+  // request time!
+  request.getAsync({url: url + '/news/find', qs: {
+    client_id: client_id, symbols: symbols, language: langCode, elimit: 50, alimit: 0
+  }}).then(([eaRequest, eaBody]) => {
+    eaBody = typeof eaBody === 'string' ? JSON.parse(eaBody) : eaBody;
+    res.json(eaBody.entities);
   }).catch(e => {
     res.status(500);
     res.json(e);
@@ -291,26 +254,12 @@ router.get('/demo/articles', (req, res) => {
   var {client_id, client_secret, url} = vcapServices.stockSentiment.credentials;
   // companies can be in symbol or symbols field
   var symbols = req.query.symbol || req.query.symbols;
-  symbols = symbols.split(',');
-  // request time! make a request for each company
-  var promArr = [];
-  for (var i = 0; i < symbols.length; i++) {
-    promArr.push(request.getAsync({url: url + '/news/find', qs: {client_id: client_id, symbol: symbols[i], language: langCode}}));
-  }
-  // once they're all done, iterate over make our array of news articles
-  Promise.all(promArr).then(dataArr => {
-    var myNews = [];
-    for (var [response, body] of dataArr) {
-      var parsedResponse = typeof body === 'string' ? JSON.parse(body) : body;
-      myNews = myNews.concat(parsedResponse.news.map(n => ({
-        title: n.title,
-        url: n.url,
-        relations: n.relations,
-        date: n.date
-      })));
-    }
-    // sort by date and return
-    res.json(myNews.sort((n1, n2) => n2.date > n1.date));
+  // request time!
+  request.getAsync({url: url + '/news/find', qs: {
+    client_id: client_id, symbols: symbols, language: langCode, elimit: 50, alimit: 0
+  }}).then(([eaRequest, eaBody]) => {
+    eaBody = typeof eaBody === 'string' ? JSON.parse(eaBody) : eaBody;
+    res.json(eaBody.articles);
   }).catch(e => {
     res.status(500);
     res.json(e);

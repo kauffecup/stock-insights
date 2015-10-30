@@ -20,31 +20,7 @@ import Constants      from '../constants/Constants';
 import assign         from 'object-assign';
 import PageStateStore from './PageStateStore';
 
-var _articleMap = {};
-
-/**
- * Here are some setters
- */
-function removeCompany (symbol) {
-  delete _articleMap[symbol.toLowerCase()];
-}
-function addArticles (newArticles, symbol) {
-  _articleMap[symbol.toLowerCase()] = newArticles.map(a => ({
-    title: a.title,
-    url: a.url,
-    relations: a.relations
-  }));
-}
-function clearArticles () {
-  _articleMap = {};
-}
-function flattenArticles () {
-  var articles = [];
-  for (var symbol in _articleMap) {
-    articles = articles.concat(_articleMap[symbol]);
-  }
-  return articles;
-}
+var _articles = [];
 
 /**
  * The store we'll be exporting. Contains getter methods for
@@ -53,7 +29,7 @@ function flattenArticles () {
  */
 var NewsArticlesStore = assign({}, _Store, {
   getArticles: function () {
-    return flattenArticles();
+    return _articles;
   }
 });
 
@@ -67,25 +43,15 @@ Dispatcher.register(function(action) {
     case Constants.NEWS_LOADING:
       break;
 
-    // when we get the articles, only set and emit if an article is
-    // still selected. otherwise we know the window has been closed.
+    // get dem articles
     case Constants.NEWS_DATA:
-      var scs = PageStateStore.getSelectedCompanies();
-      if (scs.length && scs.indexOf(action.news.symbol.toUpperCase()) > -1) {
-        addArticles(action.news.news, action.news.symbol);
-        NewsArticlesStore.emitChange();
-      }
-      break;
-
-    // when closing the article list, clear the selected company and
-    // loaded articles
-    case Constants.CLOSE_ARTICLE_LIST:
-      clearArticles();
+      _articles = action.news.articles;
       NewsArticlesStore.emitChange();
       break;
 
-    case Constants.DESELECT_COMPANY:
-      removeCompany(action.symbol);
+    // when closing the article list, clear the loaded articles
+    case Constants.CLOSE_ARTICLE_LIST:
+      _articles = [];
       NewsArticlesStore.emitChange();
       break;
   }
