@@ -14,8 +14,9 @@
 // limitations under the License.
 //------------------------------------------------------------------------------
 
-import Dispatcher from './Dispatcher';
-import Constants  from './constants/Constants';
+import Dispatcher     from './Dispatcher';
+import Constants      from './constants/Constants';
+var PageStateStore = require('./stores/PageStateStore');
 import {
   companyLookup,
   stockPrice,
@@ -23,6 +24,8 @@ import {
   sentiment,
   strings
 } from './requester'
+
+var _lastLanguage;
 
 /** Search for companies */
 export function searchCompany(companyName) {
@@ -66,12 +69,20 @@ export function getSentiment(symbol, entity) {
 
 /** Get the articles for a given company. This also selects the company and gets its stock history. */
 export function getNews(language, symbol) {
-  symbol = symbol._id || symbol.symbol || symbol;
-  selectCompany(symbol);
-  Dispatcher.dispatch({actionType: Constants.NEWS_LOADING, symbol: symbol});
-  stockNews(symbol, language).then(news => {
+  language = language || _lastLanguage;
+  _lastLanguage = language;
+  symbol = symbol && (symbol._id || symbol.symbol || symbol);
+  var symbols = PageStateStore.getSelectedCompanies().map(c => typeof c === 'string' ? c : (c._id || c.symbol));
+  if (symbol){
+    symbols = symbols.concat(symbol);
+  }
+  Dispatcher.dispatch({actionType: Constants.NEWS_LOADING});
+  stockNews(symbols, language).then(news => {
     Dispatcher.dispatch({actionType: Constants.NEWS_DATA, news: news});
   });
+  if (symbol) {
+    selectCompany(symbol);
+  }
 }
 
 /* Select a company */
@@ -83,6 +94,7 @@ export function selectCompany(symbol) {
 export function deselectCompany(company) {
   var symbol = company._id || company.symbol || symbol;
   Dispatcher.dispatch({actionType: Constants.DESELECT_COMPANY, symbol: symbol});
+  getNews();
 }
 
 /** Close the article list */
