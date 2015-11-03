@@ -20,6 +20,7 @@ import Constants      from '../constants/Constants';
 import assign         from 'object-assign';
 import clone          from 'clone';
 import moment         from 'moment';
+import PageStateStore from './PageStateStore';
 
 /** @type {Object} A map of symbols to data about that symbol */
 var _entities = [];
@@ -32,13 +33,6 @@ function addStockData(newData) {
   for (var symbol in newData) {
     _stockData[symbol] = newData[symbol];
   }
-}
-
-/**
- * Clear our entity map
- */
-function clearEntities() {
-  _entities = [];
 }
 
 /**
@@ -137,13 +131,15 @@ Dispatcher.register(function(action) {
       break;
 
     case Constants.CLOSE_ARTICLE_LIST:
-      clearEntities();
+      _entities = [];
       StockDataStore.emitChange();
       break;
 
     case Constants.DESELECT_COMPANY:
-      _entities = [];
-      StockDataStore.emitChange();
+      if (PageStateStore.getSelectedCompanies().length === 0) {
+        _entities = [];
+        StockDataStore.emitChange();
+      }
       break;
 
     default:
