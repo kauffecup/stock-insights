@@ -58,28 +58,13 @@ if (_forceBubbles && _urlCompanies.length) {
 /**
  * Set a new selected color mode
  */
-function setSelectedColorMode(newMode) {
-  _selectedColorMode = newMode;
-}
-function toggleCondensedCompanies() {
-  _condensedCompanies = !_condensedCompanies;
-}
 function selectCompany(company) {
   if (_selectedCompanies.indexOf(company) === -1) {
     _selectedCompanies.push(company);
   }
 }
-function clearCompanies () {
-  _selectedCompanies = [];
-}
 function removeCompany(symbol) {
   _selectedCompanies.splice(_selectedCompanies.indexOf(symbol), 1);
-}
-function setDate(newDate) {
-  _currentDate = newDate;
-}
-function setStrings(newStrings) {
-  _strings = newStrings;
 }
 
 /**
@@ -139,14 +124,14 @@ Dispatcher.register(function(action) {
     // only emit a change if something has changed
     case Constants.SWITCH_ANALYSIS_COLOR_MODE:
       if (action.id !== _selectedColorMode) {
-        setSelectedColorMode(action.id);
+        _selectedColorMode = action.id;
         PageStateStore.emitChange();
       }
       break;
 
     // toggle the state of the company chiclets
     case Constants.TOGGLE_CONDENSED_COMPANIES:
-      toggleCondensedCompanies();
+      _condensedCompanies = !_condensedCompanies;
       PageStateStore.emitChange();
       break;
 
@@ -167,17 +152,17 @@ Dispatcher.register(function(action) {
     // when closing the article list, clear the selected company and
     // loaded articles
     case Constants.CLOSE_ARTICLE_LIST:
-      clearCompanies();
+      _selectedCompanies = [];
       PageStateStore.emitChange();
       break;
 
     case Constants.SWITCH_DATE:
-      setDate(action.date);
+      _currentDate = action.date;
       PageStateStore.emitChange();
       break;
 
     case Constants.STRING_DATA:
-      setStrings(action.strings);
+      _strings = action.strings;
       PageStateStore.emitChange();
       break;
 
