@@ -76,10 +76,12 @@ export function getNews(language, symbol) {
   if (symbol){
     symbols = symbols.concat(symbol);
   }
-  Dispatcher.dispatch({actionType: Constants.NEWS_LOADING});
-  stockNews(symbols, language).then(news => {
-    Dispatcher.dispatch({actionType: Constants.NEWS_DATA, news: news});
-  });
+  if (symbols.length) {
+    Dispatcher.dispatch({actionType: Constants.NEWS_LOADING});
+    stockNews(symbols, language).then(news => {
+      Dispatcher.dispatch({actionType: Constants.NEWS_DATA, news: news});
+    });
+  }
   if (symbol) {
     selectCompany(symbol);
   }
