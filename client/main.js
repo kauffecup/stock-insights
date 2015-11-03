@@ -80,7 +80,7 @@ class StockInsights extends React.Component {
         <div className="stock-insights-title">
           <div className="da-logo" dangerouslySetInnerHTML={{__html: IBMsvg}}></div>
           <h1 className="stock-insights-title">{this.state.strings.stockInsights}</h1>
-          <a href="http://www.ibm.com/smarterplanet/us/en/ibmwatson/developercloud/" target="_blank">Built with IBM Watson</a>
+          <a href="https://bluemix.net" target="_blank">{this.state.strings.built}</a>
         </div>
         <CompanyContainer
           companies={this.state.companies}
