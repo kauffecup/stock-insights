@@ -58,7 +58,7 @@ Dispatcher.register(function(action) {
     case Constants.DESELECT_COMPANY:
       if (PageStateStore.getSelectedCompanies().length === 0) {
         _articles = [];
-        StockDataStore.emitChange();
+        NewsArticlesStore.emitChange();
       }
       break;
   }
