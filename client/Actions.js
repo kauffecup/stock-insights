@@ -16,7 +16,7 @@
 
 import Dispatcher     from './Dispatcher';
 import Constants      from './constants/Constants';
-var PageStateStore = require('./stores/PageStateStore');
+import PageStateStore from './stores/PageStateStore';
 import {
   companyLookup,
   stockPrice,

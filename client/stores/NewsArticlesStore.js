@@ -54,6 +54,13 @@ Dispatcher.register(function(action) {
       _articles = [];
       NewsArticlesStore.emitChange();
       break;
+
+    case Constants.DESELECT_COMPANY:
+      if (PageStateStore.getSelectedCompanies().length === 0) {
+        _articles = [];
+        StockDataStore.emitChange();
+      }
+      break;
   }
 });
 
