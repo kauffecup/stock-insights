@@ -59,7 +59,7 @@ router.get('/strings', (req, res) => {
 router.get('/companylookup', (req, res) => {
   var company = req.query.company;
   var {client_id, client_secret, url} = vcapServices.companyLookup.credentials;
-  return _doGet(url, '/markets/find', {client_id: client_id, name: company}, res);
+  return _doGet(url + '/markets/find', {client_id: client_id, name: company}, res);
 });
 
 /* Stock News. query takes symbol */
@@ -69,7 +69,7 @@ router.get('/stocknews', (req, res) => {
   var langCode = req.query.language || locales.best(supportedLocales).code;
   var symbol = req.query.symbol;
   var {client_id, client_secret, url} = vcapServices.stockNews.credentials;
-  return _doGet(url, '/news/find', {client_id: client_id, symbol: symbol, language: langCode}, res);
+  return _doGet(url + '/news/find', {client_id: client_id, symbol: symbol, language: langCode}, res);
 });
 
 /* Stock Price. query takes symbols */
@@ -79,17 +79,8 @@ router.get('/stockprice', (req, res) => {
   var {client_id: client_id1, client_secret: client_secret1, url: url1} = vcapServices.stockPrice.credentials;
   var {client_id: client_id2, client_secret: client_secret2, url: url2} = vcapServices.stockHistory.credentials;
 
-  var priceArgs, historyArgs;
-  if (vcapServices.BYPASS_URL) {
-    var auth = "Basic " + new Buffer(vcapServices.BYPASS_UN + ":" + vcapServices.BYPASS_PW).toString('base64');
-    priceArgs = {url: vcapServices.BYPASS_URL + '/markets/quote', headers: {Authorization: auth}, qs: {symbols: symbols}};
-    historyArgs = {url: vcapServices.BYPASS_URL + '/markets/history', headers: {Authorization: auth}, qs: {symbols: symbols}};
-  } else {
-    priceArgs = {url: url1 + '/markets/quote',   qs: {client_id: client_id1, symbols: symbols}};
-    historyArgs = {url: url2 + '/markets/history', qs: {client_id: client_id2, symbols: symbols}};
-  }
-  var pricePromise   = request.getAsync(priceArgs);
-  var historyPromise = request.getAsync(historyArgs);
+  var pricePromise   = request.getAsync({url: url1 + '/markets/quote',   qs: {client_id: client_id1, symbols: symbols}});
+  var historyPromise = request.getAsync({url: url2 + '/markets/history', qs: {client_id: client_id2, symbols: symbols}});
 
   Promise.join(pricePromise, historyPromise, ([pR, pB], [hR, hB]) => {
     pB = (!!pB && typeof pB === 'string') ? JSON.parse(pB) : pB;
@@ -140,20 +131,12 @@ router.get('/stockprice', (req, res) => {
 router.get('/sentiment', (req, res) => {
   var {symbol, entity} = req.query;
   var {client_id, client_secret, url} = vcapServices.stockSentiment.credentials;
-  return _doGet(url, '/sentiment/find', {client_id: client_id, symbol: symbol, entity: entity}, res);
+  return _doGet(url + '/sentiment/find', {client_id: client_id, symbol: symbol, entity: entity}, res);
 });
 
 /* Helper GET method for companylookup and stockprice similarities */
-function _doGet(baseUrl, extension, qs, res) {
-  var args;
-  if (vcapServices.BYPASS_URL) {
-    delete qs.client_id;
-    var auth = "Basic " + new Buffer(vcapServices.BYPASS_UN + ":" + vcapServices.BYPASS_PW).toString('base64');
-    args = {url: vcapServices.BYPASS_URL + extension, headers: {Authorization: auth}, qs: qs};
-  } else {
-    args = {url: baseUrl + extension, qs: qs};
-  }
-  return request.getAsync(args).then(([response, body]) => {
+function _doGet(url, qs, res) {
+  return request.getAsync({url: url, qs: qs}).then(([response, body]) => {
     var parsedResponse = (!!body && typeof body === 'string') ? JSON.parse(body) : body;
     parsedResponse.httpCode && res.status(parseInt(parsedResponse.httpCode));
     res.json(parsedResponse);
@@ -212,17 +195,8 @@ router.get('/demo/negative', (req, res) => {
   var {client_id: client_id1, client_secret: client_secret1, url: url1} = vcapServices.stockPrice.credentials;
   var {client_id: client_id2, client_secret: client_secret2, url: url2} = vcapServices.stockHistory.credentials;
 
-  var priceArgs, historyArgs;
-  if (vcapServices.BYPASS_URL) {
-    var auth = "Basic " + new Buffer(vcapServices.BYPASS_UN + ":" + vcapServices.BYPASS_PW).toString('base64');
-    priceArgs = {url: vcapServices.BYPASS_URL + '/markets/quote', headers: {Authorization: auth}, qs: {symbols: symbols}};
-    historyArgs = {url: vcapServices.BYPASS_URL + '/markets/history', headers: {Authorization: auth}, qs: {symbols: symbols}};
-  } else {
-    priceArgs = {url: url1 + '/markets/quote',   qs: {client_id: client_id1, symbols: symbols}};
-    historyArgs = {url: url2 + '/markets/history', qs: {client_id: client_id2, symbols: symbols}};
-  }
-  var pricePromise   = request.getAsync(priceArgs);
-  var historyPromise = request.getAsync(historyArgs);
+  var pricePromise   = request.getAsync({url: url1 + '/markets/quote',   qs: {client_id: client_id1, symbols: symbols}});
+  var historyPromise = request.getAsync({url: url2 + '/markets/history', qs: {client_id: client_id2, symbols: symbols}});
 
   Promise.join(pricePromise, historyPromise, ([pR, pB], [hR, hB]) => {
     pB = (!!pB && typeof pB === 'string') ? JSON.parse(pB) : pB;
@@ -260,20 +234,10 @@ router.get('/demo/entities', (req, res) => {
   var {client_id, client_secret, url} = vcapServices.stockSentiment.credentials;
   // companies can be in symbol or symbols field
   var symbols = req.query.symbol || req.query.symbols;
-
-  var args;
-  if (vcapServices.BYPASS_URL) {
-    var auth = "Basic " + new Buffer(vcapServices.BYPASS_UN + ":" + vcapServices.BYPASS_PW).toString('base64');
-    args = {url: vcapServices.BYPASS_URL + '/news/find', headers: {Authorization: auth}, qs: {
-      symbols: symbols, language: langCode, elimit: 50, alimit: 0
-    }};
-  } else {
-    args = {url: url + '/news/find', qs: {
-      client_id: client_id, symbols: symbols, language: langCode, elimit: 50, alimit: 0
-    }}
-  }
   // request time!
-  request.getAsync(args).then(([eaRequest, eaBody]) => {
+  request.getAsync({url: url + '/news/find', qs: {
+    client_id: client_id, symbols: symbols, language: langCode, elimit: 50, alimit: 0
+  }}).then(([eaRequest, eaBody]) => {
     eaBody = (!!eaBody && typeof eaBody === 'string') ? JSON.parse(eaBody) : eaBody;
     res.json(eaBody.entities);
   }).catch(e => {
@@ -290,19 +254,10 @@ router.get('/demo/articles', (req, res) => {
   var {client_id, client_secret, url} = vcapServices.stockSentiment.credentials;
   // companies can be in symbol or symbols field
   var symbols = req.query.symbol || req.query.symbols;
-  var args;
-  if (vcapServices.BYPASS_URL) {
-    var auth = "Basic " + new Buffer(vcapServices.BYPASS_UN + ":" + vcapServices.BYPASS_PW).toString('base64');
-    args = {url: vcapServices.BYPASS_URL + '/news/find', headers: {Authorization: auth}, qs: {
-      symbols: symbols, language: langCode, elimit: 50, alimit: 0
-    }};
-  } else {
-    args = {url: url + '/news/find', qs: {
-      client_id: client_id, symbols: symbols, language: langCode, elimit: 50, alimit: 0
-    }};
-  }
   // request time!
-  request.getAsync(args).then(([eaRequest, eaBody]) => {
+  request.getAsync({url: url + '/news/find', qs: {
+    client_id: client_id, symbols: symbols, language: langCode, elimit: 50, alimit: 0
+  }}).then(([eaRequest, eaBody]) => {
     eaBody = (!!eaBody && typeof eaBody === 'string') ? JSON.parse(eaBody) : eaBody;
     res.json(eaBody.articles);
   }).catch(e => {
