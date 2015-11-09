@@ -127,11 +127,22 @@ router.get('/stockprice', (req, res) => {
   });
 });
 
-/* Sentiment. query takes symbol and/or entity */
+/* Sentiment on twitter. query takes symbol and/or entity */
 router.get('/sentiment', (req, res) => {
   var {symbol, entity} = req.query;
   var {client_id, client_secret, url} = vcapServices.stockSentiment.credentials;
   return _doGet(url + '/sentiment/find', {client_id: client_id, symbol: symbol, entity: entity}, res);
+});
+
+/* Tweets about an entity and topic */
+router.get('/tweets', (req, res) => {
+  // if a language is specified in the request, prioritize that
+  var locales = new locale.Locales(req.headers['accept-language']);
+  var langCode = req.query.language || locales.best(supportedLocales).code;
+  // proceed with business as usual
+  var {symbol, entity} = req.query;
+  var {client_id, client_secret, url} = vcapServices.stockTweets.credentials;
+  return _doGet(url + '/twitter/find', {client_id: client_id, symbol: symbol, entity: entity, language: langCode}, res);
 });
 
 /* Helper GET method for companylookup and stockprice similarities */
