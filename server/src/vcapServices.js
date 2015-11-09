@@ -40,8 +40,7 @@ try {
 
 // the keys are complex, for example: `Company Lookup v1 : Sandbox 55e768c90cf2722940e66db9 prod`
 // iterate over the keys and convert to companyLookup, stockPrice, stockNews, stockHistory,
-// stockSentiment, globalization, stockTweets, and languageDetect, for easier use throughout
-// the application
+// stockSentiment, globalization, and stockTweets, for easier use throughout the application
 for (var service in vcapServices) {
   if (service.indexOf('Company Lookup') > -1) {
     vcapServices.companyLookup = vcapServices[service][0];
@@ -62,8 +61,6 @@ for (var service in vcapServices) {
     vcapServices.globalization = vcapServices[service][0];
   } else if (service.indexOf('Stock Tweets') > -1) {
     vcapServices.stockTweets = vcapServices[service][0];
-  } else if (service.indexOf('Language Detect') > -1) {
-    vcapServices.languageDetect = vcapServices[service][0];
   }
 }
 
