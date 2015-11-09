@@ -60,14 +60,6 @@ export function getStockData(symbols) {
   });
 }
 
-/** Get the sentiment around a symbol and/or entity */
-export function getSentiment(symbol, entity) {
-  Dispatcher.dispatch({actionType: Constants.SENTIMENT_LOADING, symbol: symbol, entity: entity});
-  sentiment(symbol, entity).then(data => {
-    Dispatcher.dispatch({actionType: Constants.SENTIMENT_DATA, data: data});
-  })
-}
-
 /** Get the most recent tweets about a symbol/entity combo */
 export function getTweets(symbol, entity, language) {
   Dispatcher.dispatch({actionType: Constants.TWEETS_LOADING, symbol: symbol, entity: entity});

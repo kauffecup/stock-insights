@@ -40,14 +40,6 @@ export function stockNews(symbols, language) {
   return _queryHelper('/stocknews', {symbol: symbols, language: language});
 }
 
-/**
- * Hit the sentiment endpoint with the proper query.
- * Return a promise that resolves with the response.
- */
-export function sentiment(symbol, entity) {
-  return _queryHelper('/sentiment', {symbol: symbol, entity: entity});
-}
-
 export function tweets(symbol, entity, language) {
   return _queryHelper('/tweets', {symbol: symbol, entity: entity, language: language});
 }
