@@ -214,6 +214,57 @@ button {
     }
   }
 
+  .tweet-viewer {
+    position: absolute;
+    left: 40%;
+    width: 25%;
+    top: 12%;
+    height: 68%;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    background: #fff;
+    box-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+    padding: 15px;
+
+    // sharkfin
+    &:before {
+      margin: 0;
+      padding: 0;
+      border: 0;
+      content: '';
+      position: absolute;
+      left: -10px;
+      top: 14px;
+      border-right: solid #000 10px;
+      border-top: solid #000 8px;
+      border-bottom: solid #000 8px;
+    }
+
+    .positive {color: @positive-color; }
+    .neutral  {color: @secondary-text-color; }
+    .negative {color: @negative-color; }
+
+    .tweet-description {
+      font-size: 1.3em;
+    }
+
+    .sentiment {
+      display: flex;
+      justify-content: space-between;
+      margin: 10px 0px;
+    }
+
+    .tweets {
+      flex: 1;
+      overflow: auto;
+
+      .tweet {
+        margin-bottom: 8px;
+      }
+    }
+  }
+
   .article-list {
     flex: 1;
     flex-direction: column;

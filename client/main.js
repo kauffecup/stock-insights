@@ -22,6 +22,7 @@ import CompaniesStore    from './stores/CompaniesStore';
 import StockDataStore    from './stores/StockDataStore';
 import NewsArticlesStore from './stores/NewsArticlesStore';
 import PageStateStore    from './stores/PageStateStore';
+import TweetStore        from './stores/TweetStore';
 
 import CompanyContainer  from './components/CompanyContainer';
 import StockVisualizer   from './components/StockVisualizer';
@@ -29,11 +30,13 @@ import ArticleList       from './components/ArticleList';
 import AnalysisToggle    from './components/AnalysisToggle';
 import GraphTown         from './components/GraphTown';
 import DateSlider        from './components/DateSlider';
+import TweetViewer       from './components/TweetViewer';
 
 import {
   getStockData,
   getStrings,
-  getNews
+  getNews,
+  closeTweets
 } from './Actions';
 
 // get our inline-able svg
@@ -76,7 +79,7 @@ class StockInsights extends React.Component {
     var showGraph = this.state.selectedCompanies.length;
     var showArticles = this.state.selectedCompanies.length;
     return (
-      <div className={classes}>
+      <div className={classes} onClick={closeTweets}>
         <div className="stock-insights-title">
           <div className="da-logo" dangerouslySetInnerHTML={{__html: IBMsvg}}></div>
           <h1 className="stock-insights-title">{this.state.strings.stockInsights}</h1>
@@ -103,6 +106,12 @@ class StockInsights extends React.Component {
             strings={this.state.strings}
             language={this.state.language}
             forceBubbles={this.state.forceBubbles} />
+          {this.state.tweetsOpen &&
+            <TweetViewer description={this.state.tweetDescription}
+              tweets={this.state.tweets}
+              sentiment={this.state.tweetSentiment}
+              strings={this.state.strings} />
+          }
           {!!this.state.selectedCompanies.length && 
             <ArticleList selectedCompanies={this.state.selectedCompanies}
               articles={this.state.articles} />
@@ -126,6 +135,7 @@ class StockInsights extends React.Component {
     StockDataStore.addChangeListener(this._onChange);
     NewsArticlesStore.addChangeListener(this._onChange);
     PageStateStore.addChangeListener(this._onChange);
+    TweetStore.addChangeListener(this._onChange);
     // if we already have selected companies, request their articles to populate
     // nah mean nah mean?
     if (this.state.selectedCompanies.length) {
@@ -167,7 +177,11 @@ class StockInsights extends React.Component {
       currentColorMode: PageStateStore.getCurrentAnalysisColorMode(),
       condensedCompanies: PageStateStore.getCondensedCompanies(),
       selectedCompanies: PageStateStore.getSelectedCompanies(),
-      articles: NewsArticlesStore.getArticles()
+      articles: NewsArticlesStore.getArticles(),
+      tweetsOpen: TweetStore.getStatus(),
+      tweetDescription: TweetStore.getDescription(),
+      tweets: TweetStore.getTweets(),
+      tweetSentiment: TweetStore.getSentiment()
     }
   }
 };

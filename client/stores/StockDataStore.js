@@ -87,7 +87,8 @@ function addEntities(entities) {
   _entities = entities.map(e => ({
     _id: e.text,
     value: e.count,
-    colorValue: e.averageSentiment
+    colorValue: e.averageSentiment,
+    symbols: e.symbols
   }))
 }
 

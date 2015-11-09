@@ -21,7 +21,8 @@ import d3                from 'd3';
 import dimple            from 'dimple';
 import ReactBubbleChart  from 'react-bubble-chart';
 import {
-  getNews
+  getNews,
+  getTweets
 } from '../Actions';
 
 function generateLegend(lowText, highText) {
@@ -143,6 +144,10 @@ export default class StockVisualizer extends React.Component {
     }
   }
 
+  entityClick(d) {
+    getTweets(d.symbols, d._id, this.props.language);
+  }
+
   /**
    * This function is called on mouseover of a bubble. It's passed the dom node of the tooltip,
    * the d3 data object, and the stroke color. We use these 3 things to graph a dimple bar series
@@ -261,7 +266,7 @@ export default class StockVisualizer extends React.Component {
       className="stock-visualizer"
       colorLegend={legend}
       data={data}
-      onClick={isEntities ? null : getNews.bind(null, this.props.language)}
+      onClick={isEntities ? this.entityClick.bind(this) : getNews.bind(null, this.props.language)}
       fixedDomain={domain}
       tooltip={tooltip}
       tooltipProps={tooltipProps}

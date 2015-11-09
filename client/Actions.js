@@ -21,7 +21,6 @@ import {
   companyLookup,
   stockPrice,
   stockNews,
-  sentiment,
   tweets,
   strings
 } from './requester'
@@ -61,11 +60,16 @@ export function getStockData(symbols) {
 }
 
 /** Get the most recent tweets about a symbol/entity combo */
-export function getTweets(symbol, entity, language) {
-  Dispatcher.dispatch({actionType: Constants.TWEETS_LOADING, symbol: symbol, entity: entity});
-  tweets(symbol, entity, language).then(data => {
+export function getTweets(symbols, entity, language) {
+  Dispatcher.dispatch({actionType: Constants.TWEETS_LOADING, symbols: symbols, entity: entity});
+  tweets(symbols, entity, language).then(data => {
     Dispatcher.dispatch({actionType: Constants.TWEETS_DATA, data: data});
   });
+}
+
+/** Close the tweet window */
+export function closeTweets() {
+  Dispatcher.dispatch({actionType: Constants.CLOSE_TWEETS});
 }
 
 /** Get the articles for a given company. This also selects the company and gets its stock history. */

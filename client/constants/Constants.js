@@ -36,6 +36,7 @@ export default keyMirror({
   TOGGLE_CONDENSED_COMPANIES: null,
   SWITCH_DATE: null,
   STRING_DATA: null,
+  CLOSE_TWEETS: null,
   TWEETS_LOADING: null,
   TWEETS_DATA: null
 });
