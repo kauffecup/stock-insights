@@ -22,6 +22,7 @@ import {
   stockPrice,
   stockNews,
   sentiment,
+  tweets,
   strings
 } from './requester'
 
@@ -65,6 +66,14 @@ export function getSentiment(symbol, entity) {
   sentiment(symbol, entity).then(data => {
     Dispatcher.dispatch({actionType: Constants.SENTIMENT_DATA, data: data});
   })
+}
+
+/** Get the most recent tweets about a symbol/entity combo */
+export function getTweets(symbol, entity, language) {
+  Dispatcher.dispatch({actionType: Constants.TWEETS_LOADING, symbol: symbol, entity: entity});
+  tweets(symbol, entity, language).then(data => {
+    Dispatcher.dispatch({actionType: Constants.TWEETS_DATA, data: data});
+  });
 }
 
 /** Get the articles for a given company. This also selects the company and gets its stock history. */

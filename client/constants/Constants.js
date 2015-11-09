@@ -37,5 +37,7 @@ export default keyMirror({
   SWITCH_ANALYSIS_COLOR_MODE: null,
   TOGGLE_CONDENSED_COMPANIES: null,
   SWITCH_DATE: null,
-  STRING_DATA: null
+  STRING_DATA: null,
+  TWEETS_LOADING: null,
+  TWEETS_DATA: null
 });
