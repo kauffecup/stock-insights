@@ -15,6 +15,7 @@
 //------------------------------------------------------------------------------
 
 import React     from 'react';
+import ReactDOM  from 'react-dom';
 import Constants from '../constants/Constants';
 import {
   addCompany,
@@ -73,7 +74,7 @@ export default class CompanySearcher extends React.Component {
    * because clicking on the <li> removes it from the drop down.
    */
   handleClear(event) {
-    if (!React.findDOMNode(this).contains(event.target) &&
+    if (!ReactDOM.findDOMNode(this).contains(event.target) &&
       !event.target.classList.contains('potential-company')) {
       this.setState({value: ''});
       clearPotentialCompanies();

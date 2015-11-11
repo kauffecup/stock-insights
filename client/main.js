@@ -14,7 +14,8 @@
 // limitations under the License.
 //------------------------------------------------------------------------------
 
-import React             from 'react';
+import React, { Component, PropTypes } from 'react'
+import { connect }       from 'react-redux'
 import classNames        from 'classnames';
 import Constants         from './constants/Constants';
 
@@ -46,7 +47,7 @@ var IBMsvg = fs.readFileSync(path.resolve(__dirname, './IBM.svg'));
 /**
  * The app entry point
  */
-export default class StockInsights extends React.Component {
+class StockInsights extends Component {
   constructor(props) {
     super(props);
     this.state = this._getStateObj();
@@ -168,3 +169,9 @@ export default class StockInsights extends React.Component {
     }
   }
 };
+
+// for now, we want it all! and maybe forever honestly, iuno
+var select = state => state;
+
+// Wrap the component to inject dispatch and state into it
+export default connect(select)(StockInsights)
