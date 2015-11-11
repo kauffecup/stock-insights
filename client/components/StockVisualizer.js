@@ -61,8 +61,8 @@ export default class StockVisualizer extends React.Component {
       return {
         value: s.last.toFixed(2),
         _id: s.symbol,
-        colorValue: colorFunc(s),
-        change: this.getChangeAnalysis(s),
+        colorValue: s.change.toFixed(2),
+        change: s.change.toFixed(2),
         week_52_high: s.week_52_high,
         week_52_low: s.week_52_low
       }
@@ -81,32 +81,6 @@ export default class StockVisualizer extends React.Component {
       }));
     }
     return data;
-  }
-
-  /**
-   * Will be passed in to getData - extract the change of a stock
-   */
-  getChangeAnalysis(s) {
-    return s.change.toFixed(2);
-  }
-
-  /**
-   * Week52 Analysis... this might be helpful?
-   * Gets the stocks current position relative to its week 52 high and week
-   * 52 low. If the stock exceeds its week 52 high, this value will be > 1, if
-   * a stock is currently in the middele, this value will be 0.5, etc...
-   */
-  getWeek52Analysis(s) {
-    var high = s.week_52_high || s.high;
-    var low  = s.week_52_low  || s.low;
-    var now  = s.last || s.close;
-    // protect against dividing by 0. this may seem a little... fake, but if we
-    // don't have the data we'll give it a perfectly average score.
-    if (!high && !low) {
-      return 0.5;
-    } else {
-      return 1 - ((high - now) / (high - low));
-    }
   }
 
   /**
@@ -131,16 +105,6 @@ export default class StockVisualizer extends React.Component {
     return {
       min: min,
       max: max
-    }
-  }
-
-  /**
-   * Return a color domain for Week52 analysis. Go from -0.2 to 1.2?
-   */
-  getWeek52Domain() {
-    return {
-      min: -0.2,
-      max: 1.2
     }
   }
 
@@ -201,7 +165,7 @@ export default class StockVisualizer extends React.Component {
    * Render town.
    */
   render() {
-    var {entityData, stockData, currentDate, currentColorMode, selectedCompanies} = this.props;
+    var {entityData, stockData, currentDate, selectedCompanies} = this.props;
     var isEntities = selectedCompanies.length && !!entityData.length && !this.props.forceBubbles;
     var tooltip = !isEntities;
 
@@ -245,19 +209,9 @@ export default class StockVisualizer extends React.Component {
       var data = typeof currentPos === 'undefined' ? [] : stockData[currentPos].data;
       // then, depending on the color mode, get the actual data, color
       // domain, and color legend.
-      switch(currentColorMode) {
-        case '_am_color_change':
-          data = this.getData(data, this.getChangeAnalysis);
-          domain = this.getChangeDomain(data);
-          legend = generateLegend(`(-) ${this.props.strings.change || ''}`, `(+) ${this.props.strings.change || ''}`);
-          break;
-
-        case '_am_color_52week':
-          data = this.getData(data, this.getWeek52Analysis);
-          domain = this.getWeek52Domain();
-          legend = generateLegend(`↓ ${this.props.strings.fiftyTwoLow || ''}`, `↑ ${this.props.strings.fiftyTwoHigh || ''}`);
-          break;
-      }
+      data = this.getData(data);
+      domain = this.getChangeDomain(data);
+      legend = generateLegend(`(-) ${this.props.strings.change || ''}`, `(+) ${this.props.strings.change || ''}`);
     }
     // now we make a bubble chart! yay!
     return <ReactBubbleChart

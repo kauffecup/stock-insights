@@ -27,7 +27,6 @@ import TweetStore        from './stores/TweetStore';
 import CompanyContainer  from './components/CompanyContainer';
 import StockVisualizer   from './components/StockVisualizer';
 import ArticleList       from './components/ArticleList';
-import AnalysisToggle    from './components/AnalysisToggle';
 import GraphTown         from './components/GraphTown';
 import DateSlider        from './components/DateSlider';
 import TweetViewer       from './components/TweetViewer';
@@ -88,7 +87,6 @@ export default class StockInsights extends React.Component {
           <StockVisualizer
             stockData={this.state.stockData}
             entityData={this.state.entityData}
-            currentColorMode={this.state.currentColorMode}
             currentDate={this.state.currentDate}
             dataMap={this.state.stockDataMap}
             strings={this.state.strings}
@@ -106,10 +104,8 @@ export default class StockInsights extends React.Component {
               articles={this.state.articles} />
           }
         </div>
-        {showGraph ?
+        {showGraph &&
           <GraphTown dataMap={this.state.stockDataMap} selectedCompanies={this.state.selectedCompanies} />
-          :
-          <AnalysisToggle analysisColorModes={this.state.analysisColorModes} strings={this.state.strings} />
         }
       </div>
     );
@@ -162,8 +158,6 @@ export default class StockInsights extends React.Component {
       isEmbedded: PageStateStore.getEmbeddedMode(),
       currentDate: PageStateStore.getDate(),
       forceBubbles: PageStateStore.getForceBubbles(),
-      analysisColorModes: PageStateStore.getAnalysisColorModes(),
-      currentColorMode: PageStateStore.getCurrentAnalysisColorMode(),
       condensedCompanies: PageStateStore.getCondensedCompanies(),
       selectedCompanies: PageStateStore.getSelectedCompanies(),
       articles: NewsArticlesStore.getArticles(),
