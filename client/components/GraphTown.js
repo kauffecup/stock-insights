@@ -14,8 +14,9 @@
 // limitations under the License.
 //------------------------------------------------------------------------------
 
-import React  from 'react';
-import dimple from 'dimple';
+import React    from 'react';
+import ReactDOM from 'react-dom';
+import dimple   from 'dimple';
 
 const DRAW_TIME = 400;
 
@@ -31,7 +32,7 @@ export default class GraphTown extends React.Component {
     this.adaptData();
 
     // intialize the svg and chart with proper sizes
-    var svg = dimple.newSvg(React.findDOMNode(this), '100%', '100%');
+    var svg = dimple.newSvg(ReactDOM.findDOMNode(this), '100%', '100%');
     this.lineChart = new dimple.chart(svg, this.data);
     this.lineChart.setBounds(30, 14, '100%,-40', '100%,-34');
 

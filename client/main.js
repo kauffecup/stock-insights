@@ -44,22 +44,10 @@ var fs = require('fs');
 var path = require('path');
 var IBMsvg = fs.readFileSync(path.resolve(__dirname, './IBM.svg'));
 
-// make sure all es6 things work correctly in all browsers
-require('babel/polyfill');
-// load in locales so we can force it if we need to
-// require('moment/locale/en');
-// require('moment/locale/zh');
-require('moment/locale/fr');
-require('moment/locale/de');
-require('moment/locale/it');
-require('moment/locale/ja');
-require('moment/locale/pt-br');
-require('moment/locale/es');
-
 /**
  * The app entry point
  */
-class StockInsights extends React.Component {
+export default class StockInsights extends React.Component {
   constructor(props) {
     super(props);
     this.state = this._getStateObj();
@@ -186,6 +174,3 @@ class StockInsights extends React.Component {
     }
   }
 };
-
-React.initializeTouchEvents(true);
-React.render(<StockInsights />, document.body);
