@@ -64,6 +64,7 @@ function selectCompany(company) {
   }
 }
 function removeCompany(symbol) {
+  symbol = symbol._id || symbol.symbol || symbol;
   _selectedCompanies.splice(_selectedCompanies.indexOf(symbol), 1);
 }
 
@@ -147,6 +148,14 @@ Dispatcher.register(function(action) {
     case Constants.DESELECT_COMPANY:
       removeCompany(action.symbol);
       PageStateStore.emitChange();
+      break;
+
+    case Constants.REMOVE_COMPANY:
+      var prevLength = _selectedCompanies.length;
+      removeCompany(action.company)
+      if (_selectedCompanies.length != prevLength) {
+        PageStateStore.emitChange();
+      }
       break;
 
     // when closing the article list, clear the selected company and

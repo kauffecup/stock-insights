@@ -49,6 +49,7 @@ export function addCompany(company) {
 /** Remove a company */
 export function removeCompany(company) {
   Dispatcher.dispatch({actionType: Constants.REMOVE_COMPANY, company: company});
+  getNews();
 }
 
 /** Get the stock data for a given array of companies */

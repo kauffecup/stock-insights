@@ -201,8 +201,8 @@ export default class StockVisualizer extends React.Component {
    * Render town.
    */
   render() {
-    var {entityData, stockData, currentDate, currentColorMode} = this.props;
-    var isEntities = !!entityData.length && !this.props.forceBubbles;
+    var {entityData, stockData, currentDate, currentColorMode, selectedCompanies} = this.props;
+    var isEntities = selectedCompanies.length && !!entityData.length && !this.props.forceBubbles;
     var tooltip = !isEntities;
 
     var tooltipProps = [{

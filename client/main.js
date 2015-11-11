@@ -105,7 +105,8 @@ class StockInsights extends React.Component {
             dataMap={this.state.stockDataMap}
             strings={this.state.strings}
             language={this.state.language}
-            forceBubbles={this.state.forceBubbles} />
+            forceBubbles={this.state.forceBubbles}
+            selectedCompanies={this.state.selectedCompanies} />
           {this.state.tweetsOpen &&
             <TweetViewer description={this.state.tweetDescription}
               tweets={this.state.tweets}
