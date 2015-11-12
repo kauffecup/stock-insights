@@ -19,8 +19,7 @@ import classNames      from 'classnames';
 import CompanySearcher from './CompanySearcher';
 import {
   getNews,
-  deselectCompany,
-  toggleCondensedCompanies
+  deselectCompany
 } from '../Actions';
 
 /**
@@ -73,7 +72,7 @@ export default class CompanyContainer extends React.Component {
             language={this.props.language}
             onRemoveClick={this.props.onCompanyRemove} />
         )}
-        {this.props.companies.length ? <button onClick={toggleCondensedCompanies}>
+        {this.props.companies.length ? <button onClick={this.props.onToggle}>
           {this.props.condensed ? this.props.strings.showNames : this.props.strings.hideNames}
         </button> : null}
         <CompanySearcher {...this.props} />

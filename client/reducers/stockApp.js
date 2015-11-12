@@ -95,6 +95,15 @@ const defaultState = {
 
 export default function reduce (state = defaultState, action) {
   switch(action.type) {
+    case Constants.TOGGLE_CONDENSED_COMPANIES:
+      return assign({}, state, {
+        companies: {
+          condensed: !state.companies.condensed,
+          companies: state.companies.companies
+        }
+      })
+      break;
+
     case Constants.ADD_COMPANY:
       var newCompanies = [...state.companies.companies, action.company];
       _updateLocalStorage(newCompanies);

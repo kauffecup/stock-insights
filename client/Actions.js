@@ -98,11 +98,6 @@ export function closeArticleList() {
   Dispatcher.dispatch({actionType: Constants.CLOSE_ARTICLE_LIST});
 }
 
-/** Toggle the company condensed-ness */
-export function toggleCondensedCompanies() {
-  Dispatcher.dispatch({actionType: Constants.TOGGLE_CONDENSED_COMPANIES});
-}
-
 /** Change the date */
 export function setDate(date) {
   Dispatcher.dispatch({actionType: Constants.SWITCH_DATE, date: date});

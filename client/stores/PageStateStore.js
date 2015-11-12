@@ -25,9 +25,6 @@ var _strings = {};
 // initialize current date at today
 var _currentDate = moment();
 
-/** @type {Boolean} When condensed, only display the ticker symbol */
-var _condensedCompanies = false;
-
 /** @type {Array} The companies that are selected. Initialized blank unless passed in via URL */
 var _matchTake2 = /[&?]articles=([^&]+)/.exec(location.href);
 var _urlSelected = _matchTake2 && _matchTake2[1].split(',');
@@ -57,9 +54,6 @@ function removeCompany(symbol) {
  * stock data, color modes and size modes
  */
 var PageStateStore = assign({}, _Store, {
-  getCondensedCompanies: function () {
-    return _condensedCompanies;
-  },
   getSelectedCompanies: function () {
     return _selectedCompanies;
   },
@@ -77,12 +71,6 @@ var PageStateStore = assign({}, _Store, {
  */
 Dispatcher.register(function(action) {
   switch(action.actionType) {
-    // toggle the state of the company chiclets
-    case Constants.TOGGLE_CONDENSED_COMPANIES:
-      _condensedCompanies = !_condensedCompanies;
-      PageStateStore.emitChange();
-      break;
-
     case Constants.SELECT_COMPANY:
       var currentNumberOfCompanies = _selectedCompanies.length;
       selectCompany(action.symbol);

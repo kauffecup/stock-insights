@@ -34,7 +34,8 @@ import TweetViewer       from './components/TweetViewer';
 
 import {
   addCompany,
-  removeCompany
+  removeCompany,
+  toggleCondensedCompanies
 } from './actions/actions';
 
 import {
@@ -86,12 +87,13 @@ class StockInsights extends Component {
           companies={companies.companies}
           potentialCompanies={this.state.potentialCompanies}
           loadingStatus={this.state.potentialCompaniesLoading}
-          condensed={this.state.condensedCompanies}
+          condensed={companies.condensed}
           selectedCompanies={this.state.selectedCompanies}
           strings={this.state.strings}
           language={language}
           onCompanyRemove={c => dispatch(removeCompany(c))}
-          onCompanyAdd={c => dispatch(addCompany(c))} />
+          onCompanyAdd={c => dispatch(addCompany(c))}
+          onToggle={() => dispatch(toggleCondensedCompanies())} />
         {showDateSlider &&
           <DateSlider stockData={this.state.stockData} currentDate={this.state.currentDate} language={language} />
         }
@@ -166,7 +168,6 @@ class StockInsights extends Component {
       entityData: StockDataStore.getEntities(),
       strings: PageStateStore.getStrings(),
       currentDate: PageStateStore.getDate(),
-      condensedCompanies: PageStateStore.getCondensedCompanies(),
       selectedCompanies: PageStateStore.getSelectedCompanies(),
       articles: NewsArticlesStore.getArticles(),
       tweetsOpen: TweetStore.getStatus(),

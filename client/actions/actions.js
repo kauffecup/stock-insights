@@ -16,6 +16,11 @@
 
 import Constants from '../constants/Constants';
 
+/** Toggle the company condensed-ness */
+export function toggleCondensedCompanies() {
+  return {type: Constants.TOGGLE_CONDENSED_COMPANIES};
+}
+
 /** Add a company */
 export function addCompany(company) {
   return {type: Constants.ADD_COMPANY, company: company};
