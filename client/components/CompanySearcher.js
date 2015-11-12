@@ -84,8 +84,8 @@ export default class CompanySearcher extends React.Component {
   /**
    * When adding a company... add the company, clear and refocus the input
    */
-  handleAdd(company) {
-    addCompany(company);
+  handleClick(company) {
+    this.props.onCompanyAdd(company);
     this.setState({value: ''});
     this.refs.input.getDOMNode().focus();
   }
@@ -108,7 +108,7 @@ export default class CompanySearcher extends React.Component {
     ).filter(pc =>
       !companies.some(c => (c.description === pc.description) && (c.symbol === pc.symbol))
     ).map(pC =>
-      <li className="potential-company" onClick={this.handleAdd.bind(this, pC)} key={pC.symbol}>
+      <li className="potential-company" onClick={this.handleClick.bind(this, pC)} key={pC.symbol}>
         {pC.description + ' (' + pC.symbol + ')'}
       </li>
     ).slice(0, 15);

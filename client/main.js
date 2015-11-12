@@ -33,6 +33,11 @@ import DateSlider        from './components/DateSlider';
 import TweetViewer       from './components/TweetViewer';
 
 import {
+  addCompany,
+  removeCompany
+} from './actions/actions';
+
+import {
   getStockData,
   getStrings,
   getNews,
@@ -60,6 +65,10 @@ class StockInsights extends Component {
    * Currently the app consists of a header and a CompanyContainer
    */
   render() {
+    // injected by connect call
+    var {dispatch, isEmbedded, language, forceBubbles, strings, currentDate, potentialCompanies,
+      companies, entities, stockData, selectedCompanies, articles} = this.props;
+
     var classes = classNames('stock-insights', {
       embedded: this.state.isEmbedded
     });
@@ -74,13 +83,15 @@ class StockInsights extends Component {
           <a href="https://bluemix.net" target="_blank">{this.state.strings.built}</a>
         </div>
         <CompanyContainer
-          companies={this.state.companies}
+          companies={companies.companies}
           potentialCompanies={this.state.potentialCompanies}
           loadingStatus={this.state.potentialCompaniesLoading}
           condensed={this.state.condensedCompanies}
           selectedCompanies={this.state.selectedCompanies}
           strings={this.state.strings}
-          language={this.state.language} />
+          language={this.state.language}
+          onCompanyRemove={c => dispatch(removeCompany(c))}
+          onCompanyAdd={c => dispatch(addCompany(c))} />
         {showDateSlider &&
           <DateSlider stockData={this.state.stockData} currentDate={this.state.currentDate} language={this.state.language} />
         }
@@ -131,8 +142,8 @@ class StockInsights extends Component {
     } 
     // if we already have companies, request the stock data to populate
     // our visualizations
-    if (this.state.companies.length) {
-      var symbols = this.state.companies.map(c => c.symbol)
+    if (this.props.companies.companies.length) {
+      var symbols = this.props.companies.companies.map(c => c.symbol)
       getStockData(symbols);
     }
   }
@@ -148,7 +159,6 @@ class StockInsights extends Component {
    */
   _getStateObj() {
     return {
-      companies: CompaniesStore.getCompanies(),
       potentialCompanies: CompaniesStore.getPotentialCompanies(),
       potentialCompaniesLoading: CompaniesStore.getLoadingStatus(),
       stockData: StockDataStore.getStockData(),

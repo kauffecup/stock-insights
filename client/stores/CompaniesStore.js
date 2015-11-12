@@ -23,67 +23,14 @@ import assign     from'object-assign';
 const LOCAL_STORAGE_KEY = 'COMPANY_LOCAL_STORAGE';
 /** @type {Array.<Companies>} The array of potential companies (for autocomplete) */
 var _potentialCompanies = [];
-/** @type {Array.<Companies>} The array of companies initialized from url param or local storage */
-var _companies;
 /** @type {Boolean} Whether or not we're loading potential companies */
 var _loadingStatus = Constants.POTENTIAL_STATUS_CLEAR;
-
-/** Configure the companies either from the url or from local storage */
-var match = /[&?]symbols=([^&]+)/.exec(location.href);
-var urlCompanies = match && match[1].split(',');
-var setFromUrlParam = urlCompanies && urlCompanies.length;
-if (setFromUrlParam) {
-  _companies = urlCompanies.map(c => ({
-    symbol: c
-  }));
-} else {
-  _companies = localStorage.getItem(LOCAL_STORAGE_KEY);
-  _companies = _companies ? JSON.parse(_companies) : [];
-}
-
-/**
- * Add a company to our _companies array
- */
-function addCompany(newCompany) {
-  _companies.push(newCompany);
-  _updateLocalStorage();
-}
-
-/**
- * Remove a company from our _companies array
- */
-function removeCompany(company) {
-  _companies = _companies.filter(c => (
-    c !== company
-  ));
-  _updateLocalStorage();
-}
-
-/**
- * Helper method to store the companies in the browser's local storage
- */
-function _updateLocalStorage () {
-  if (!setFromUrlParam) {
-    localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(_companies));
-  }
-}
-
-/**
- * Helper method to clear the browser's local storage
- */
-function _clearLocalStorage () {
-  localStorage.removeItem(LOCAL_STORAGE_KEY);
-}
 
 /**
  * The store we'll be exporting. Contains getter methods for
  * companies, potential companies, and loading status.
  */
 var CompaniesStore = assign({}, _Store, {
-  getCompanies: function () {
-    return _companies;
-  },
-
   getPotentialCompanies: function () {
     return _potentialCompanies;
   },
@@ -117,18 +64,6 @@ Dispatcher.register(function(action) {
     case Constants.CLEAR_POTENTIAL_COMPANIES:
       _loadingStatus = Constants.POTENTIAL_STATUS_CLEAR;
       _potentialCompanies = [];
-      CompaniesStore.emitChange();
-      break;
-
-    // add a company
-    case Constants.ADD_COMPANY:
-      addCompany(action.company);
-      CompaniesStore.emitChange();
-      break;
-
-    // remove a company
-    case Constants.REMOVE_COMPANY:
-      removeCompany(action.company);
       CompaniesStore.emitChange();
       break;
 

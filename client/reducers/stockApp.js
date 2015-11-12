@@ -18,6 +18,24 @@ import moment    from 'moment';
 import Constants from '../constants/Constants';
 import assign    from 'object-assign';
 
+/** @type {String} The local storage key */
+const LOCAL_STORAGE_KEY = 'COMPANY_LOCAL_STORAGE';
+
+/** @type {Array.<Companies>} The array of companies initialized from url param or local storage */
+var _companies;
+/** Configure the companies either from the url or from local storage */
+var match = /[&?]symbols=([^&]+)/.exec(location.href);
+var urlCompanies = match && match[1].split(',');
+var setFromUrlParam = urlCompanies && urlCompanies.length;
+if (setFromUrlParam) {
+  _companies = urlCompanies.map(c => ({
+    symbol: c
+  }));
+} else {
+  _companies = localStorage.getItem(LOCAL_STORAGE_KEY);
+  _companies = _companies ? JSON.parse(_companies) : [];
+}
+
 /** @type {Boolean} If we're running embedded or not. Right now determined by setting symbols in the URL */
 var _match = /[&?]symbols=([^&]+)/.exec(location.href);
 var _urlCompanies = _match && _match[1].split(',');
@@ -42,6 +60,15 @@ if (_forceBubbles && _urlCompanies.length) {
   _selectedCompanies = _urlCompanies;
 }
 
+/**
+ * Helper method to store the companies in the browser's local storage
+ */
+function _updateLocalStorage (companies) {
+  if (!setFromUrlParam) {
+    localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(companies));
+  }
+}
+
 const defaultState = {
   isEmbedded: _isEmbedded,
   language: _language,
@@ -54,7 +81,7 @@ const defaultState = {
   },
   companies: {
     condensed: false,
-    companies: []
+    companies: _companies
   },
   entities: [],
   stockData: {
@@ -66,10 +93,33 @@ const defaultState = {
 }
 
 
-export default function reduce (state, action) {
-  switch(action.actionType) {
+export default function reduce (state = defaultState, action) {
+  switch(action.type) {
+    case Constants.ADD_COMPANY:
+      var newCompanies = [...state.companies.companies, action.company];
+      _updateLocalStorage(newCompanies);
+      return assign({}, state, {
+        companies: {
+          condensed: state.companies.condensed,
+          companies: newCompanies
+        }
+      });
+      break;
+
+    case Constants.REMOVE_COMPANY:
+      // filter returns a new array, so we all good hurrr
+      var newCompanies = state.companies.companies.filter(c => c !== action.company);
+      _updateLocalStorage(newCompanies);
+      return assign({}, state, {
+        companies: {
+          condensed: state.companies.condensed,
+          companies: newCompanies
+        }
+      });
+      break;
+
     default:
-      return defaultState;
+      return state;
       break;
   }
 }

@@ -40,18 +40,6 @@ export function clearPotentialCompanies() {
   Dispatcher.dispatch({actionType: Constants.CLEAR_POTENTIAL_COMPANIES})
 }
 
-/** Add a company */
-export function addCompany(company) {
-  Dispatcher.dispatch({actionType: Constants.ADD_COMPANY, company: company});
-  company.symbol && getStockData(company.symbol);
-}
-
-/** Remove a company */
-export function removeCompany(company) {
-  Dispatcher.dispatch({actionType: Constants.REMOVE_COMPANY, company: company});
-  getNews();
-}
-
 /** Get the stock data for a given array of companies */
 export function getStockData(symbols) {
   Dispatcher.dispatch({actionType: Constants.STOCK_PRICE_LOADING, symbols: symbols});

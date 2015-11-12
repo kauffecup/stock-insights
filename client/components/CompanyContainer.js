@@ -19,7 +19,6 @@ import classNames      from 'classnames';
 import CompanySearcher from './CompanySearcher';
 import {
   getNews,
-  removeCompany,
   deselectCompany,
   toggleCondensedCompanies
 } from '../Actions';
@@ -45,7 +44,7 @@ class Company extends React.Component {
       <div className={classes} onClick={this.toggleSelected.bind(this)}>
         <span className="company-description">{c.description}</span>
         <span className="company-symbol">{c.symbol}</span>
-        <span className="company-close" onClick={e => {e.stopPropagation(); removeCompany(c);}}>x</span>
+        <span className="company-close" onClick={e => {e.stopPropagation(); this.props.onRemoveClick(c);}}>x</span>
       </div>
     );
   }
@@ -67,7 +66,12 @@ export default class CompanyContainer extends React.Component {
     return (
       <div className={classes}>
         {this.props.companies.map(c =>
-          <Company company={c} key={c.symbol} condensed={this.props.condensed} selected={!!selected[c.symbol]} language={this.props.language} />
+          <Company company={c}
+            key={c.symbol}
+            condensed={this.props.condensed}
+            selected={!!selected[c.symbol]}
+            language={this.props.language}
+            onRemoveClick={this.props.onCompanyRemove} />
         )}
         {this.props.companies.length ? <button onClick={toggleCondensedCompanies}>
           {this.props.condensed ? this.props.strings.showNames : this.props.strings.hideNames}
