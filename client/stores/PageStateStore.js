@@ -28,32 +28,16 @@ var _currentDate = moment();
 /** @type {Boolean} When condensed, only display the ticker symbol */
 var _condensedCompanies = false;
 
-/** @type {String} The id for the current selected color mode */
-var _selectedColorMode = '_am_color_change';
-
-/** @type {Boolean} If we're running embedded or not. Right now determined by setting symbols in the URL */
-var _match = /[&?]symbols=([^&]+)/.exec(location.href);
-var _urlCompanies = _match && _match[1].split(',');
-var _isEmbedded = _urlCompanies && _urlCompanies.length;
-
 /** @type {Array} The companies that are selected. Initialized blank unless passed in via URL */
 var _matchTake2 = /[&?]articles=([^&]+)/.exec(location.href);
 var _urlSelected = _matchTake2 && _matchTake2[1].split(',');
 var _selectedCompanies = _urlSelected || [];
 
-/** @type {string} can force a language by specifying it in the url */
-var _matchTake3 = /[&?]language=([^&]+)/.exec(location.href);
-var _language = _matchTake3 && _matchTake3[1];
-
-/** @type {boolean} if we want to see the articles and the stock color bubbles */
-var _matchTake4 = /[&?]forcebubbles=([^&]+)/.exec(location.href);
-var _forceBubbles = _matchTake4 && (_matchTake4[1] === 'true' || _matchTake4[1] === '1');
-
 // let the hackery commence, if there are symbols specified and forcebubbles is true,
 // select all of them by default
-if (_forceBubbles && _urlCompanies.length) {
-  _selectedCompanies = _urlCompanies;
-}
+// if (_forceBubbles && _urlCompanies.length) {
+//   _selectedCompanies = _urlCompanies;
+// }
 
 /**
  * Set a new selected color mode
@@ -73,30 +57,8 @@ function removeCompany(symbol) {
  * stock data, color modes and size modes
  */
 var PageStateStore = assign({}, _Store, {
-  getEmbeddedMode: function () {
-    return !!_isEmbedded;
-  },
-
   getCondensedCompanies: function () {
     return _condensedCompanies;
-  },
-
-  getAnalysisColorModes: function () {
-    var _analysisColorModes = [{
-      label: _strings.change,
-      id: '_am_color_change'
-    }, {
-      label: _strings.valueRelative,
-      id: '_am_color_52week'
-    }];
-    return _analysisColorModes.map((am => {
-      var amr = clone(am);
-      amr.selected = amr.id === _selectedColorMode;
-      return amr;
-    }));
-  },
-  getCurrentAnalysisColorMode: function () {
-    return _selectedColorMode;
   },
   getSelectedCompanies: function () {
     return _selectedCompanies;
@@ -106,12 +68,6 @@ var PageStateStore = assign({}, _Store, {
   },
   getStrings: function () {
     return _strings;
-  },
-  getLanguage: function () {
-    return _language;
-  },
-  getForceBubbles: function () {
-    return _forceBubbles;
   }
 });
 
@@ -121,15 +77,6 @@ var PageStateStore = assign({}, _Store, {
  */
 Dispatcher.register(function(action) {
   switch(action.actionType) {
-    // change the selected color mode
-    // only emit a change if something has changed
-    case Constants.SWITCH_ANALYSIS_COLOR_MODE:
-      if (action.id !== _selectedColorMode) {
-        _selectedColorMode = action.id;
-        PageStateStore.emitChange();
-      }
-      break;
-
     // toggle the state of the company chiclets
     case Constants.TOGGLE_CONDENSED_COMPANIES:
       _condensedCompanies = !_condensedCompanies;

@@ -98,11 +98,6 @@ export function closeArticleList() {
   Dispatcher.dispatch({actionType: Constants.CLOSE_ARTICLE_LIST});
 }
 
-/** Switch the analysis color mode */
-export function switchAnalysisColorMode(id) {
-  Dispatcher.dispatch({actionType: Constants.SWITCH_ANALYSIS_COLOR_MODE, id: id});
-}
-
 /** Toggle the company condensed-ness */
 export function toggleCondensedCompanies() {
   Dispatcher.dispatch({actionType: Constants.TOGGLE_CONDENSED_COMPANIES});

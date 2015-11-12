@@ -59,10 +59,10 @@ export default class StockVisualizer extends React.Component {
   getData(data, colorFunc) {
     data = data.map(s => {
       return {
-        value: s.last.toFixed(2),
+        value: s.last ? s.last.toFixed(2) : 0,
         _id: s.symbol,
-        colorValue: s.change.toFixed(2),
-        change: s.change.toFixed(2),
+        colorValue: s.change ? s.change.toFixed(2) : 0,
+        change: s.change ? s.change.toFixed(2) : 0,
         week_52_high: s.week_52_high,
         week_52_low: s.week_52_low
       }

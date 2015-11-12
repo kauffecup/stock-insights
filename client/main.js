@@ -70,9 +70,9 @@ class StockInsights extends Component {
       companies, entities, stockData, selectedCompanies, articles} = this.props;
 
     var classes = classNames('stock-insights', {
-      embedded: this.state.isEmbedded
+      embedded: isEmbedded
     });
-    var showDateSlider = !this.state.selectedCompanies.length || this.state.forceBubbles;
+    var showDateSlider = !this.state.selectedCompanies.length || forceBubbles;
     var showGraph = this.state.selectedCompanies.length;
     var showArticles = this.state.selectedCompanies.length;
     return (
@@ -89,11 +89,11 @@ class StockInsights extends Component {
           condensed={this.state.condensedCompanies}
           selectedCompanies={this.state.selectedCompanies}
           strings={this.state.strings}
-          language={this.state.language}
+          language={language}
           onCompanyRemove={c => dispatch(removeCompany(c))}
           onCompanyAdd={c => dispatch(addCompany(c))} />
         {showDateSlider &&
-          <DateSlider stockData={this.state.stockData} currentDate={this.state.currentDate} language={this.state.language} />
+          <DateSlider stockData={this.state.stockData} currentDate={this.state.currentDate} language={language} />
         }
         <div className="cool-stuff">
           <StockVisualizer
@@ -102,8 +102,8 @@ class StockInsights extends Component {
             currentDate={this.state.currentDate}
             dataMap={this.state.stockDataMap}
             strings={this.state.strings}
-            language={this.state.language}
-            forceBubbles={this.state.forceBubbles}
+            language={language}
+            forceBubbles={forceBubbles}
             selectedCompanies={this.state.selectedCompanies} />
           {this.state.tweetsOpen &&
             <TweetViewer description={this.state.tweetDescription}
@@ -127,7 +127,7 @@ class StockInsights extends Component {
    * When mounting/unmounting add/remove change listeners to stores
    */
   componentDidMount() {
-    getStrings(this.state.language);
+    getStrings(this.props.language);
     CompaniesStore.addChangeListener(this._onChange);
     StockDataStore.addChangeListener(this._onChange);
     NewsArticlesStore.addChangeListener(this._onChange);
@@ -137,7 +137,7 @@ class StockInsights extends Component {
     // nah mean nah mean?
     if (this.state.selectedCompanies.length) {
       for (var company of this.state.selectedCompanies) {
-        getNews(this.state.language, company);
+        getNews(this.props.language, company);
       }
     } 
     // if we already have companies, request the stock data to populate
@@ -165,10 +165,7 @@ class StockInsights extends Component {
       stockDataMap: StockDataStore.getDataMap(),
       entityData: StockDataStore.getEntities(),
       strings: PageStateStore.getStrings(),
-      language: PageStateStore.getLanguage(),
-      isEmbedded: PageStateStore.getEmbeddedMode(),
       currentDate: PageStateStore.getDate(),
-      forceBubbles: PageStateStore.getForceBubbles(),
       condensedCompanies: PageStateStore.getCondensedCompanies(),
       selectedCompanies: PageStateStore.getSelectedCompanies(),
       articles: NewsArticlesStore.getArticles(),

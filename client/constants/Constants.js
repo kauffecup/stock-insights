@@ -32,7 +32,6 @@ export default keyMirror({
   NEWS_LOADING: null,
   NEWS_DATA: null,
   CLOSE_ARTICLE_LIST: null,
-  SWITCH_ANALYSIS_COLOR_MODE: null,
   TOGGLE_CONDENSED_COMPANIES: null,
   SWITCH_DATE: null,
   STRING_DATA: null,
