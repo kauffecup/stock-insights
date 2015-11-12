@@ -14,14 +14,23 @@
 // limitations under the License.
 //------------------------------------------------------------------------------
 
-import React           from 'react';
-import { render }      from 'react-dom';
-import { createStore } from 'redux';
-import { Provider }    from 'react-redux';
-import StockInsights   from './main';
-import stockApp        from './reducers/stockApp';
+import React         from 'react';
+import { render }    from 'react-dom';
+import { Provider }  from 'react-redux';
+import thunk         from 'redux-thunk';
+import StockInsights from './main';
+import stockApp      from './reducers/stockApp';
+import {
+  createStore,
+  applyMiddleware
+} from 'redux';
 
-let store = createStore(stockApp)
+// create a store that has redux-thunk middleware enabled
+const createStoreWithMiddleware = applyMiddleware(
+  thunk
+)(createStore);
+
+let store = createStoreWithMiddleware(stockApp)
 let rootElement = document.body;
 
 // make sure all es6 things work correctly in all browsers
