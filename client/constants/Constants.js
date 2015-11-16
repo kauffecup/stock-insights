@@ -17,6 +17,7 @@
 import keyMirror from 'keymirror';
 
 export default keyMirror({
+  COMPANY_LOCAL_STORAGE: null,
   COMPANIES_LOADING: null,
   COMPANY_DATA: null,
   ADD_COMPANY: null,
