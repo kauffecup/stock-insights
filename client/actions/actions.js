@@ -38,6 +38,21 @@ export function closeArticleList() {
   return { type: Constants.CLOSE_ARTICLE_LIST };
 }
 
+/** Clear potential companies */
+export function clearPotentialCompanies() {
+  return { type: Constants.CLEAR_POTENTIAL_COMPANIES };
+}
+
+/** Search for companies */
+export function searchCompany(companyName) {
+  return dispatch => {
+    dispatch({ type: Constants.COMPANIES_LOADING });
+    companyLookup(companyName).then(companies => {
+      dispatch({ type: Constants.COMPANY_DATA, companies: companies });
+    });
+  }
+}
+
 /** Toggle a company's selected-ness */
 export function toggleSelect(symbol) {
   return (dispatch, getState) => {

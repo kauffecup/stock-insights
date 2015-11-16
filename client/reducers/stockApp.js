@@ -157,7 +157,6 @@ export default function reduce (state = defaultState, action) {
       return assign({}, state, {
         articles: assign({}, state.articles, {
           loading: true
-          // should we clear articles here?
         })
       });
       break;
@@ -176,6 +175,32 @@ export default function reduce (state = defaultState, action) {
         articles: assign({}, state.articles, {
           loading: false,
           articles: []
+        })
+      });
+      break;
+
+    case Constants.COMPANIES_LOADING:
+      return assign({}, state, {
+        potentialCompanies: assign({}, state.potentialCompanies, {
+          status: Constants.POTENTIAL_STATUS_LOADING
+        })
+      });
+      break;
+
+    case Constants.COMPANY_DATA:
+      return assign({}, state, {
+        potentialCompanies: assign({}, state.potentialCompanies, {
+          status: Constants.POTENTIAL_STATUS_RECEIVED,
+          companies: action.companies
+        })
+      });
+      break;
+
+    case Constants.CLEAR_POTENTIAL_COMPANIES:
+      return assign({}, state, {
+        potentialCompanies: assign({}, state.potentialCompanies, {
+          status: Constants.POTENTIAL_STATUS_CLEAR,
+          companies: []
         })
       });
       break;

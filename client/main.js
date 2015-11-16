@@ -19,7 +19,6 @@ import { connect }       from 'react-redux'
 import classNames        from 'classnames';
 import Constants         from './constants/Constants';
 
-import CompaniesStore    from './stores/CompaniesStore';
 import StockDataStore    from './stores/StockDataStore';
 import TweetStore        from './stores/TweetStore';
 
@@ -38,6 +37,9 @@ import {
   getStrings,
   setDate,
   closeArticleList,
+  clearPotentialCompanies,
+  searchCompany,
+  // TODO
   getTweets
 } from './actions/actions';
 
@@ -87,8 +89,8 @@ class StockInsights extends Component {
         </div>
         <CompanyContainer
           companies={companies.companies}
-          potentialCompanies={this.state.potentialCompanies}
-          loadingStatus={this.state.potentialCompaniesLoading}
+          potentialCompanies={potentialCompanies.companies}
+          loadingStatus={potentialCompanies.status}
           condensed={companies.condensed}
           selectedCompanies={selectedCompanies}
           strings={strings}
@@ -96,7 +98,9 @@ class StockInsights extends Component {
           onCompanyRemove={c => dispatch(removeCompany(c))}
           onCompanyAdd={c => dispatch(addCompany(c))}
           onToggle={() => dispatch(toggleCondensedCompanies())}
-          onSelect={c => dispatch(toggleSelect(c))} />
+          onSelect={c => dispatch(toggleSelect(c))}
+          onSearch={v => dispatch(searchCompany(v))}
+          onClear={() => dispatch(clearPotentialCompanies())} />
         {showDateSlider &&
           <DateSlider stockData={this.state.stockData} currentDate={currentDate}
             language={language} onChange={d => dispatch(setDate(d))}/>
@@ -138,7 +142,6 @@ class StockInsights extends Component {
    */
   componentDidMount() {
     this.props.dispatch(getStrings(this.props.language));
-    CompaniesStore.addChangeListener(this._onChange);
     StockDataStore.addChangeListener(this._onChange);
     TweetStore.addChangeListener(this._onChange);
     // if we already have selected companies, request their articles to populate
@@ -155,7 +158,6 @@ class StockInsights extends Component {
     }
   }
   componentWillUnmount() {
-    CompaniesStore.removeChangeListener(this._onChange);
     StockDataStore.removeChangeListener(this._onChange);
   }
 
@@ -164,8 +166,6 @@ class StockInsights extends Component {
    */
   _getStateObj() {
     return {
-      potentialCompanies: CompaniesStore.getPotentialCompanies(),
-      potentialCompaniesLoading: CompaniesStore.getLoadingStatus(),
       stockData: StockDataStore.getStockData(),
       stockDataMap: StockDataStore.getDataMap(),
       entityData: StockDataStore.getEntities(),
