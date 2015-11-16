@@ -136,6 +136,18 @@ export default function reduce (state = defaultState, action) {
       });
       break;
 
+    case Constants.CLOSE_ARTICLE_LIST:
+      return assign({}, state, {
+        selectedCompanies: []
+      });
+      break;
+
+    case Constants.STRING_DATA:
+      return assign({}, state, {
+        strings: action.strings
+      })
+      break;
+
     default:
       return state;
       break;

@@ -36,12 +36,12 @@ import {
   addCompany,
   removeCompany,
   toggleSelect,
-  toggleCondensedCompanies
+  toggleCondensedCompanies,
+  getStrings
 } from './actions/actions';
 
 import {
   getStockData,
-  getStrings,
   getNews,
   closeTweets
 } from './Actions';
@@ -81,8 +81,8 @@ class StockInsights extends Component {
       <div className={classes} onClick={closeTweets}>
         <div className="stock-insights-title">
           <div className="da-logo" dangerouslySetInnerHTML={{__html: IBMsvg}}></div>
-          <h1 className="stock-insights-title">{this.state.strings.stockInsights}</h1>
-          <a href="https://bluemix.net" target="_blank">{this.state.strings.built}</a>
+          <h1 className="stock-insights-title">{strings.stockInsights}</h1>
+          <a href="https://bluemix.net" target="_blank">{strings.built}</a>
         </div>
         <CompanyContainer
           companies={companies.companies}
@@ -90,7 +90,7 @@ class StockInsights extends Component {
           loadingStatus={this.state.potentialCompaniesLoading}
           condensed={companies.condensed}
           selectedCompanies={selectedCompanies}
-          strings={this.state.strings}
+          strings={strings}
           language={language}
           onCompanyRemove={c => dispatch(removeCompany(c))}
           onCompanyAdd={c => dispatch(addCompany(c))}
@@ -105,7 +105,7 @@ class StockInsights extends Component {
             entityData={this.state.entityData}
             currentDate={this.state.currentDate}
             dataMap={this.state.stockDataMap}
-            strings={this.state.strings}
+            strings={strings}
             language={language}
             forceBubbles={forceBubbles}
             selectedCompanies={selectedCompanies} />
@@ -113,7 +113,7 @@ class StockInsights extends Component {
             <TweetViewer description={this.state.tweetDescription}
               tweets={this.state.tweets}
               sentiment={this.state.tweetSentiment}
-              strings={this.state.strings} />
+              strings={strings} />
           }
           {!!selectedCompanies.length && 
             <ArticleList selectedCompanies={selectedCompanies}
@@ -131,7 +131,7 @@ class StockInsights extends Component {
    * When mounting/unmounting add/remove change listeners to stores
    */
   componentDidMount() {
-    getStrings(this.props.language);
+    this.props.dispatch(getStrings(this.props.language));
     CompaniesStore.addChangeListener(this._onChange);
     StockDataStore.addChangeListener(this._onChange);
     NewsArticlesStore.addChangeListener(this._onChange);
@@ -168,7 +168,6 @@ class StockInsights extends Component {
       stockData: StockDataStore.getStockData(),
       stockDataMap: StockDataStore.getDataMap(),
       entityData: StockDataStore.getEntities(),
-      strings: PageStateStore.getStrings(),
       currentDate: PageStateStore.getDate(),
       articles: NewsArticlesStore.getArticles(),
       tweetsOpen: TweetStore.getStatus(),

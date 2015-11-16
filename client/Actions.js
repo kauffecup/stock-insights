@@ -102,10 +102,3 @@ export function closeArticleList() {
 export function setDate(date) {
   Dispatcher.dispatch({actionType: Constants.SWITCH_DATE, date: date});
 }
-
-/** Get the globalized strings */
-export function getStrings(language) {
-  strings(language).then(strings => {
-    Dispatcher.dispatch({actionType: Constants.STRING_DATA, strings: strings});
-  });
-}

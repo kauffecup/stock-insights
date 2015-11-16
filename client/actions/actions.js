@@ -39,7 +39,7 @@ export function toggleSelect(symbol) {
       dispatch({type: Constants.DESELECT_COMPANY, symbol: symbol});
     }
     selectedCompanies = getState().selectedCompanies;
-    return _getNews(selectedCompanies, language, dispatch);
+    _getNews(selectedCompanies, language, dispatch);
   }
 }
 
@@ -54,7 +54,16 @@ export function removeCompany(company) {
   return (dispatch, getState) => {
     dispatch({type: Constants.REMOVE_COMPANY, company: company});
     var { selectedCompanies, language } = getState();
-    return _getNews(selectedCompanies, language, dispatch);
+    _getNews(selectedCompanies, language, dispatch);
+  }
+}
+
+/** Get the globalized strings */
+export function getStrings(language) {
+  return dispatch => {
+    strings(language).then(strings => {
+      dispatch({type: Constants.STRING_DATA, strings: strings});
+    });
   }
 }
 
@@ -62,10 +71,10 @@ export function removeCompany(company) {
 function _getNews(companies, language, dispatch) {
   if (companies.length) {
     dispatch({ type: Constants.NEWS_LOADING });
-    return stockNews(companies, language).then(news => {
-      return dispatch({ type: Constants.NEWS_DATA, news: news });
+    stockNews(companies, language).then(news => {
+      dispatch({ type: Constants.NEWS_DATA, news: news });
     }).catch(e => {
-      return dispatch({ type: Constants.NEWS_ERROR });
+      dispatch({ type: Constants.NEWS_ERROR });
     });
   }
 }

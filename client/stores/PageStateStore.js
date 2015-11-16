@@ -18,10 +18,8 @@ import _Store     from './_Store';
 import Dispatcher from '../Dispatcher';
 import Constants  from '../constants/Constants';
 import assign     from 'object-assign';
-import clone      from 'clone';
 import moment     from 'moment';
 
-var _strings = {};
 // initialize current date at today
 var _currentDate = moment();
 
@@ -32,9 +30,6 @@ var _currentDate = moment();
 var PageStateStore = assign({}, _Store, {
   getDate: function () {
     return _currentDate;
-  },
-  getStrings: function () {
-    return _strings;
   }
 });
 
@@ -44,20 +39,8 @@ var PageStateStore = assign({}, _Store, {
  */
 Dispatcher.register(function(action) {
   switch(action.actionType) {
-    // when closing the article list, clear the selected company and
-    // loaded articles
-    case Constants.CLOSE_ARTICLE_LIST:
-      _selectedCompanies = [];
-      PageStateStore.emitChange();
-      break;
-
     case Constants.SWITCH_DATE:
       _currentDate = action.date;
-      PageStateStore.emitChange();
-      break;
-
-    case Constants.STRING_DATA:
-      _strings = action.strings;
       PageStateStore.emitChange();
       break;
 
