@@ -17,7 +17,6 @@
     "d3": "^3.5.6",
     "dimple": "git+https://github.com/PMSI-AlignAlytics/dimple.git",
     "express": "^4.13.3",
-    "flux": "^2.0.3",
     "gaas": "^1.0.1",
     "keymirror": "^0.1.1",
     "locale": "0.0.20",

@@ -17,14 +17,14 @@
 import React, { Component, PropTypes } from 'react'
 import { connect }       from 'react-redux'
 import classNames        from 'classnames';
-import Constants         from './constants/Constants';
+import Constants         from '../constants/Constants';
 
-import CompanyContainer  from './components/CompanyContainer';
-import StockVisualizer   from './components/StockVisualizer';
-import ArticleList       from './components/ArticleList';
-import GraphTown         from './components/GraphTown';
-import DateSlider        from './components/DateSlider';
-import TweetViewer       from './components/TweetViewer';
+import CompanyContainer  from '../components/CompanyContainer';
+import StockVisualizer   from '../components/StockVisualizer';
+import ArticleList       from '../components/ArticleList';
+import GraphTown         from '../components/GraphTown';
+import DateSlider        from '../components/DateSlider';
+import TweetViewer       from '../components/TweetViewer';
 
 import {
   addCompany,
@@ -40,12 +40,12 @@ import {
   getTweets,
   closeTweets,
   getSelectedNews
-} from './actions/actions';
+} from '../actions/actions';
 
 // get our inline-able svg
 var fs = require('fs');
 var path = require('path');
-var IBMsvg = fs.readFileSync(path.resolve(__dirname, './IBM.svg'));
+var IBMsvg = fs.readFileSync(path.resolve(__dirname, '../IBM.svg'));
 
 /**
  * The app entry point
