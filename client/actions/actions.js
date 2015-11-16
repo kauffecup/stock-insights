@@ -33,10 +33,15 @@ export function setDate(date) {
   return { type: Constants.SWITCH_DATE, date: date };
 }
 
+/** Close the article list */
+export function closeArticleList() {
+  return { type: Constants.CLOSE_ARTICLE_LIST };
+}
+
 /** Toggle a company's selected-ness */
 export function toggleSelect(symbol) {
   return (dispatch, getState) => {
-    symbol = symbol.symbol || symbol;
+    symbol = symbol.symbol || symbol._id || symbol;
     var { selectedCompanies, language } = getState();
     if (selectedCompanies.indexOf(symbol) === -1) {
       dispatch({ type: Constants.SELECT_COMPANY, symbol: symbol });

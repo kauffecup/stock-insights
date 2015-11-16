@@ -21,7 +21,6 @@ import Constants         from './constants/Constants';
 
 import CompaniesStore    from './stores/CompaniesStore';
 import StockDataStore    from './stores/StockDataStore';
-import NewsArticlesStore from './stores/NewsArticlesStore';
 import TweetStore        from './stores/TweetStore';
 
 import CompanyContainer  from './components/CompanyContainer';
@@ -37,7 +36,9 @@ import {
   toggleSelect,
   toggleCondensedCompanies,
   getStrings,
-  setDate
+  setDate,
+  closeArticleList,
+  getTweets
 } from './actions/actions';
 
 import {
@@ -109,7 +110,9 @@ class StockInsights extends Component {
             strings={strings}
             language={language}
             forceBubbles={forceBubbles}
-            selectedCompanies={selectedCompanies} />
+            selectedCompanies={selectedCompanies}
+            onCompanyClick={c => dispatch(toggleSelect(c))}
+            onEntityClick={e => dispatch(getTweets(e))} />
           {this.state.tweetsOpen &&
             <TweetViewer description={this.state.tweetDescription}
               tweets={this.state.tweets}
@@ -118,7 +121,9 @@ class StockInsights extends Component {
           }
           {!!selectedCompanies.length && 
             <ArticleList selectedCompanies={selectedCompanies}
-              articles={this.state.articles} />
+              loading={articles.loading}
+              articles={articles.articles}
+              onClose={() => dispatch(closeArticleList())} />
           }
         </div>
         {showGraph &&
@@ -135,7 +140,6 @@ class StockInsights extends Component {
     this.props.dispatch(getStrings(this.props.language));
     CompaniesStore.addChangeListener(this._onChange);
     StockDataStore.addChangeListener(this._onChange);
-    NewsArticlesStore.addChangeListener(this._onChange);
     TweetStore.addChangeListener(this._onChange);
     // if we already have selected companies, request their articles to populate
     if (this.props.selectedCompanies.length) {
@@ -153,7 +157,6 @@ class StockInsights extends Component {
   componentWillUnmount() {
     CompaniesStore.removeChangeListener(this._onChange);
     StockDataStore.removeChangeListener(this._onChange);
-    NewsArticlesStore.removeChangeListener(this._onChange);
   }
 
   /**
@@ -166,7 +169,6 @@ class StockInsights extends Component {
       stockData: StockDataStore.getStockData(),
       stockDataMap: StockDataStore.getDataMap(),
       entityData: StockDataStore.getEntities(),
-      articles: NewsArticlesStore.getArticles(),
       tweetsOpen: TweetStore.getStatus(),
       tweetDescription: TweetStore.getDescription(),
       tweets: TweetStore.getTweets(),

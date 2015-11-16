@@ -16,7 +16,6 @@
 
 import Dispatcher     from './Dispatcher';
 import Constants      from './constants/Constants';
-import PageStateStore from './stores/PageStateStore';
 import {
   companyLookup,
   stockPrice,
@@ -59,41 +58,4 @@ export function getTweets(symbols, entity, language) {
 /** Close the tweet window */
 export function closeTweets() {
   Dispatcher.dispatch({actionType: Constants.CLOSE_TWEETS});
-}
-
-/** Get the articles for a given company. This also selects the company and gets its stock history. */
-export function getNews(language, symbol) {
-  language = language || _lastLanguage;
-  _lastLanguage = language;
-  symbol = symbol && (symbol._id || symbol.symbol || symbol);
-  var symbols = PageStateStore.getSelectedCompanies().map(c => typeof c === 'string' ? c : (c._id || c.symbol));
-  if (symbol){
-    symbols = symbols.concat(symbol);
-  }
-  if (symbols.length) {
-    Dispatcher.dispatch({actionType: Constants.NEWS_LOADING});
-    stockNews(symbols, language).then(news => {
-      Dispatcher.dispatch({actionType: Constants.NEWS_DATA, news: news});
-    });
-  }
-  if (symbol) {
-    selectCompany(symbol);
-  }
-}
-
-/* Select a company */
-export function selectCompany(symbol) {
-  Dispatcher.dispatch({actionType: Constants.SELECT_COMPANY, symbol: symbol});
-}
-
-/* Deselect a company */
-export function deselectCompany(company) {
-  var symbol = company._id || company.symbol || symbol;
-  Dispatcher.dispatch({actionType: Constants.DESELECT_COMPANY, symbol: symbol});
-  getNews();
-}
-
-/** Close the article list */
-export function closeArticleList() {
-  Dispatcher.dispatch({actionType: Constants.CLOSE_ARTICLE_LIST});
 }

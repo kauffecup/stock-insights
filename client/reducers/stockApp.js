@@ -75,21 +75,27 @@ const defaultState = {
   forceBubbles: _forceBubbles,
   strings: {},
   currentDate: moment(),
-  potentialCompanies: {
-    status: Constants.POTENTIAL_STATUS_CLEAR,
-    companies: []
-  },
+  selectedCompanies: _selectedCompanies,
   companies: {
     condensed: false,
     companies: _companies
   },
-  entities: [],
+  potentialCompanies: {
+    status: Constants.POTENTIAL_STATUS_CLEAR,
+    companies: []
+  },
+  entities: {
+    loading: false,
+    entities: []
+  },
   stockData: {
     flat: [],
     map: {}
   },
-  selectedCompanies: _selectedCompanies,
-  articles: []
+  articles: {
+    loading: false,
+    articles:[]
+  }
 }
 
 
@@ -131,8 +137,13 @@ export default function reduce (state = defaultState, action) {
       break;
 
     case Constants.DESELECT_COMPANY:
+      var newCompanies = state.selectedCompanies.filter(c => c !== action.symbol);
+      var newArticles = newCompanies.length ? state.articles.articles : [];
       return assign({}, state, {
-        selectedCompanies: state.selectedCompanies.filter(c => c !== action.symbol)
+        selectedCompanies: state.selectedCompanies.filter(c => c !== action.symbol),
+        articles: assign({}, state.articles, {
+          articles: newArticles
+        })
       });
       break;
 
@@ -142,9 +153,30 @@ export default function reduce (state = defaultState, action) {
       });
       break;
 
+    case Constants.NEWS_LOADING:
+      return assign({}, state, {
+        articles: assign({}, state.articles, {
+          loading: true
+          // should we clear articles here?
+        })
+      });
+      break;
+
+    case Constants.NEWS_DATA:
+      return assign({}, state, {
+        articles: assign({}, state.articles, {
+          articles: action.news.articles
+        })
+      });
+      break;
+
     case Constants.CLOSE_ARTICLE_LIST:
       return assign({}, state, {
-        selectedCompanies: []
+        selectedCompanies: [],
+        articles: assign({}, state.articles, {
+          loading: false,
+          articles: []
+        })
       });
       break;
 
