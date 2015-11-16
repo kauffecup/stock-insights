@@ -15,8 +15,9 @@
 //------------------------------------------------------------------------------
 
 import moment    from 'moment';
-import Constants from '../constants/Constants';
+import clone     from 'clone';
 import assign    from 'object-assign';
+import Constants from '../constants/Constants';
 
 /** @type {String} The local storage key */
 const LOCAL_STORAGE_KEY = 'COMPANY_LOCAL_STORAGE';
@@ -89,8 +90,8 @@ const defaultState = {
     entities: []
   },
   stockData: {
-    flat: [],
-    map: {}
+    map: {},
+    flat: []
   },
   articles: {
     loading: false,
@@ -98,6 +99,42 @@ const defaultState = {
   }
 }
 
+/**
+ * Return the contents of our _stockData map as one flattened array
+ * sorted by date containing objects with a date property and data array.
+ */
+function flattenStockData(stockData) {
+  var stockDateArray = [];
+  for (var symbol in stockData) {
+    var dateArr = stockData[symbol];
+    if (stockDateArray.length) {
+      for (var i = 0; i < dateArr.length; i++) {
+        var d = dateArr[i];
+        stockDateArray[i].data.push({
+          week_52_high: d.week_52_high,
+          week_52_low: d.week_52_low,
+          change: d.change,
+          symbol: d.symbol,
+          last: d.last,
+          date: moment(d.date)
+        });
+      }
+    } else {
+      stockDateArray = dateArr.map(d => ({
+        date: moment(d.date),
+        data: [{
+          week_52_high: d.week_52_high,
+          week_52_low: d.week_52_low,
+          change: d.change,
+          symbol: d.symbol,
+          last: d.last,
+          date: moment(d.date)
+        }]
+      }))
+    }
+  }
+  return stockDateArray;
+}
 
 export default function reduce (state = defaultState, action) {
   switch(action.type) {
@@ -120,12 +157,19 @@ export default function reduce (state = defaultState, action) {
       break;
 
     case Constants.REMOVE_COMPANY:
+      var symbol = action.company.symbol || action.company;
+      var stockDataMap = clone(state.stockData.map);
+      delete stockDataMap[symbol];
       var newCompanies = state.companies.companies.filter(c => c !== action.company);
       _updateLocalStorage(newCompanies);
       return assign({}, state, {
         selectedCompanies: state.selectedCompanies.filter(c => c !== (action.company.symbol || action.company)),
         companies: assign({}, state.companies, {
           companies: newCompanies
+        }),
+        stockData: assign({}, state.stockData, {
+          map: stockDataMap,
+          flat: flattenStockData(stockDataMap)
         })
       });
       break;
@@ -149,6 +193,19 @@ export default function reduce (state = defaultState, action) {
           entities: newEntities
         })
       });
+      break;
+
+    case Constants.STOCK_PRICE_DATA:
+      var stockDataMap = clone(state.stockData.map);
+      for (var symbol in action.data) {
+        stockDataMap[symbol] = action.data[symbol];
+      }
+      return assign({}, state, {
+        stockData: assign({}, state.stockData, {
+          map: stockDataMap,
+          flat: flattenStockData(stockDataMap)
+        })
+      })
       break;
 
     case Constants.SWITCH_DATE:

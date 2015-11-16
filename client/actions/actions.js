@@ -70,8 +70,15 @@ export function toggleSelect(symbol) {
 
 /** Add a company */
 export function addCompany(company) {
-  return { type: Constants.ADD_COMPANY, company: company };
-  // company.symbol && getStockData(company.symbol);
+  return dispatch => {
+    dispatch({ type: Constants.ADD_COMPANY, company: company });
+    if (company.symbol) {
+      dispatch({ type: Constants.STOCK_PRICE_LOADING, symbols: company.symbol });
+      stockPrice(company.symbol).then(data => {
+        dispatch({ type: Constants.STOCK_PRICE_DATA, data: data });
+      });
+    }
+  }
 }
 
 /** Remove a company */
@@ -88,6 +95,16 @@ export function getStrings(language) {
   return dispatch => {
     strings(language).then(strings => {
       dispatch({ type: Constants.STRING_DATA, strings: strings });
+    });
+  }
+}
+
+/** Get the stock data for a given array of companies */
+export function getStockData(symbols) {
+  return dispatch => {
+    dispatch({ type: Constants.STOCK_PRICE_LOADING, symbols: symbols });
+    stockPrice(symbols).then(data => {
+      dispatch({ type: Constants.STOCK_PRICE_DATA, data: data });
     });
   }
 }

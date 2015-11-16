@@ -19,7 +19,6 @@ import { connect }       from 'react-redux'
 import classNames        from 'classnames';
 import Constants         from './constants/Constants';
 
-import StockDataStore    from './stores/StockDataStore';
 import TweetStore        from './stores/TweetStore';
 
 import CompanyContainer  from './components/CompanyContainer';
@@ -39,12 +38,12 @@ import {
   closeArticleList,
   clearPotentialCompanies,
   searchCompany,
+  getStockData,
   // TODO
   getTweets
 } from './actions/actions';
 
 import {
-  getStockData,
   getNews,
   closeTweets
 } from './Actions';
@@ -102,15 +101,15 @@ class StockInsights extends Component {
           onSearch={v => dispatch(searchCompany(v))}
           onClear={() => dispatch(clearPotentialCompanies())} />
         {showDateSlider &&
-          <DateSlider stockData={this.state.stockData} currentDate={currentDate}
+          <DateSlider stockData={stockData.flat} currentDate={currentDate}
             language={language} onChange={d => dispatch(setDate(d))}/>
         }
         <div className="cool-stuff">
           <StockVisualizer
-            stockData={this.state.stockData}
+            stockData={stockData.flat}
             entityData={entities.entities}
             currentDate={currentDate}
-            dataMap={this.state.stockDataMap}
+            dataMap={stockData.map}
             strings={strings}
             language={language}
             forceBubbles={forceBubbles}
@@ -131,7 +130,7 @@ class StockInsights extends Component {
           }
         </div>
         {showGraph &&
-          <GraphTown dataMap={this.state.stockDataMap} selectedCompanies={selectedCompanies} />
+          <GraphTown dataMap={stockData.map} selectedCompanies={selectedCompanies} />
         }
       </div>
     );
@@ -142,7 +141,6 @@ class StockInsights extends Component {
    */
   componentDidMount() {
     this.props.dispatch(getStrings(this.props.language));
-    StockDataStore.addChangeListener(this._onChange);
     TweetStore.addChangeListener(this._onChange);
     // if we already have selected companies, request their articles to populate
     if (this.props.selectedCompanies.length) {
@@ -154,11 +152,8 @@ class StockInsights extends Component {
     // our visualizations
     if (this.props.companies.companies.length) {
       var symbols = this.props.companies.companies.map(c => c.symbol)
-      getStockData(symbols);
+      this.props.dispatch(getStockData(symbols));
     }
-  }
-  componentWillUnmount() {
-    StockDataStore.removeChangeListener(this._onChange);
   }
 
   /**
@@ -166,8 +161,6 @@ class StockInsights extends Component {
    */
   _getStateObj() {
     return {
-      stockData: StockDataStore.getStockData(),
-      stockDataMap: StockDataStore.getDataMap(),
       tweetsOpen: TweetStore.getStatus(),
       tweetDescription: TweetStore.getDescription(),
       tweets: TweetStore.getTweets(),

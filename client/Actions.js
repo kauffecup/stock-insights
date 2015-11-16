@@ -17,35 +17,8 @@
 import Dispatcher     from './Dispatcher';
 import Constants      from './constants/Constants';
 import {
-  companyLookup,
-  stockPrice,
-  stockNews,
-  tweets,
-  strings
+  tweets
 } from './requester'
-
-var _lastLanguage;
-
-/** Search for companies */
-export function searchCompany(companyName) {
-  Dispatcher.dispatch({actionType: Constants.COMPANIES_LOADING});
-  companyLookup(companyName).then(companies => {
-    Dispatcher.dispatch({actionType: Constants.COMPANY_DATA, companies: companies});
-  });
-}
-
-/** Clear potential companies */
-export function clearPotentialCompanies() {
-  Dispatcher.dispatch({actionType: Constants.CLEAR_POTENTIAL_COMPANIES})
-}
-
-/** Get the stock data for a given array of companies */
-export function getStockData(symbols) {
-  Dispatcher.dispatch({actionType: Constants.STOCK_PRICE_LOADING, symbols: symbols});
-  stockPrice(symbols).then(data => {
-    Dispatcher.dispatch({actionType: Constants.STOCK_PRICE_DATA, data: data});
-  });
-}
 
 /** Get the most recent tweets about a symbol/entity combo */
 export function getTweets(symbols, entity, language) {
