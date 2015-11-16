@@ -139,10 +139,14 @@ export default function reduce (state = defaultState, action) {
     case Constants.DESELECT_COMPANY:
       var newCompanies = state.selectedCompanies.filter(c => c !== action.symbol);
       var newArticles = newCompanies.length ? state.articles.articles : [];
+      var newEntities = newCompanies.length ? state.entities.entities : [];
       return assign({}, state, {
         selectedCompanies: state.selectedCompanies.filter(c => c !== action.symbol),
         articles: assign({}, state.articles, {
           articles: newArticles
+        }),
+        entities: assign({}, state.entities, {
+          entities: newEntities
         })
       });
       break;
@@ -164,7 +168,17 @@ export default function reduce (state = defaultState, action) {
     case Constants.NEWS_DATA:
       return assign({}, state, {
         articles: assign({}, state.articles, {
+          loading: false,
           articles: action.news.articles
+        }),
+        entities: assign({}, state.entities, {
+          loading: false,
+          entities: action.news.entities.map(e => ({
+            _id: e.text,
+            value: e.count,
+            colorValue: e.averageSentiment,
+            symbols: e.symbols
+          }))
         })
       });
       break;
@@ -175,6 +189,10 @@ export default function reduce (state = defaultState, action) {
         articles: assign({}, state.articles, {
           loading: false,
           articles: []
+        }),
+        entities: assign({}, state.entities, {
+          loading: false,
+          entities: []
         })
       });
       break;

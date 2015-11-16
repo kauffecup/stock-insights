@@ -108,7 +108,7 @@ class StockInsights extends Component {
         <div className="cool-stuff">
           <StockVisualizer
             stockData={this.state.stockData}
-            entityData={this.state.entityData}
+            entityData={entities.entities}
             currentDate={currentDate}
             dataMap={this.state.stockDataMap}
             strings={strings}
@@ -168,7 +168,6 @@ class StockInsights extends Component {
     return {
       stockData: StockDataStore.getStockData(),
       stockDataMap: StockDataStore.getDataMap(),
-      entityData: StockDataStore.getEntities(),
       tweetsOpen: TweetStore.getStatus(),
       tweetDescription: TweetStore.getDescription(),
       tweets: TweetStore.getTweets(),

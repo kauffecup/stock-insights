@@ -18,9 +18,7 @@ import _Store         from './_Store';
 import Dispatcher     from '../Dispatcher';
 import Constants      from '../constants/Constants';
 import assign         from 'object-assign';
-import clone          from 'clone';
 import moment         from 'moment';
-// import PageStateStore from './PageStateStore';
 
 /** @type {Object} A map of symbols to data about that symbol */
 var _entities = [];
@@ -81,27 +79,12 @@ function flattenStockData() {
 }
 
 /**
- * Map the entities into a format consumable by the react chart
- */
-function addEntities(entities) {
-  _entities = entities.map(e => ({
-    _id: e.text,
-    value: e.count,
-    colorValue: e.averageSentiment,
-    symbols: e.symbols
-  }))
-}
-
-/**
  * The store we'll be exporting. Contains getter methods for
  * stock data, color modes and size modes
  */
 var StockDataStore = assign({}, _Store, {
   getStockData: function () {
     return flattenStockData();
-  },
-  getEntities: function () {
-    return _entities;
   },
   getDataMap: function () {
     return _stockData;
@@ -124,23 +107,6 @@ Dispatcher.register(function(action) {
     case Constants.STOCK_PRICE_DATA:
       addStockData(action.data);
       StockDataStore.emitChange();
-      break;
-
-    case Constants.NEWS_DATA:
-      addEntities(action.news.entities);
-      StockDataStore.emitChange();
-      break;
-
-    case Constants.CLOSE_ARTICLE_LIST:
-      _entities = [];
-      StockDataStore.emitChange();
-      break;
-
-    case Constants.DESELECT_COMPANY:
-      // if (PageStateStore.getSelectedCompanies().length === 0) {
-        _entities = [];
-        StockDataStore.emitChange();
-      // }
       break;
 
     default:
