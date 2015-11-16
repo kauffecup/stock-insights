@@ -16,9 +16,6 @@
 
 import React  from 'react';
 import moment from 'moment';
-import {
-  setDate
-} from '../Actions';
 
 export default class DateSlider extends React.Component {
   render() {
@@ -44,7 +41,7 @@ export default class DateSlider extends React.Component {
           max={"" + (dateArr.length-1)}
           value={currentPos}
           steps={dateArr.length}
-          onChange={e => setDate(moment(this.props.stockData[parseInt(e.target.value)].date))} />
+          onChange={e => this.props.onChange(moment(this.props.stockData[parseInt(e.target.value)].date))} />
       </div>
     );
   }

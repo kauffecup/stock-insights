@@ -28,15 +28,20 @@ export function toggleCondensedCompanies() {
   return { type: Constants.TOGGLE_CONDENSED_COMPANIES };
 }
 
+/** Change the date */
+export function setDate(date) {
+  return { type: Constants.SWITCH_DATE, date: date };
+}
+
 /** Toggle a company's selected-ness */
 export function toggleSelect(symbol) {
   return (dispatch, getState) => {
     symbol = symbol.symbol || symbol;
     var { selectedCompanies, language } = getState();
     if (selectedCompanies.indexOf(symbol) === -1) {
-      dispatch({type: Constants.SELECT_COMPANY, symbol: symbol});
+      dispatch({ type: Constants.SELECT_COMPANY, symbol: symbol });
     } else {
-      dispatch({type: Constants.DESELECT_COMPANY, symbol: symbol});
+      dispatch({ type: Constants.DESELECT_COMPANY, symbol: symbol });
     }
     selectedCompanies = getState().selectedCompanies;
     _getNews(selectedCompanies, language, dispatch);
@@ -52,7 +57,7 @@ export function addCompany(company) {
 /** Remove a company */
 export function removeCompany(company) {
   return (dispatch, getState) => {
-    dispatch({type: Constants.REMOVE_COMPANY, company: company});
+    dispatch({ type: Constants.REMOVE_COMPANY, company: company });
     var { selectedCompanies, language } = getState();
     _getNews(selectedCompanies, language, dispatch);
   }
@@ -62,7 +67,7 @@ export function removeCompany(company) {
 export function getStrings(language) {
   return dispatch => {
     strings(language).then(strings => {
-      dispatch({type: Constants.STRING_DATA, strings: strings});
+      dispatch({ type: Constants.STRING_DATA, strings: strings });
     });
   }
 }

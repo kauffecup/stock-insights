@@ -136,6 +136,12 @@ export default function reduce (state = defaultState, action) {
       });
       break;
 
+    case Constants.SWITCH_DATE:
+      return assign({}, state, {
+        currentDate: action.date
+      });
+      break;
+
     case Constants.CLOSE_ARTICLE_LIST:
       return assign({}, state, {
         selectedCompanies: []

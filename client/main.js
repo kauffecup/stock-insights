@@ -22,7 +22,6 @@ import Constants         from './constants/Constants';
 import CompaniesStore    from './stores/CompaniesStore';
 import StockDataStore    from './stores/StockDataStore';
 import NewsArticlesStore from './stores/NewsArticlesStore';
-import PageStateStore    from './stores/PageStateStore';
 import TweetStore        from './stores/TweetStore';
 
 import CompanyContainer  from './components/CompanyContainer';
@@ -37,7 +36,8 @@ import {
   removeCompany,
   toggleSelect,
   toggleCondensedCompanies,
-  getStrings
+  getStrings,
+  setDate
 } from './actions/actions';
 
 import {
@@ -97,13 +97,14 @@ class StockInsights extends Component {
           onToggle={() => dispatch(toggleCondensedCompanies())}
           onSelect={c => dispatch(toggleSelect(c))} />
         {showDateSlider &&
-          <DateSlider stockData={this.state.stockData} currentDate={this.state.currentDate} language={language} />
+          <DateSlider stockData={this.state.stockData} currentDate={currentDate}
+            language={language} onChange={d => dispatch(setDate(d))}/>
         }
         <div className="cool-stuff">
           <StockVisualizer
             stockData={this.state.stockData}
             entityData={this.state.entityData}
-            currentDate={this.state.currentDate}
+            currentDate={currentDate}
             dataMap={this.state.stockDataMap}
             strings={strings}
             language={language}
@@ -135,10 +136,8 @@ class StockInsights extends Component {
     CompaniesStore.addChangeListener(this._onChange);
     StockDataStore.addChangeListener(this._onChange);
     NewsArticlesStore.addChangeListener(this._onChange);
-    PageStateStore.addChangeListener(this._onChange);
     TweetStore.addChangeListener(this._onChange);
     // if we already have selected companies, request their articles to populate
-    // nah mean nah mean?
     if (this.props.selectedCompanies.length) {
       for (var company of this.props.selectedCompanies) {
         getNews(this.props.language, company);
@@ -155,7 +154,6 @@ class StockInsights extends Component {
     CompaniesStore.removeChangeListener(this._onChange);
     StockDataStore.removeChangeListener(this._onChange);
     NewsArticlesStore.removeChangeListener(this._onChange);
-    PageStateStore.removeChangeListener(this._onChange);
   }
 
   /**
@@ -168,7 +166,6 @@ class StockInsights extends Component {
       stockData: StockDataStore.getStockData(),
       stockDataMap: StockDataStore.getDataMap(),
       entityData: StockDataStore.getEntities(),
-      currentDate: PageStateStore.getDate(),
       articles: NewsArticlesStore.getArticles(),
       tweetsOpen: TweetStore.getStatus(),
       tweetDescription: TweetStore.getDescription(),

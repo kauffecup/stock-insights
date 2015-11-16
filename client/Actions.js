@@ -97,8 +97,3 @@ export function deselectCompany(company) {
 export function closeArticleList() {
   Dispatcher.dispatch({actionType: Constants.CLOSE_ARTICLE_LIST});
 }
-
-/** Change the date */
-export function setDate(date) {
-  Dispatcher.dispatch({actionType: Constants.SWITCH_DATE, date: date});
-}
