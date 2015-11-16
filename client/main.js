@@ -35,6 +35,7 @@ import TweetViewer       from './components/TweetViewer';
 import {
   addCompany,
   removeCompany,
+  toggleSelect,
   toggleCondensedCompanies
 } from './actions/actions';
 
@@ -73,9 +74,9 @@ class StockInsights extends Component {
     var classes = classNames('stock-insights', {
       embedded: isEmbedded
     });
-    var showDateSlider = !this.state.selectedCompanies.length || forceBubbles;
-    var showGraph = this.state.selectedCompanies.length;
-    var showArticles = this.state.selectedCompanies.length;
+    var showDateSlider = !selectedCompanies.length || forceBubbles;
+    var showGraph = selectedCompanies.length;
+    var showArticles = selectedCompanies.length;
     return (
       <div className={classes} onClick={closeTweets}>
         <div className="stock-insights-title">
@@ -88,12 +89,13 @@ class StockInsights extends Component {
           potentialCompanies={this.state.potentialCompanies}
           loadingStatus={this.state.potentialCompaniesLoading}
           condensed={companies.condensed}
-          selectedCompanies={this.state.selectedCompanies}
+          selectedCompanies={selectedCompanies}
           strings={this.state.strings}
           language={language}
           onCompanyRemove={c => dispatch(removeCompany(c))}
           onCompanyAdd={c => dispatch(addCompany(c))}
-          onToggle={() => dispatch(toggleCondensedCompanies())} />
+          onToggle={() => dispatch(toggleCondensedCompanies())}
+          onSelect={c => dispatch(toggleSelect(c))} />
         {showDateSlider &&
           <DateSlider stockData={this.state.stockData} currentDate={this.state.currentDate} language={language} />
         }
@@ -106,20 +108,20 @@ class StockInsights extends Component {
             strings={this.state.strings}
             language={language}
             forceBubbles={forceBubbles}
-            selectedCompanies={this.state.selectedCompanies} />
+            selectedCompanies={selectedCompanies} />
           {this.state.tweetsOpen &&
             <TweetViewer description={this.state.tweetDescription}
               tweets={this.state.tweets}
               sentiment={this.state.tweetSentiment}
               strings={this.state.strings} />
           }
-          {!!this.state.selectedCompanies.length && 
-            <ArticleList selectedCompanies={this.state.selectedCompanies}
+          {!!selectedCompanies.length && 
+            <ArticleList selectedCompanies={selectedCompanies}
               articles={this.state.articles} />
           }
         </div>
         {showGraph &&
-          <GraphTown dataMap={this.state.stockDataMap} selectedCompanies={this.state.selectedCompanies} />
+          <GraphTown dataMap={this.state.stockDataMap} selectedCompanies={selectedCompanies} />
         }
       </div>
     );
@@ -137,8 +139,8 @@ class StockInsights extends Component {
     TweetStore.addChangeListener(this._onChange);
     // if we already have selected companies, request their articles to populate
     // nah mean nah mean?
-    if (this.state.selectedCompanies.length) {
-      for (var company of this.state.selectedCompanies) {
+    if (this.props.selectedCompanies.length) {
+      for (var company of this.props.selectedCompanies) {
         getNews(this.props.language, company);
       }
     } 
@@ -168,7 +170,6 @@ class StockInsights extends Component {
       entityData: StockDataStore.getEntities(),
       strings: PageStateStore.getStrings(),
       currentDate: PageStateStore.getDate(),
-      selectedCompanies: PageStateStore.getSelectedCompanies(),
       articles: NewsArticlesStore.getArticles(),
       tweetsOpen: TweetStore.getStatus(),
       tweetDescription: TweetStore.getDescription(),

@@ -114,13 +114,25 @@ export default function reduce (state = defaultState, action) {
       break;
 
     case Constants.REMOVE_COMPANY:
-      // filter returns a new array, so we all good hurrr
       var newCompanies = state.companies.companies.filter(c => c !== action.company);
       _updateLocalStorage(newCompanies);
       return assign({}, state, {
+        selectedCompanies: state.selectedCompanies.filter(c => c !== (action.company.symbol || action.company)),
         companies: assign({}, state.companies, {
           companies: newCompanies
         })
+      });
+      break;
+
+    case Constants.SELECT_COMPANY:
+      return assign({}, state, {
+        selectedCompanies: [...state.selectedCompanies, action.symbol]
+      });
+      break;
+
+    case Constants.DESELECT_COMPANY:
+      return assign({}, state, {
+        selectedCompanies: state.selectedCompanies.filter(c => c !== action.symbol)
       });
       break;
 

@@ -31,6 +31,7 @@ export default keyMirror({
   STOCK_PRICE_DATA: null,
   NEWS_LOADING: null,
   NEWS_DATA: null,
+  NEWS_ERROR: null,
   CLOSE_ARTICLE_LIST: null,
   TOGGLE_CONDENSED_COMPANIES: null,
   SWITCH_DATE: null,

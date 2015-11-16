@@ -17,30 +17,19 @@
 import React           from 'react';
 import classNames      from 'classnames';
 import CompanySearcher from './CompanySearcher';
-import {
-  getNews,
-  deselectCompany
-} from '../Actions';
 
 /**
  * An individual company. Displays the description, ticker symbol, and an `x` that you can
  * click on to remove the company
  */
 class Company extends React.Component {
-  toggleSelected() {
-    if (this.props.selected) {
-      deselectCompany(this.props.company);
-    } else {
-      getNews(this.props.language, this.props.company);
-    }
-  }
   render() {
     var c = this.props.company;
     var classes = classNames('company', {
       selected: this.props.selected
     });
     return (
-      <div className={classes} onClick={this.toggleSelected.bind(this)}>
+      <div className={classes} onClick={this.props.onClick}>
         <span className="company-description">{c.description}</span>
         <span className="company-symbol">{c.symbol}</span>
         <span className="company-close" onClick={e => {e.stopPropagation(); this.props.onRemoveClick(c);}}>x</span>
@@ -70,7 +59,8 @@ export default class CompanyContainer extends React.Component {
             condensed={this.props.condensed}
             selected={!!selected[c.symbol]}
             language={this.props.language}
-            onRemoveClick={this.props.onCompanyRemove} />
+            onRemoveClick={this.props.onCompanyRemove}
+            onClick={this.props.onSelect.bind(null, c)} />
         )}
         {this.props.companies.length ? <button onClick={this.props.onToggle}>
           {this.props.condensed ? this.props.strings.showNames : this.props.strings.hideNames}

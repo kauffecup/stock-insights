@@ -15,20 +15,57 @@
 //------------------------------------------------------------------------------
 
 import Constants from '../constants/Constants';
+import {
+  companyLookup,
+  stockPrice,
+  stockNews,
+  tweets,
+  strings
+} from '../requester';
 
 /** Toggle the company condensed-ness */
 export function toggleCondensedCompanies() {
-  return {type: Constants.TOGGLE_CONDENSED_COMPANIES};
+  return { type: Constants.TOGGLE_CONDENSED_COMPANIES };
+}
+
+/** Toggle a company's selected-ness */
+export function toggleSelect(symbol) {
+  return (dispatch, getState) => {
+    symbol = symbol.symbol || symbol;
+    var { selectedCompanies, language } = getState();
+    if (selectedCompanies.indexOf(symbol) === -1) {
+      dispatch({type: Constants.SELECT_COMPANY, symbol: symbol});
+    } else {
+      dispatch({type: Constants.DESELECT_COMPANY, symbol: symbol});
+    }
+    selectedCompanies = getState().selectedCompanies;
+    return _getNews(selectedCompanies, language, dispatch);
+  }
 }
 
 /** Add a company */
 export function addCompany(company) {
-  return {type: Constants.ADD_COMPANY, company: company};
+  return { type: Constants.ADD_COMPANY, company: company };
   // company.symbol && getStockData(company.symbol);
 }
 
 /** Remove a company */
 export function removeCompany(company) {
-  return {type: Constants.REMOVE_COMPANY, company: company};
-  // getNews();
+  return (dispatch, getState) => {
+    dispatch({type: Constants.REMOVE_COMPANY, company: company});
+    var { selectedCompanies, language } = getState();
+    return _getNews(selectedCompanies, language, dispatch);
+  }
+}
+
+/** Helper method - fetch stock news for an array of companies */
+function _getNews(companies, language, dispatch) {
+  if (companies.length) {
+    dispatch({ type: Constants.NEWS_LOADING });
+    return stockNews(companies, language).then(news => {
+      return dispatch({ type: Constants.NEWS_DATA, news: news });
+    }).catch(e => {
+      return dispatch({ type: Constants.NEWS_ERROR });
+    });
+  }
 }
