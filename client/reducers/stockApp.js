@@ -96,6 +96,12 @@ const defaultState = {
   articles: {
     loading: false,
     articles:[]
+  },
+  tweets: {
+    open: false,
+    tweets: [],
+    sentiment: {},
+    description: {}
   }
 }
 
@@ -278,6 +284,49 @@ export default function reduce (state = defaultState, action) {
           companies: []
         })
       });
+      break;
+
+    case Constants.TWEETS_LOADING:
+      return assign({}, state, {
+        tweets: assign({}, state.tweets, {
+          open: true,
+          tweets: [],
+          sentiment: {},
+          description: {
+            symbols: action.symbols,
+            entity: action.entity
+          }
+        })
+      });
+      break;
+
+    case Constants.TWEETS_DATA:
+      if (state.tweets.open) {
+        var tweets = action.data.tweets;
+        return assign({}, state, {
+          tweets: assign({}, state.tweets, {
+            tweets: typeof tweets.length === 'undefined' ? [] : tweets,
+            sentiment: action.data.sentiment
+          })
+        });
+      } else {
+        return state;
+      }
+      break;
+
+    case Constants.CLOSE_TWEETS:
+      if (state.tweets.open) {
+        return assign({}, state, {
+          tweets: assign({}, state.tweets, {
+            open: false,
+            tweets: [],
+            sentiment: {},
+            description: {}
+          })
+        });
+      } else {
+        return state;
+      }
       break;
 
     case Constants.STRING_DATA:

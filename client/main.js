@@ -19,8 +19,6 @@ import { connect }       from 'react-redux'
 import classNames        from 'classnames';
 import Constants         from './constants/Constants';
 
-import TweetStore        from './stores/TweetStore';
-
 import CompanyContainer  from './components/CompanyContainer';
 import StockVisualizer   from './components/StockVisualizer';
 import ArticleList       from './components/ArticleList';
@@ -39,14 +37,10 @@ import {
   clearPotentialCompanies,
   searchCompany,
   getStockData,
-  // TODO
-  getTweets
+  getTweets,
+  closeTweets,
+  getSelectedNews
 } from './actions/actions';
-
-import {
-  getNews,
-  closeTweets
-} from './Actions';
 
 // get our inline-able svg
 var fs = require('fs');
@@ -57,21 +51,13 @@ var IBMsvg = fs.readFileSync(path.resolve(__dirname, './IBM.svg'));
  * The app entry point
  */
 class StockInsights extends Component {
-  constructor(props) {
-    super(props);
-    this.state = this._getStateObj();
-    // need to initialize the function this way so that we have a reference
-    // to the arrow function. this way we can add/remove it properly
-    this._onChange = e => this.setState(this._getStateObj());
-  }
-
   /**
    * Currently the app consists of a header and a CompanyContainer
    */
   render() {
     // injected by connect call
     var {dispatch, isEmbedded, language, forceBubbles, strings, currentDate, potentialCompanies,
-      companies, entities, stockData, selectedCompanies, articles} = this.props;
+      companies, entities, stockData, selectedCompanies, articles, tweets} = this.props;
 
     var classes = classNames('stock-insights', {
       embedded: isEmbedded
@@ -80,7 +66,7 @@ class StockInsights extends Component {
     var showGraph = selectedCompanies.length;
     var showArticles = selectedCompanies.length;
     return (
-      <div className={classes} onClick={closeTweets}>
+      <div className={classes} onClick={() => dispatch(closeTweets())}>
         <div className="stock-insights-title">
           <div className="da-logo" dangerouslySetInnerHTML={{__html: IBMsvg}}></div>
           <h1 className="stock-insights-title">{strings.stockInsights}</h1>
@@ -115,11 +101,11 @@ class StockInsights extends Component {
             forceBubbles={forceBubbles}
             selectedCompanies={selectedCompanies}
             onCompanyClick={c => dispatch(toggleSelect(c))}
-            onEntityClick={e => dispatch(getTweets(e))} />
-          {this.state.tweetsOpen &&
-            <TweetViewer description={this.state.tweetDescription}
-              tweets={this.state.tweets}
-              sentiment={this.state.tweetSentiment}
+            onEntityClick={(symbols, entity) => dispatch(getTweets(symbols, entity))} />
+          {tweets.open &&
+            <TweetViewer description={tweets.description}
+              tweets={tweets.tweets}
+              sentiment={tweets.sentiment}
               strings={strings} />
           }
           {!!selectedCompanies.length && 
@@ -141,30 +127,15 @@ class StockInsights extends Component {
    */
   componentDidMount() {
     this.props.dispatch(getStrings(this.props.language));
-    TweetStore.addChangeListener(this._onChange);
     // if we already have selected companies, request their articles to populate
     if (this.props.selectedCompanies.length) {
-      for (var company of this.props.selectedCompanies) {
-        getNews(this.props.language, company);
-      }
+      this.props.dispatch(getSelectedNews());
     } 
     // if we already have companies, request the stock data to populate
     // our visualizations
     if (this.props.companies.companies.length) {
       var symbols = this.props.companies.companies.map(c => c.symbol)
       this.props.dispatch(getStockData(symbols));
-    }
-  }
-
-  /**
-   * Get the main state for the application from the various stores
-   */
-  _getStateObj() {
-    return {
-      tweetsOpen: TweetStore.getStatus(),
-      tweetDescription: TweetStore.getDescription(),
-      tweets: TweetStore.getTweets(),
-      tweetSentiment: TweetStore.getSentiment()
     }
   }
 };

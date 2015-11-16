@@ -20,9 +20,6 @@ import clone             from 'clone';
 import d3                from 'd3';
 import dimple            from 'dimple';
 import ReactBubbleChart  from 'react-bubble-chart';
-import {
-  getTweets
-} from '../Actions';
 
 function generateLegend(lowText, highText) {
   return [
@@ -105,10 +102,6 @@ export default class StockVisualizer extends React.Component {
       min: min,
       max: max
     }
-  }
-
-  entityClick(d) {
-    getTweets(d.symbols, d._id, this.props.language);
   }
 
   /**
@@ -219,7 +212,7 @@ export default class StockVisualizer extends React.Component {
       className="stock-visualizer"
       colorLegend={legend}
       data={data}
-      onClick={isEntities ? this.entityClick.bind(this) : this.props.onCompanyClick}
+      onClick={isEntities ? d => this.props.onEntityClick(d.symbols, d._id) : this.props.onCompanyClick}
       fixedDomain={domain}
       tooltip={tooltip}
       tooltipProps={tooltipProps}

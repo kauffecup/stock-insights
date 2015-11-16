@@ -43,6 +43,11 @@ export function clearPotentialCompanies() {
   return { type: Constants.CLEAR_POTENTIAL_COMPANIES };
 }
 
+/** Close the tweet window */
+export function closeTweets() {
+  return { type: Constants.CLOSE_TWEETS };
+}
+
 /** Search for companies */
 export function searchCompany(companyName) {
   return dispatch => {
@@ -106,6 +111,25 @@ export function getStockData(symbols) {
     stockPrice(symbols).then(data => {
       dispatch({ type: Constants.STOCK_PRICE_DATA, data: data });
     });
+  }
+}
+
+/** Get the most recent tweets about a symbol/entity combo */
+export function getTweets(symbols, entity) {
+  return (dispatch, getState) => {
+    var { language } = getState();
+    dispatch({ type: Constants.TWEETS_LOADING, symbols: symbols, entity: entity });
+    tweets(symbols, entity, language).then(data => {
+      dispatch({ type: Constants.TWEETS_DATA, data: data });
+    });
+  }
+}
+
+/** Get the news for everything that's currently selected */
+export function getSelectedNews() {
+  return (dispatch, getState) => {
+    var { selectedCompanies, language } = getState();
+    _getNews(selectedCompanies, language, dispatch);
   }
 }
 
