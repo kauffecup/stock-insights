@@ -15,9 +15,6 @@
 //------------------------------------------------------------------------------
 
 import React      from 'react';
-import {
-  closeArticleList
-} from '../Actions';
 
 class Article extends React.Component {
   render() {
@@ -37,7 +34,7 @@ export default class ArticleList extends React.Component {
   render() {
     return (
       <div className="article-list" onClick={e => e.stopPropagation()}>
-        <button className="back" onClick={closeArticleList}>x</button>
+        <button className="back" onClick={this.props.onClose}>x</button>
         <h2>{this.props.selectedCompanies.join(', ')}</h2>
         <ul className="the-articles">{this.props.articles.map(a =>
           <Article article={a} />

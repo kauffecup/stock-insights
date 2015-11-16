@@ -19,7 +19,7 @@ import nodeDev      from 'node-dev';
 var path = {
   OUT: 'bundle.js',
   DEST: './public',
-  ENTRY_POINT: './client/main.js'
+  ENTRY_POINT: './client/index.js'
 }
 
 /**

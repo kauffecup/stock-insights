@@ -17,6 +17,7 @@
 import keyMirror from 'keymirror';
 
 export default keyMirror({
+  COMPANY_LOCAL_STORAGE: null,
   COMPANIES_LOADING: null,
   COMPANY_DATA: null,
   ADD_COMPANY: null,
@@ -31,8 +32,8 @@ export default keyMirror({
   STOCK_PRICE_DATA: null,
   NEWS_LOADING: null,
   NEWS_DATA: null,
+  NEWS_ERROR: null,
   CLOSE_ARTICLE_LIST: null,
-  SWITCH_ANALYSIS_COLOR_MODE: null,
   TOGGLE_CONDENSED_COMPANIES: null,
   SWITCH_DATE: null,
   STRING_DATA: null,

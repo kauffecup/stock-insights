@@ -15,12 +15,8 @@
 //------------------------------------------------------------------------------
 
 import React     from 'react';
+import ReactDOM  from 'react-dom';
 import Constants from '../constants/Constants';
-import {
-  addCompany,
-  searchCompany,
-  clearPotentialCompanies
-} from '../Actions';
 
 /**
  * A CompanySearcher.
@@ -46,12 +42,12 @@ export default class CompanySearcher extends React.Component {
     var value = event.target.value;
     this.setState({value: value});
     if (!value) {
-      clearPotentialCompanies();
+      this.props.onClear();
     }
     this._searchTimeout && clearTimeout(this._searchTimeout);
     this._searchTimeout = setTimeout(() => {
       if (this.state.value.length > 1) {
-        searchCompany(this.state.value);
+        this.props.onSearch(this.state.value);
       }
       delete this._searchTimeout;
     }, 300);
@@ -63,7 +59,7 @@ export default class CompanySearcher extends React.Component {
    */
   handleFocus(event) {
     if (this.state.value.length > 1 && !this.props.potentialCompanies.length) {
-      searchCompany(this.state.value);
+      this.props.onSearch(this.state.value);
     }
   }
 
@@ -73,18 +69,18 @@ export default class CompanySearcher extends React.Component {
    * because clicking on the <li> removes it from the drop down.
    */
   handleClear(event) {
-    if (!React.findDOMNode(this).contains(event.target) &&
+    if (!ReactDOM.findDOMNode(this).contains(event.target) &&
       !event.target.classList.contains('potential-company')) {
       this.setState({value: ''});
-      clearPotentialCompanies();
+      this.props.onClear();
     }
   }
 
   /**
    * When adding a company... add the company, clear and refocus the input
    */
-  handleAdd(company) {
-    addCompany(company);
+  handleClick(company) {
+    this.props.onCompanyAdd(company);
     this.setState({value: ''});
     this.refs.input.getDOMNode().focus();
   }
@@ -107,7 +103,7 @@ export default class CompanySearcher extends React.Component {
     ).filter(pc =>
       !companies.some(c => (c.description === pc.description) && (c.symbol === pc.symbol))
     ).map(pC =>
-      <li className="potential-company" onClick={this.handleAdd.bind(this, pC)} key={pC.symbol}>
+      <li className="potential-company" onClick={this.handleClick.bind(this, pC)} key={pC.symbol}>
         {pC.description + ' (' + pC.symbol + ')'}
       </li>
     ).slice(0, 15);
