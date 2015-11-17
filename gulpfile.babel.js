@@ -1,7 +1,5 @@
 import gulp         from 'gulp';
 import gutil        from 'gulp-util';
-import source       from 'vinyl-source-stream';
-import buffer       from 'vinyl-buffer';
 import less         from 'gulp-less';
 import postcss      from 'gulp-postcss';
 import autoprefixer from 'autoprefixer';
@@ -14,6 +12,27 @@ var path = {
   OUT: 'bundle.js',
   DEST: './public',
   ENTRY_POINT: './client/index.js'
+}
+
+var babelrcObject = {
+  stage: 0,
+  optional: 'runtime',
+  loose: 'all',
+  plugins: [
+    'react-transform'
+  ],
+  extra: {
+    'react-transform': {
+      transforms: [{
+        transform: 'react-transform-catch-errors',
+        imports: ['react', 'redbox-react']
+      }, {
+        transform: 'react-transform-hmr',
+        imports: ['react'],
+        locals: ['module']
+      }]
+    }
+  }
 }
 
 /**
@@ -48,10 +67,34 @@ gulp.task('build-server', () => {
 });
 
 /**
+ * Use webpack to add sourcemaps and for hotloading our client-side code
+ */
+gulp.task('webpack-dev', (callback) => {
+  webpack(_getWebpackConfig(false), (e, stats) => {
+    if (e) throw new gutil.PluginError('webpack', e);
+    gutil.log('[webpack]', stats.toString({ /* output options */ }));
+    callback();
+  })
+});
+
+/**
  * Use webpack to create our minified production bundle
  */
 gulp.task('webpack-production', (callback) => {
-  webpack({
+  webpack(_getWebpackConfig(true), (e, stats) => {
+    if (e) throw new gutil.PluginError('webpack', e);
+    gutil.log('[webpack]', stats.toString({ /* output options */ }));
+    callback();
+  });
+})
+
+/**
+ * Helper function that returns the webpack config object for both
+ * production and dev environments. Maintains similarites and differences
+ * between them.
+ */
+function _getWebpackConfig(production) {
+  var config = {
     entry: {
       main: [
         path.ENTRY_POINT
@@ -63,30 +106,39 @@ gulp.task('webpack-production', (callback) => {
     },
     module: {
       loaders: [
-        { test: /\.js$/, exclude: /node_modules/, loaders: ['babel']},
+        { test: /\.js$/, exclude: /node_modules/, loaders: [production ? 'babel' : 'babel?' + JSON.stringify(babelrcObject)]},
         { test: /\.svg$/, loaders: ['raw-loader']}
       ]
     },
-    plugins: [
-      new webpack.DefinePlugin({
-        'process.env': {
-          // Useful to reduce the size of client-side libraries, e.g. react
-          NODE_ENV: JSON.stringify('production')
-        }
-      }),
+    progress: true
+  }
+  config.devtool = production ? '' : 'inline-source-map';
+  config.plugins = production ? [
+    new webpack.DefinePlugin({
+      'process.env': {
+        // Useful to reduce the size of client-side libraries, e.g. react
+        NODE_ENV: JSON.stringify('production')
+      }
+    }),
 
-      // optimizations
-      new webpack.optimize.DedupePlugin(),
-      new webpack.optimize.OccurenceOrderPlugin(),
-      new webpack.optimize.UglifyJsPlugin({
-        compress: {
-          warnings: false
-        }
-      })
-    ]
-  }, (e, stats) => {
-    if (e) throw new gutil.PluginError('webpack', e);
-    gutil.log('[webpack]', stats.toString({ /* output options */ }));
-    callback();
-  });
-})
+    // optimizations
+    new webpack.optimize.DedupePlugin(),
+    new webpack.optimize.OccurenceOrderPlugin(),
+    new webpack.optimize.UglifyJsPlugin({
+      compress: {
+        warnings: false
+      }
+    })
+  ] : [
+    // hot reload
+    new webpack.HotModuleReplacementPlugin(),
+    new webpack.IgnorePlugin(/webpack-stats\.json$/),
+    new webpack.DefinePlugin({
+      __CLIENT__: true,
+      __SERVER__: false,
+      __DEVELOPMENT__: true,
+      __DEVTOOLS__: true  // <-------- DISABLE redux-devtools HERE
+    })
+  ];
+  return config;
+}
