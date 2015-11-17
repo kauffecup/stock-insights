@@ -1,20 +1,14 @@
 import gulp         from 'gulp';
 import gutil        from 'gulp-util';
-import browserify   from 'browserify';
-import watchify     from 'watchify';
 import source       from 'vinyl-source-stream';
-import babelify     from 'babelify';
 import buffer       from 'vinyl-buffer';
-import uglify       from 'gulp-uglify';
-import envify       from 'envify/custom';
 import less         from 'gulp-less';
 import postcss      from 'gulp-postcss';
 import autoprefixer from 'autoprefixer';
 import csswring     from 'csswring';
 import concatCss    from 'gulp-concat-css';
-import browserSync  from 'browser-sync';
 import babel        from 'gulp-babel';
-import nodeDev      from 'node-dev';
+import webpack      from 'webpack';
 
 var path = {
   OUT: 'bundle.js',
@@ -25,23 +19,7 @@ var path = {
 /**
  * To build, create bundle.js and style.css
  */
-gulp.task('build', ['browserify', 'less', 'build-server']);
-
-/**
- * Create and minify bundle.js
- */
-gulp.task('browserify', () => {
-  process.env['NODE_ENV'] = 'production';
-  return browserify(path.ENTRY_POINT)
-    .transform(babelify.configure())
-    .transform('brfs')
-    .transform(envify({ NODE_ENV: 'production' }))
-    .bundle()
-    .pipe(source(path.OUT))  // gives streaming vinyl file object
-    .pipe(buffer())          // convert from streaming to buffered vinyl file object
-    .pipe(uglify())          // minify dat code
-    .pipe(gulp.dest(path.DEST));
-});
+gulp.task('build', ['webpack-production', 'less', 'build-server']);
 
 /**
  * Convert all less into minified autoprefixed css
@@ -55,7 +33,6 @@ gulp.task('less', () =>
       csswring.postcss
     ]))
     .pipe(gulp.dest(path.DEST))
-    .pipe(browserSync.stream())
 );
 
 /**
@@ -71,53 +48,45 @@ gulp.task('build-server', () => {
 });
 
 /**
- * Kick off a node-dev "watch" for automatic server restarts
- * when server files change
+ * Use webpack to create our minified production bundle
  */
-gulp.task('node-dev', ['build-server'], () => {
-  nodeDev('server/lib/app.js', ['--all-deps'], []);
-  gulp.watch(['./server/src/**/*.js', './server/src/**/*.json'], ['build-server']);
-});
+gulp.task('webpack-production', (callback) => {
+  webpack({
+    entry: {
+      main: [
+        path.ENTRY_POINT
+      ]
+    },
+    output: {
+      path: path.DEST,
+      filename: path.OUT
+    },
+    module: {
+      loaders: [
+        { test: /\.js$/, exclude: /node_modules/, loaders: ['babel']},
+        { test: /\.svg$/, loaders: ['raw-loader']}
+      ]
+    },
+    plugins: [
+      new webpack.DefinePlugin({
+        'process.env': {
+          // Useful to reduce the size of client-side libraries, e.g. react
+          NODE_ENV: JSON.stringify('production')
+        }
+      }),
 
-/**
- * In dev mode, watch for changes in client code and Less and
- * rebuild bundle.js or style.css when these happen. Connect browserSync
- * to the node server.
- */
-gulp.task('dev', ['less', 'node-dev'], () => {
-  gulp.watch(['./client/**/**.less'], ['less']);
-  gulp.watch('./public/index.html').on('change', browserSync.reload);
-
-  var watcher  = watchify(browserify({
-    entries: [path.ENTRY_POINT],
-    transform: [babelify, 'brfs'],
-    debug: true,
-    cache: {},
-    packageCache: {},
-    fullPaths: true
-  }));
-
-  var port = process.env.PORT || 3000;
-  browserSync({
-    proxy: 'localhost:' + port,
-    port: port + 1
-  });
-
-  return watcher.on('update', () => {
-    watcher.bundle()
-      .on('error', function (err) {
-        gutil.log(err.message);
-        this.emit('end');
+      // optimizations
+      new webpack.optimize.DedupePlugin(),
+      new webpack.optimize.OccurenceOrderPlugin(),
+      new webpack.optimize.UglifyJsPlugin({
+        compress: {
+          warnings: false
+        }
       })
-      .pipe(source(path.OUT))
-      .pipe(gulp.dest(path.DEST))
-      .pipe(browserSync.stream());
-  }).bundle()
-    .on('error', function (err) {
-      gutil.log(err.message);
-      this.emit('end');
-    })
-    .pipe(source(path.OUT))
-    .pipe(gulp.dest(path.DEST))
-    .pipe(browserSync.stream());
-});
+    ]
+  }, (e, stats) => {
+    if (e) throw new gutil.PluginError('webpack', e);
+    gutil.log('[webpack]', stats.toString({ /* output options */ }));
+    callback();
+  });
+})

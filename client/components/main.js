@@ -26,6 +26,9 @@ import GraphTown         from '../components/GraphTown';
 import DateSlider        from '../components/DateSlider';
 import TweetViewer       from '../components/TweetViewer';
 
+// get our inline-able svg
+import IBMsvg from '../IBM.svg';
+
 import {
   addCompany,
   removeCompany,
@@ -41,11 +44,6 @@ import {
   closeTweets,
   getSelectedNews
 } from '../actions/actions';
-
-// get our inline-able svg
-var fs = require('fs');
-var path = require('path');
-var IBMsvg = fs.readFileSync(path.resolve(__dirname, '../IBM.svg'));
 
 /**
  * The app entry point
