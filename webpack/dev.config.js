@@ -13,15 +13,12 @@ module.exports = {
     publicPath: '/'
   },
   module: {
-    loaders: [{
-      test: /\.js$/,
-      loaders: [ 'babel' ],
-      exclude: /node_modules/,
-      include: path.join(__dirname, '..')
-    }, { 
-      test: /\.svg$/,
-      loaders: ['raw-loader']
-    }]
+    loaders: [
+      { test: /\.js$/, exclude: /node_modules/, loaders: ['babel']},
+      { test: /\.svg$/, loaders: ['raw-loader']},
+      // take all less files, compile them, and bundle them in with our js bundle
+      { test: /\.less$/, loader: 'style!css!autoprefixer?browsers=last 2 version!less' }
+    ]
   },
   plugins: [
     new webpack.DefinePlugin({
