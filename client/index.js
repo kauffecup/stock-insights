@@ -25,13 +25,18 @@ import {
   applyMiddleware
 } from 'redux';
 
+// load our css. there probably is a better way to do this
+// but for now this is our move
+require('./styles/style.less');
+require('./styles/slider.less');
+
 // create a store that has redux-thunk middleware enabled
 const createStoreWithMiddleware = applyMiddleware(
   thunk
 )(createStore);
 
 let store = createStoreWithMiddleware(stockApp)
-let rootElement = document.body;
+let rootElement = document.getElementById('root');
 
 // make sure all es6 things work correctly in all browsers
 require('babel/polyfill');
