@@ -8,6 +8,8 @@
   1. Add the custom "Stock News" API
   1. Add the custom "Stock History" API
   1. Add the custom "Stock Sentiment" API
+  1. Add the custom "Stock Tweets" API
+  1. Add the "IBM Globalization" service
 
 ## Running Locally
 
@@ -54,10 +56,7 @@ npm install
 npm run dev
 ```
 
-Running `npm run dev` kicks off the `gulp dev` task, which in turn kicks off a
-`watchify` on your client-side JS that will rebuild every time you save, and
-also watches all `.less` files and compiles those when you save. It also kicks
-off browserSync which will inject all of your css changes without needing to
-reload the page, and will reload the page every time you change a client-side
-.js file. This will also kick off the dev server - every time you change a
-server side .js file, the server will automatically restart.
+Running `npm run dev` adds the Webpack dev and hot middleware to the server.
+These are used to serve the bundle. It also handles rebuilding the bundle on js
+or css changes, and "hot reloading" them into your page. Access the server at
+localhost:3000
