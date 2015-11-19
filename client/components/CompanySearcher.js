@@ -70,7 +70,8 @@ export default class CompanySearcher extends React.Component {
    */
   handleClear(event) {
     if (!ReactDOM.findDOMNode(this).contains(event.target) &&
-      !event.target.classList.contains('potential-company')) {
+      !event.target.classList.contains('potential-company') &&
+      this.props.potentialCompanies.length) {
       this.setState({value: ''});
       this.props.onClear();
     }

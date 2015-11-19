@@ -64,7 +64,7 @@ class StockInsights extends Component {
     var showGraph = selectedCompanies.length;
     var showArticles = selectedCompanies.length;
     return (
-      <div className={classes} onClick={() => dispatch(closeTweets())}>
+      <div className={classes} onClick={() => tweets.open && dispatch(closeTweets())}>
         <div className="stock-insights-title">
           <div className="da-logo" dangerouslySetInnerHTML={{__html: IBMsvg}}></div>
           <h1 className="stock-insights-title">{strings.stockInsights}</h1>
