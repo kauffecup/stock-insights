@@ -1,7 +1,7 @@
 applications:
 - disk_quota: 1024M
   random-route: true
-  buildpack: sdk-for-nodejs
+  buildpack: https://github.com/jthomas/nodejs-v4-buildpack.git
   command: npm run start
   path: .
   instances: 1
