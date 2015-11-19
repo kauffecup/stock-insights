@@ -14,28 +14,18 @@
 // limitations under the License.
 //------------------------------------------------------------------------------
 
-import React         from 'react';
-import { render }    from 'react-dom';
-import { Provider }  from 'react-redux';
-import thunk         from 'redux-thunk';
-import StockInsights from './components/main';
-import stockApp      from './reducers/stockApp';
-import {
-  createStore,
-  applyMiddleware
-} from 'redux';
+import React          from 'react';
+import { render }     from 'react-dom';
+import Root           from './containers/Root';
+import configureStore from './store/configureStore';
 
 // load our css. there probably is a better way to do this
 // but for now this is our move
 require('./styles/style.less');
 require('./styles/slider.less');
 
-// create a store that has redux-thunk middleware enabled
-const createStoreWithMiddleware = applyMiddleware(
-  thunk
-)(createStore);
 
-let store = createStoreWithMiddleware(stockApp)
+let store = configureStore();
 let rootElement = document.getElementById('root');
 
 // make sure all es6 things work correctly in all browsers
@@ -51,9 +41,4 @@ require('moment/locale/pt-br');
 require('moment/locale/es');
 
 // React.initializeTouchEvents(true);
-render(
-  <Provider store={store}>
-    <StockInsights />
-  </Provider>,
-  rootElement
-);
+render( <Root store={store} />, rootElement );
