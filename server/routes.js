@@ -17,13 +17,13 @@
 import express      from 'express';
 import path         from 'path';
 import Promise      from 'bluebird';
-import gaas         from 'gaas';
+import g11nPipeline from 'g11n-pipeline';
 import locale       from 'locale';
 import vcapServices from './vcapServices';
 
 var router = express.Router();
-var gaasClient = gaas.getClient({credentials: vcapServices.globalization.credentials});
-var gaasStock = Promise.promisifyAll(gaasClient.project('stockinsights'));
+var gpClient = g11nPipeline.getClient({credentials: vcapServices.globalization.credentials});
+var gpStrings = Promise.promisifyAll(gpClient.bundle('stock_strings'));
 var request = Promise.promisifyAll(require('request'));
 
 var supportedLocales = new locale.Locales([
@@ -43,11 +43,11 @@ router.get('/strings', (req, res) => {
   // once we get the new data object, we hold on to it for quicker
   // second requests
   } else {
-    gaasStock.getResourceDataAsync({
-      languageID: langCode
-    }).then(([{data}, body]) => {
-      stringCache[langCode] = data;
-      res.json(data);
+    gpStrings.getStringsAsync({
+      languageId: langCode
+    }).then(({resourceStrings}) => {
+      stringCache[langCode] = resourceStrings;
+      res.json(resourceStrings);
     }).catch(e => {
       res.status(500);
       res.json(e);
