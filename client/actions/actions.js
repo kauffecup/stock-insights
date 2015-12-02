@@ -55,22 +55,22 @@ export function searchCompany(companyName) {
     companyLookup(companyName).then(companies => {
       dispatch({ type: Constants.COMPANY_DATA, companies: companies });
     });
-  }
+  };
 }
 
 /** Toggle a company's selected-ness */
 export function toggleSelect(symbol) {
+  const s = symbol.symbol || symbol._id || symbol;
   return (dispatch, getState) => {
-    symbol = symbol.symbol || symbol._id || symbol;
     var { selectedCompanies, language } = getState();
-    if (selectedCompanies.indexOf(symbol) === -1) {
-      dispatch({ type: Constants.SELECT_COMPANY, symbol: symbol });
+    if (selectedCompanies.indexOf(s) === -1) {
+      dispatch({ type: Constants.SELECT_COMPANY, symbol: s });
     } else {
-      dispatch({ type: Constants.DESELECT_COMPANY, symbol: symbol });
+      dispatch({ type: Constants.DESELECT_COMPANY, symbol: s });
     }
     selectedCompanies = getState().selectedCompanies;
     _getNews(selectedCompanies, language, dispatch);
-  }
+  };
 }
 
 /** Add a company */
@@ -83,7 +83,7 @@ export function addCompany(company) {
         dispatch({ type: Constants.STOCK_PRICE_DATA, data: data });
       });
     }
-  }
+  };
 }
 
 /** Remove a company */
@@ -92,16 +92,16 @@ export function removeCompany(company) {
     dispatch({ type: Constants.REMOVE_COMPANY, company: company });
     var { selectedCompanies, language } = getState();
     _getNews(selectedCompanies, language, dispatch);
-  }
+  };
 }
 
 /** Get the globalized strings */
 export function getStrings(language) {
   return dispatch => {
-    strings(language).then(strings => {
-      dispatch({ type: Constants.STRING_DATA, strings: strings });
+    strings(language).then(s => {
+      dispatch({ type: Constants.STRING_DATA, strings: s });
     });
-  }
+  };
 }
 
 /** Get the stock data for a given array of companies */
@@ -111,7 +111,7 @@ export function getStockData(symbols) {
     stockPrice(symbols).then(data => {
       dispatch({ type: Constants.STOCK_PRICE_DATA, data: data });
     });
-  }
+  };
 }
 
 /** Get the most recent tweets about a symbol/entity combo */
@@ -122,7 +122,7 @@ export function getTweets(symbols, entity) {
     tweets(symbols, entity, language).then(data => {
       dispatch({ type: Constants.TWEETS_DATA, data: data });
     });
-  }
+  };
 }
 
 /** Get the news for everything that's currently selected */
@@ -130,7 +130,7 @@ export function getSelectedNews() {
   return (dispatch, getState) => {
     var { selectedCompanies, language } = getState();
     _getNews(selectedCompanies, language, dispatch);
-  }
+  };
 }
 
 /** Helper method - fetch stock news for an array of companies */
@@ -140,7 +140,7 @@ function _getNews(companies, language, dispatch) {
     stockNews(companies, language).then(news => {
       dispatch({ type: Constants.NEWS_DATA, news: news });
     }).catch(e => {
-      dispatch({ type: Constants.NEWS_ERROR });
+      dispatch({ type: Constants.NEWS_ERROR, error: e });
     });
   }
 }

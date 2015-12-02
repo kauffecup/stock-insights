@@ -25,8 +25,8 @@ require('./styles/style.less');
 require('./styles/slider.less');
 
 
-let store = configureStore();
-let rootElement = document.getElementById('root');
+const store = configureStore();
+const rootElement = document.getElementById('root');
 
 // make sure all es6 things work correctly in all browsers
 require('babel/polyfill');

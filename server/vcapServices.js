@@ -35,8 +35,10 @@ var envVars = {
   BYPASS_PW: process.env.BYPASS_PW
 };
 try {
-  envVars = require('./ENV_VARS.json')
-} catch (e) {}
+  envVars = require('./ENV_VARS.json');
+} catch (e) {
+  console.error(e);
+}
 
 // the keys are complex, for example: `Company Lookup v1 : Sandbox 55e768c90cf2722940e66db9 prod`
 // iterate over the keys and convert to companyLookup, stockPrice, stockNews, stockHistory,

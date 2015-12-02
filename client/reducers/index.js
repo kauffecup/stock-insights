@@ -23,7 +23,7 @@ import initialState from './initialState';
 /**
  * Helper method to store the companies in the browser's local storage
  */
-function _updateLocalStorage (companies) {
+function _updateLocalStorage(companies) {
   localStorage.setItem(Constants.COMPANY_LOCAL_STORAGE, JSON.stringify(companies));
 }
 
@@ -34,231 +34,219 @@ function _updateLocalStorage (companies) {
 function flattenStockData(stockData) {
   var stockDateArray = [];
   for (var symbol in stockData) {
-    var dateArr = stockData[symbol];
-    if (stockDateArray.length) {
-      for (var i = 0; i < dateArr.length; i++) {
-        var d = dateArr[i];
-        stockDateArray[i].data.push({
-          week_52_high: d.week_52_high,
-          week_52_low: d.week_52_low,
-          change: d.change,
-          symbol: d.symbol,
-          last: d.last,
-          date: moment(d.date)
-        });
+    if (stockData.hasOwnProperty(symbol)) {
+      var dateArr = stockData[symbol];
+      if (stockDateArray.length) {
+        for (var i = 0; i < dateArr.length; i++) {
+          var d = dateArr[i];
+          stockDateArray[i].data.push({
+            week_52_high: d.week_52_high,
+            week_52_low: d.week_52_low,
+            change: d.change,
+            symbol: d.symbol,
+            last: d.last,
+            date: moment(d.date)
+          });
+        }
+      } else {
+        stockDateArray = dateArr.map(da => ({
+          date: moment(da.date),
+          data: [{
+            week_52_high: da.week_52_high,
+            week_52_low: da.week_52_low,
+            change: da.change,
+            symbol: da.symbol,
+            last: da.last,
+            date: moment(da.date)
+          }]
+        }));
       }
-    } else {
-      stockDateArray = dateArr.map(d => ({
-        date: moment(d.date),
-        data: [{
-          week_52_high: d.week_52_high,
-          week_52_low: d.week_52_low,
-          change: d.change,
-          symbol: d.symbol,
-          last: d.last,
-          date: moment(d.date)
-        }]
-      }))
     }
   }
   return stockDateArray;
 }
 
-export default function reduce (state = initialState, action) {
-  switch(action.type) {
-    case Constants.TOGGLE_CONDENSED_COMPANIES:
-      return assign({}, state, {
-        companies: assign({}, state.companies, {
-          condensed: !state.companies.condensed
-        })
-      });
-      break;
-
-    case Constants.ADD_COMPANY:
-      var newCompanies = [...state.companies.companies, action.company];
-      !state.isEmbedded && _updateLocalStorage(newCompanies);
-      return assign({}, state, {
-        companies: assign({}, state.companies, {
-          companies: newCompanies
-        })
-      });
-      break;
-
-    case Constants.REMOVE_COMPANY:
-      var symbol = action.company.symbol || action.company;
-      var stockDataMap = clone(state.stockData.map);
-      delete stockDataMap[symbol];
-      var newCompanies = state.companies.companies.filter(c => c !== action.company);
-      !state.isEmbedded &&  _updateLocalStorage(newCompanies);
-      return assign({}, state, {
-        selectedCompanies: state.selectedCompanies.filter(c => c !== (action.company.symbol || action.company)),
-        companies: assign({}, state.companies, {
-          companies: newCompanies
-        }),
-        stockData: assign({}, state.stockData, {
-          map: stockDataMap,
-          flat: flattenStockData(stockDataMap)
-        })
-      });
-      break;
-
-    case Constants.SELECT_COMPANY:
-      return assign({}, state, {
-        selectedCompanies: [...state.selectedCompanies, action.symbol]
-      });
-      break;
-
-    case Constants.DESELECT_COMPANY:
-      var newCompanies = state.selectedCompanies.filter(c => c !== action.symbol);
-      var newArticles = newCompanies.length ? state.articles.articles : [];
-      var newEntities = newCompanies.length ? state.entities.entities : [];
-      return assign({}, state, {
-        selectedCompanies: state.selectedCompanies.filter(c => c !== action.symbol),
-        articles: assign({}, state.articles, {
-          articles: newArticles
-        }),
-        entities: assign({}, state.entities, {
-          entities: newEntities
-        })
-      });
-      break;
-
-    case Constants.STOCK_PRICE_DATA:
-      var stockDataMap = clone(state.stockData.map);
-      for (var symbol in action.data) {
-        stockDataMap[symbol] = action.data[symbol];
-      }
-      return assign({}, state, {
-        stockData: assign({}, state.stockData, {
-          map: stockDataMap,
-          flat: flattenStockData(stockDataMap)
-        })
+export default function reduce(state = initialState, action) {
+  switch (action.type) {
+  case Constants.TOGGLE_CONDENSED_COMPANIES:
+    return assign({}, state, {
+      companies: assign({}, state.companies, {
+        condensed: !state.companies.condensed
       })
-      break;
+    });
 
-    case Constants.SWITCH_DATE:
-      return assign({}, state, {
-        currentDate: action.date
-      });
-      break;
+  case Constants.ADD_COMPANY:
+    const newAddCompanies = [...state.companies.companies, action.company];
+    if (!state.isEmbedded) {
+      _updateLocalStorage(newAddCompanies);
+    }
+    return assign({}, state, {
+      companies: assign({}, state.companies, {
+        companies: newAddCompanies
+      })
+    });
 
-    case Constants.NEWS_LOADING:
-      return assign({}, state, {
-        articles: assign({}, state.articles, {
-          loading: true
-        })
-      });
-      break;
+  case Constants.REMOVE_COMPANY:
+    const symbol = action.company.symbol || action.company;
+    var stockDataMap = clone(state.stockData.map);
+    delete stockDataMap[symbol];
+    const newRemoveCompanies = state.companies.companies.filter(c => c !== action.company);
+    if (!state.isEmbedded) {
+      _updateLocalStorage(newRemoveCompanies);
+    }
+    return assign({}, state, {
+      selectedCompanies: state.selectedCompanies.filter(c => c !== (action.company.symbol || action.company)),
+      companies: assign({}, state.companies, {
+        companies: newRemoveCompanies
+      }),
+      stockData: assign({}, state.stockData, {
+        map: stockDataMap,
+        flat: flattenStockData(stockDataMap)
+      })
+    });
 
-    case Constants.NEWS_DATA:
-      return assign({}, state, {
-        articles: assign({}, state.articles, {
-          loading: false,
-          articles: action.news.articles
-        }),
-        entities: assign({}, state.entities, {
-          loading: false,
-          entities: action.news.entities.map(e => ({
-            _id: e.text,
-            value: e.count,
-            colorValue: e.averageSentiment,
-            symbols: e.symbols
-          }))
-        })
-      });
-      break;
+  case Constants.SELECT_COMPANY:
+    return assign({}, state, {
+      selectedCompanies: [...state.selectedCompanies, action.symbol]
+    });
 
-    case Constants.CLOSE_ARTICLE_LIST:
-      return assign({}, state, {
-        selectedCompanies: [],
-        articles: assign({}, state.articles, {
-          loading: false,
-          articles: []
-        }),
-        entities: assign({}, state.entities, {
-          loading: false,
-          entities: []
-        })
-      });
-      break;
+  case Constants.DESELECT_COMPANY:
+    var newCompanies = state.selectedCompanies.filter(c => c !== action.symbol);
+    var newArticles = newCompanies.length ? state.articles.articles : [];
+    var newEntities = newCompanies.length ? state.entities.entities : [];
+    return assign({}, state, {
+      selectedCompanies: state.selectedCompanies.filter(c => c !== action.symbol),
+      articles: assign({}, state.articles, {
+        articles: newArticles
+      }),
+      entities: assign({}, state.entities, {
+        entities: newEntities
+      })
+    });
 
-    case Constants.COMPANIES_LOADING:
-      return assign({}, state, {
-        potentialCompanies: assign({}, state.potentialCompanies, {
-          status: Constants.POTENTIAL_STATUS_LOADING
-        })
-      });
-      break;
+  case Constants.STOCK_PRICE_DATA:
+    const stockDataMapPrice = clone(state.stockData.map);
+    for (var s in action.data) {
+      if (action.data.hasOwnProperty(s)) {
+        stockDataMapPrice[s] = action.data[s];
+      }
+    }
+    return assign({}, state, {
+      stockData: assign({}, state.stockData, {
+        map: stockDataMapPrice,
+        flat: flattenStockData(stockDataMapPrice)
+      })
+    });
 
-    case Constants.COMPANY_DATA:
-      return assign({}, state, {
-        potentialCompanies: assign({}, state.potentialCompanies, {
-          status: Constants.POTENTIAL_STATUS_RECEIVED,
-          companies: action.companies
-        })
-      });
-      break;
+  case Constants.SWITCH_DATE:
+    return assign({}, state, {
+      currentDate: action.date
+    });
 
-    case Constants.CLEAR_POTENTIAL_COMPANIES:
-      return assign({}, state, {
-        potentialCompanies: assign({}, state.potentialCompanies, {
-          status: Constants.POTENTIAL_STATUS_CLEAR,
-          companies: []
-        })
-      });
-      break;
+  case Constants.NEWS_LOADING:
+    return assign({}, state, {
+      articles: assign({}, state.articles, {
+        loading: true
+      })
+    });
 
-    case Constants.TWEETS_LOADING:
+  case Constants.NEWS_DATA:
+    return assign({}, state, {
+      articles: assign({}, state.articles, {
+        loading: false,
+        articles: action.news.articles
+      }),
+      entities: assign({}, state.entities, {
+        loading: false,
+        entities: action.news.entities.map(e => ({
+          _id: e.text,
+          value: e.count,
+          colorValue: e.averageSentiment,
+          symbols: e.symbols
+        }))
+      })
+    });
+
+  case Constants.CLOSE_ARTICLE_LIST:
+    return assign({}, state, {
+      selectedCompanies: [],
+      articles: assign({}, state.articles, {
+        loading: false,
+        articles: []
+      }),
+      entities: assign({}, state.entities, {
+        loading: false,
+        entities: []
+      })
+    });
+
+  case Constants.COMPANIES_LOADING:
+    return assign({}, state, {
+      potentialCompanies: assign({}, state.potentialCompanies, {
+        status: Constants.POTENTIAL_STATUS_LOADING
+      })
+    });
+
+  case Constants.COMPANY_DATA:
+    return assign({}, state, {
+      potentialCompanies: assign({}, state.potentialCompanies, {
+        status: Constants.POTENTIAL_STATUS_RECEIVED,
+        companies: action.companies
+      })
+    });
+
+  case Constants.CLEAR_POTENTIAL_COMPANIES:
+    return assign({}, state, {
+      potentialCompanies: assign({}, state.potentialCompanies, {
+        status: Constants.POTENTIAL_STATUS_CLEAR,
+        companies: []
+      })
+    });
+
+  case Constants.TWEETS_LOADING:
+    return assign({}, state, {
+      tweets: assign({}, state.tweets, {
+        open: true,
+        tweets: [],
+        sentiment: {},
+        description: {
+          symbols: action.symbols,
+          entity: action.entity
+        }
+      })
+    });
+
+  case Constants.TWEETS_DATA:
+    if (state.tweets.open) {
+      var tweets = action.data.tweets;
       return assign({}, state, {
         tweets: assign({}, state.tweets, {
-          open: true,
-          tweets: [],
-          sentiment: {},
-          description: {
-            symbols: action.symbols,
-            entity: action.entity
-          }
+          tweets: typeof tweets.length === 'undefined' ? [] : tweets,
+          sentiment: action.data.sentiment
         })
       });
-      break;
+    }
+    return state;
 
-    case Constants.TWEETS_DATA:
-      if (state.tweets.open) {
-        var tweets = action.data.tweets;
-        return assign({}, state, {
-          tweets: assign({}, state.tweets, {
-            tweets: typeof tweets.length === 'undefined' ? [] : tweets,
-            sentiment: action.data.sentiment
-          })
-        });
-      } else {
-        return state;
-      }
-      break;
-
-    case Constants.CLOSE_TWEETS:
-      if (state.tweets.open) {
-        return assign({}, state, {
-          tweets: assign({}, state.tweets, {
-            open: false,
-            tweets: [],
-            sentiment: {},
-            description: {}
-          })
-        });
-      } else {
-        return state;
-      }
-      break;
-
-    case Constants.STRING_DATA:
+  case Constants.CLOSE_TWEETS:
+    if (state.tweets.open) {
       return assign({}, state, {
-        strings: action.strings
-      })
-      break;
+        tweets: assign({}, state.tweets, {
+          open: false,
+          tweets: [],
+          sentiment: {},
+          description: {}
+        })
+      });
+    }
+    return state;
 
-    default:
-      return state;
-      break;
+  case Constants.STRING_DATA:
+    return assign({}, state, {
+      strings: action.strings
+    });
+
+  default:
+    return state;
   }
 }

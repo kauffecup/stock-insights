@@ -74,7 +74,7 @@ export default {
   },
   articles: {
     loading: false,
-    articles:[]
+    articles: []
   },
   tweets: {
     open: false,
@@ -82,4 +82,4 @@ export default {
     sentiment: {},
     description: {}
   }
-}
+};

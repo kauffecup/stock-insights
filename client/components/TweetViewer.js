@@ -14,34 +14,11 @@
 // limitations under the License.
 //------------------------------------------------------------------------------
 
-import React      from 'react';
+import React, { Component, PropTypes } from 'react';
 import classNames from 'classnames';
+import Status     from './Status';
 
-class Status extends React.Component {
-  render() {
-    var {positive: positiveResults, negative: negativeResults, neutral: neutralResults} = this.props.sentiment;
-    var {loading, noResults, positive, neutral, negative} = this.props.strings;
-
-    var statusNoResults = (positiveResults === 0 && negativeResults === 0 && neutralResults === 0);
-    var statusLoading = typeof positiveResults === 'undefined' && typeof negativeResults === 'undefined' && typeof neutralResults === 'undefined';
-
-    if (statusNoResults) {
-      return <div>{noResults}</div>;
-    } else if (statusLoading) {
-      return <div>{loading}</div>;
-    } else {
-      return (
-        <div className="sentiment">
-          <div className="positive">{positive + ' ' + positiveResults}</div>
-          <div className="neutral">{neutral + ' ' + neutralResults}</div>
-          <div className="negative">{negative + ' ' + negativeResults}</div>
-        </div>
-      );
-    }
-  }
-}
-
-export default class TweetViewer extends React.Component {
+export default class TweetViewer extends Component {
   render() {
     var {description, tweets, sentiment} = this.props;
     return (
@@ -55,3 +32,10 @@ export default class TweetViewer extends React.Component {
     );
   }
 }
+
+TweetViewer.propTypes = {
+  description: PropTypes.object.isRequired,
+  sentiment: PropTypes.object.isRequired,
+  tweets: PropTypes.array.isRequired,
+  strings: PropTypes.object.isRequired
+};

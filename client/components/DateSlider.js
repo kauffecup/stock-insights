@@ -14,10 +14,10 @@
 // limitations under the License.
 //------------------------------------------------------------------------------
 
-import React  from 'react';
+import React, { Component, PropTypes } from 'react';
 import moment from 'moment';
 
-export default class DateSlider extends React.Component {
+export default class DateSlider extends Component {
   render() {
     var {stockData, currentDate, language} = this.props;
     var startOfCurrentDate = moment(currentDate).startOf('day');
@@ -32,17 +32,24 @@ export default class DateSlider extends React.Component {
     return (
       <div className="date-slider">
         <div className="date-slider-label">{
-          currentDate.locale(language || 'en').format("LL")
+          currentDate.locale(language || 'en').format('LL')
         }</div>
         <input
           className="slider"
           type="range"
           min="0"
-          max={"" + (dateArr.length-1)}
+          max={'' + (dateArr.length - 1)}
           value={currentPos}
           steps={dateArr.length}
-          onChange={e => this.props.onChange(moment(this.props.stockData[parseInt(e.target.value)].date))} />
+          onChange={e => this.props.onChange(moment(this.props.stockData[parseInt(e.target.value, 10)].date))} />
       </div>
     );
   }
 }
+
+DateSlider.propTypes = {
+  stockData: PropTypes.array.isRequired,
+  language: PropTypes.string,
+  onChange: PropTypes.func.isRequired,
+  currentDate: PropTypes.object.isRequired
+};

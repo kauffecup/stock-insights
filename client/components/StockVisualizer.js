@@ -14,9 +14,8 @@
 // limitations under the License.
 //------------------------------------------------------------------------------
 
-import React             from 'react';
+import React, { Component, PropTypes } from 'react';
 import moment            from 'moment';
-import clone             from 'clone';
 import d3                from 'd3';
 import dimple            from 'dimple';
 import ReactBubbleChart  from 'react-bubble-chart';
@@ -24,36 +23,36 @@ import ReactBubbleChart  from 'react-bubble-chart';
 function generateLegend(lowText, highText) {
   return [
     // reds from dark to light
-    {color: "#67000d", textColor: '#fee0d2', text: lowText},
-    {color: "#a50f15", textColor: '#fee0d2'},
-    "#cb181d",
-    "#ef3b2c",
-    "#fb6a4a",
-    "#fc9272",
-    "#fcbba1",
-    "#fee0d2",
-    //neutral grey
-    "#f0f0f0",
+    {color: '#67000d', textColor: '#fee0d2', text: lowText},
+    {color: '#a50f15', textColor: '#fee0d2'},
+    '#cb181d',
+    '#ef3b2c',
+    '#fb6a4a',
+    '#fc9272',
+    '#fcbba1',
+    '#fee0d2',
+    // neutral grey
+    '#f0f0f0',
     // blues from light to dark
-    "#deebf7",
-    "#c6dbef",
-    "#9ecae1",
-    "#6baed6",
-    "#4292c6",
-    "#2171b5",
+    '#deebf7',
+    '#c6dbef',
+    '#9ecae1',
+    '#6baed6',
+    '#4292c6',
+    '#2171b5',
     {color: '#08519c', textColor: '#deebf7'},
-    {color: "#08306b", textColor: '#deebf7', text: highText}
+    {color: '#08306b', textColor: '#deebf7', text: highText}
   ];
 }
 
-export default class StockVisualizer extends React.Component {
+export default class StockVisualizer extends Component {
   /**
    * Given a function to determine a stocks color value, and
    * a function to determine a stocks time value, produce an array
    * of data that can be consumed by ReactBubbleChart
    */
-  getData(data, colorFunc) {
-    data = data.map(s => {
+  getData(data) {
+    let myData = data.map(s => {
       return {
         value: s.last ? s.last.toFixed(2) : 0,
         _id: s.symbol,
@@ -61,22 +60,22 @@ export default class StockVisualizer extends React.Component {
         change: s.change ? s.change.toFixed(2) : 0,
         week_52_high: s.week_52_high,
         week_52_low: s.week_52_low
-      }
+      };
     }).sort((s1, s2) => s2.value - s1.value);
 
     // this might be a bit hacky...
     // make sure that none of the values are negative
     // if any are negative, shift all the values up so that
     // the minimum value is 1
-    var minVal = Math.min(...data.map(d => d.value));
+    var minVal = Math.min(...myData.map(d => d.value));
     if (minVal <= 0) {
-      data = data.map(d => ({
+      myData = myData.map(d => ({
         value: d.value - minVal + 1,
         _id: d._id,
         colorValue: d.colorValue
       }));
     }
-    return data;
+    return myData;
   }
 
   /**
@@ -101,7 +100,7 @@ export default class StockVisualizer extends React.Component {
     return {
       min: min,
       max: max
-    }
+    };
   }
 
   /**
@@ -131,21 +130,21 @@ export default class StockVisualizer extends React.Component {
     if (this.tipChart) {
       svg.selectAll('*').remove();
     }
-    this.tipChart = new dimple.chart(svg, myData, '100%', '100%');
+    this.tipChart = new dimple.chart(svg, myData, '100%', '100%'); // eslint-disable-line
 
     // configure the axis - x for date, y for close value
     var x = this.tipChart.addCategoryAxis('x', 'date');
     x.addOrderRule('date');
     x.hidden = true;
     var y = this.tipChart.addMeasureAxis('y', 'close');
-    y.hidden = true
-    var myNums = myData.map(d => d.close);
+    y.hidden = true;
+    var myNums = myData.map(ds => ds.close);
     y.overrideMin = Math.min(...myNums);
     y.overrideMax = Math.max(...myNums);
 
     // set up the series and its color
     var series = this.tipChart.addSeries('symbol', dimple.plot.bar);
-    this.tipChart.setBounds(0, 0, '100%','100%');
+    this.tipChart.setBounds(0, 0, '100%', '100%');
     this.tipChart.assignColor(d._id, stroke, stroke, 1);
     series.barGap = 0.6;
 
@@ -182,14 +181,16 @@ export default class StockVisualizer extends React.Component {
       display: this.props.strings.week52Low
     }];
 
-    var data, legend, domain, sizeFunc;
+    var data;
+    var legend;
+    var domain;
     if (isEntities) {
       data = this.props.entityData;
       legend = generateLegend(`(-) ${this.props.strings.sentiment || ''}`, `(+) ${this.props.strings.sentiment || ''}`);
       domain = {
         min: -1,
         max: 1
-      }
+      };
     } else {
       var startOfCurrentDate = moment(currentDate).startOf('day');
       var currentPos;
@@ -198,7 +199,7 @@ export default class StockVisualizer extends React.Component {
           currentPos = i;
         }
       }
-      var data = typeof currentPos === 'undefined' ? [] : stockData[currentPos].data;
+      data = typeof currentPos === 'undefined' ? [] : stockData[currentPos].data;
       // then, depending on the color mode, get the actual data, color
       // domain, and color legend.
       data = this.getData(data);
@@ -206,17 +207,31 @@ export default class StockVisualizer extends React.Component {
       legend = generateLegend(`(-) ${this.props.strings.change || ''}`, `(+) ${this.props.strings.change || ''}`);
     }
     // now we make a bubble chart! yay!
-    return <ReactBubbleChart
-      legend={true}
-      legendSpacing={0}
-      className="stock-visualizer"
-      colorLegend={legend}
-      data={data}
-      onClick={isEntities ? d => this.props.onEntityClick(d.symbols, d._id) : this.props.onCompanyClick}
-      fixedDomain={domain}
-      tooltip={tooltip}
-      tooltipProps={tooltipProps}
-      tooltipFunc={this.tooltipFunc.bind(this)}
-    />;
+    return (
+      <ReactBubbleChart
+        legend
+        legendSpacing={0}
+        className="stock-visualizer"
+        colorLegend={legend}
+        data={data}
+        onClick={isEntities ? d => this.props.onEntityClick(d.symbols, d._id) : this.props.onCompanyClick}
+        fixedDomain={domain}
+        tooltip={tooltip}
+        tooltipProps={tooltipProps}
+        tooltipFunc={this.tooltipFunc.bind(this)}
+      />
+    );
   }
 }
+
+StockVisualizer.propTypes = {
+  strings: PropTypes.object.isRequired,
+  entityData: PropTypes.array.isRequired,
+  stockData: PropTypes.array.isRequired,
+  currentDate: PropTypes.object.isRequired,
+  dataMap: PropTypes.object,
+  selectedCompanies: PropTypes.array.isRequired,
+  forceBubbles: PropTypes.bool,
+  onEntityClick: PropTypes.func.isRequired,
+  onCompanyClick: PropTypes.func.isRequired
+};

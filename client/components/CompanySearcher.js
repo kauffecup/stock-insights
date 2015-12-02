@@ -14,7 +14,7 @@
 // limitations under the License.
 //------------------------------------------------------------------------------
 
-import React     from 'react';
+import React, { Component, PropTypes } from 'react';
 import ReactDOM  from 'react-dom';
 import Constants from '../constants/Constants';
 
@@ -25,7 +25,7 @@ import Constants from '../constants/Constants';
  * the companies that have already been added from the drop down, and limits the drop down
  * to 15 companies
  */
-export default class CompanySearcher extends React.Component {
+export default class CompanySearcher extends Component {
   constructor(props) {
     super(props);
     this.state = {value: ''};
@@ -33,7 +33,17 @@ export default class CompanySearcher extends React.Component {
     // this is necessary for document add/remove event listener to work properly
     this._handleClear = this.handleClear.bind(this);
   }
-  
+
+  /**
+   * When mounting/unmounting set up the clear click handlers
+   */
+  componentDidMount() {
+    document.addEventListener('click', this._handleClear);
+  }
+  componentWillUnmount() {
+    document.removeEventListener('click', this._handleClear);
+  }
+
   /**
    * Where some of the magic happens.
    * As the user's typing debounce a searchCompany call by 300ms.
@@ -44,7 +54,9 @@ export default class CompanySearcher extends React.Component {
     if (!value) {
       this.props.onClear();
     }
-    this._searchTimeout && clearTimeout(this._searchTimeout);
+    if (this._searchTimeout) {
+      clearTimeout(this._searchTimeout);
+    }
     this._searchTimeout = setTimeout(() => {
       if (this.state.value.length > 1) {
         this.props.onSearch(this.state.value);
@@ -57,7 +69,7 @@ export default class CompanySearcher extends React.Component {
    * When focusing the input, if there are 2 or more characters and nothing in the drop down,
    * issue a searchCompany call
    */
-  handleFocus(event) {
+  handleFocus() {
     if (this.state.value.length > 1 && !this.props.potentialCompanies.length) {
       this.props.onSearch(this.state.value);
     }
@@ -135,14 +147,14 @@ export default class CompanySearcher extends React.Component {
       </div>
     );
   }
-
-  /**
-   * When mounting/unmounting set up the clear click handlers
-   */
-  componentDidMount() {
-    document.addEventListener('click', this._handleClear);
-  }
-  componentWillUnmount() {
-    document.removeEventListener('click', this._handleClear);
-  }
 }
+
+CompanySearcher.propTypes = {
+  strings: PropTypes.object.isRequired,
+  potentialCompanies: PropTypes.array.isRequired,
+  companies: PropTypes.array.isRequired,
+  loadingStatus: PropTypes.string.isRequired,
+  onCompanyAdd: PropTypes.func.isRequired,
+  onSearch: PropTypes.func.isRequired,
+  onClear: PropTypes.func.isRequired
+};

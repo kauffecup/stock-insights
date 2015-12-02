@@ -14,37 +14,18 @@
 // limitations under the License.
 //------------------------------------------------------------------------------
 
-import React           from 'react';
+import React, { Component, PropTypes } from 'react';
 import classNames      from 'classnames';
 import CompanySearcher from './CompanySearcher';
-
-/**
- * An individual company. Displays the description, ticker symbol, and an `x` that you can
- * click on to remove the company
- */
-class Company extends React.Component {
-  render() {
-    var c = this.props.company;
-    var classes = classNames('company', {
-      selected: this.props.selected
-    });
-    return (
-      <div className={classes} onClick={this.props.onClick}>
-        <span className="company-description">{c.description}</span>
-        <span className="company-symbol">{c.symbol}</span>
-        <span className="company-close" onClick={e => {e.stopPropagation(); this.props.onRemoveClick(c);}}>x</span>
-      </div>
-    );
-  }
-}
+import Company         from './Company';
 
 /**
  * The actual company container that we will export. Instantiates one company for each...
  * company, and instantiates a CompanySearcher
  */
-export default class CompanyContainer extends React.Component {
+export default class CompanyContainer extends Component {
   render() {
-    var classes=classNames('company-container', {
+    var classes = classNames('company-container', {
       condensed: this.props.condensed
     });
     var selected = {};
@@ -70,3 +51,14 @@ export default class CompanyContainer extends React.Component {
     );
   }
 }
+
+CompanyContainer.propTypes = {
+  companies: PropTypes.array.isRequired,
+  strings: PropTypes.object.isRequired,
+  selectedCompanies: PropTypes.array.isRequired,
+  condensed: PropTypes.bool.isRequired,
+  language: PropTypes.string,
+  onCompanyRemove: PropTypes.func.isRequired,
+  onSelect: PropTypes.func.isRequired,
+  onToggle: PropTypes.func.isRequired
+};

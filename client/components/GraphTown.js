@@ -14,30 +14,26 @@
 // limitations under the License.
 //------------------------------------------------------------------------------
 
-import React    from 'react';
+import React, { Component, PropTypes } from 'react';
 import ReactDOM from 'react-dom';
 import dimple   from 'dimple';
 
 const DRAW_TIME = 400;
 
-export default class GraphTown extends React.Component {
-  render() {
-    return <div className="graph-town"></div>;
-  }
-
+export default class GraphTown extends Component {
   /** Configure our dimple chart */
   componentDidMount() {
-    this.handleResize = (e => this._handleResize(e));
+    this.handleResize = e => this._handleResize(e);
     window.addEventListener('resize', this.handleResize);
     this.adaptData();
 
     // intialize the svg and chart with proper sizes
     var svg = dimple.newSvg(ReactDOM.findDOMNode(this), '100%', '100%');
-    this.lineChart = new dimple.chart(svg, this.data);
+    this.lineChart = new dimple.chart(svg, this.data); // eslint-disable-line
     this.lineChart.setBounds(30, 14, '100%,-40', '100%,-34');
 
     // intialize the axis
-    this.x = this.lineChart.addTimeAxis('x', 'date', "%Y-%m-%d", '%b %d');
+    this.x = this.lineChart.addTimeAxis('x', 'date', '%Y-%m-%d', '%b %d');
     this.y = this.lineChart.addMeasureAxis('y', 'last');
     this.y.ticks = 7;
     this.updateAxis();
@@ -47,7 +43,7 @@ export default class GraphTown extends React.Component {
     lines.lineMarkers = true;
 
     // initialize the legend
-    this.legend = this.lineChart.addLegend(60, 5, '100%,-50', 20, "right");
+    this.legend = this.lineChart.addLegend(60, 5, '100%,-50', 20, 'right');
 
     // lessss go
     this.lineChart.draw(DRAW_TIME);
@@ -87,11 +83,22 @@ export default class GraphTown extends React.Component {
 
   /** when we resize update our bounds, im not really too sure why this doesnt happen
     * automatically because we're using percents... but oh well maybe one day i'll fix it */
-  _handleResize(e) {
-    this.__resizeTimeout && clearTimeout(this.__resizeTimeout);
+  _handleResize() {
+    if (this.__resizeTimeout) {
+      clearTimeout(this.__resizeTimeout);
+    }
     this.__resizeTimeout = setTimeout(() => {
       this.lineChart.setBounds(30, 14, '100%,-40', '100%,-34');
       delete this.__resizeTimeout;
     }, 200);
   }
+
+  render() {
+    return <div className="graph-town"></div>;
+  }
 }
+
+GraphTown.propTypes = {
+  dataMap: PropTypes.object.isRequired,
+  selectedCompanies: PropTypes.array.isRequired
+};

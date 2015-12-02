@@ -14,10 +14,9 @@
 // limitations under the License.
 //------------------------------------------------------------------------------
 
-import React, { Component, PropTypes } from 'react'
-import { connect }       from 'react-redux'
+import React, { Component, PropTypes } from 'react';
+import { connect }       from 'react-redux';
 import classNames        from 'classnames';
-import Constants         from '../constants/Constants';
 
 import CompanyContainer  from '../components/CompanyContainer';
 import StockVisualizer   from '../components/StockVisualizer';
@@ -50,6 +49,23 @@ import {
  */
 class StockInsights extends Component {
   /**
+   * When mounting/unmounting add/remove change listeners to stores
+   */
+  componentDidMount() {
+    this.props.dispatch(getStrings(this.props.language));
+    // if we already have selected companies, request their articles to populate
+    if (this.props.selectedCompanies.length) {
+      this.props.dispatch(getSelectedNews());
+    }
+    // if we already have companies, request the stock data to populate
+    // our visualizations
+    if (this.props.companies.companies.length) {
+      var symbols = this.props.companies.companies.map(c => c.symbol);
+      this.props.dispatch(getStockData(symbols));
+    }
+  }
+
+  /**
    * Currently the app consists of a header and a CompanyContainer
    */
   render() {
@@ -62,7 +78,6 @@ class StockInsights extends Component {
     });
     var showDateSlider = !selectedCompanies.length || forceBubbles;
     var showGraph = selectedCompanies.length;
-    var showArticles = selectedCompanies.length;
     return (
       <div className={classes} onClick={() => tweets.open && dispatch(closeTweets())}>
         <div className="stock-insights-title">
@@ -106,7 +121,7 @@ class StockInsights extends Component {
               sentiment={tweets.sentiment}
               strings={strings} />
           }
-          {!!selectedCompanies.length && 
+          {!!selectedCompanies.length &&
             <ArticleList selectedCompanies={selectedCompanies}
               loading={articles.loading}
               articles={articles.articles}
@@ -119,27 +134,26 @@ class StockInsights extends Component {
       </div>
     );
   }
+}
 
-  /**
-   * When mounting/unmounting add/remove change listeners to stores
-   */
-  componentDidMount() {
-    this.props.dispatch(getStrings(this.props.language));
-    // if we already have selected companies, request their articles to populate
-    if (this.props.selectedCompanies.length) {
-      this.props.dispatch(getSelectedNews());
-    } 
-    // if we already have companies, request the stock data to populate
-    // our visualizations
-    if (this.props.companies.companies.length) {
-      var symbols = this.props.companies.companies.map(c => c.symbol)
-      this.props.dispatch(getStockData(symbols));
-    }
-  }
+StockInsights.propTypes = {
+  dispatch: PropTypes.func.isRequired,
+  selectedCompanies: PropTypes.array.isRequired,
+  language: PropTypes.string,
+  companies: PropTypes.object.isRequired,
+  isEmbedded: PropTypes.bool,
+  forceBubbles: PropTypes.bool,
+  strings: PropTypes.object.isRequired,
+  entities: PropTypes.object.isRequired,
+  stockData: PropTypes.object.isRequired,
+  currentDate: PropTypes.object.isRequired,
+  potentialCompanies: PropTypes.object.isRequired,
+  articles: PropTypes.object.isRequired,
+  tweets: PropTypes.object.isRequired
 };
 
 // for now, we want it all! and maybe forever honestly, iuno
 var select = state => state;
 
 // Wrap the component to inject dispatch and state into it
-export default connect(select)(StockInsights)
+export default connect(select)(StockInsights);

@@ -15,13 +15,12 @@
 //------------------------------------------------------------------------------
 
 import express      from 'express';
-import path         from 'path';
 import Promise      from 'bluebird';
 import g11nPipeline from 'g11n-pipeline';
 import locale       from 'locale';
 import vcapServices from './vcapServices';
 
-var router = express.Router();
+var router = new express.Router();
 var gpClient = g11nPipeline.getClient({credentials: vcapServices.globalization.credentials});
 var gpStrings = Promise.promisifyAll(gpClient.bundle('stock_strings'));
 var request = Promise.promisifyAll(require('request'));
@@ -58,7 +57,7 @@ router.get('/strings', (req, res) => {
 /* Company Lookup. query takes company */
 router.get('/companylookup', (req, res) => {
   var company = req.query.company;
-  var {client_id, client_secret, url} = vcapServices.companyLookup.credentials;
+  var {client_id, url} = vcapServices.companyLookup.credentials;
   return _doGet(url + '/markets/find', {client_id: client_id, name: company}, res);
 });
 
@@ -68,7 +67,7 @@ router.get('/stocknews', (req, res) => {
   var locales = new locale.Locales(req.headers['accept-language']);
   var langCode = req.query.language || locales.best(supportedLocales).code;
   var symbol = req.query.symbol;
-  var {client_id, client_secret, url} = vcapServices.stockNews.credentials;
+  var {client_id, url} = vcapServices.stockNews.credentials;
   return _doGet(url + '/news/find', {client_id: client_id, symbol: symbol, language: langCode}, res);
 });
 
@@ -76,16 +75,16 @@ router.get('/stocknews', (req, res) => {
 router.get('/stockprice', (req, res) => {
   var symbols = req.query.symbols;
 
-  var {client_id: client_id1, client_secret: client_secret1, url: url1} = vcapServices.stockPrice.credentials;
-  var {client_id: client_id2, client_secret: client_secret2, url: url2} = vcapServices.stockHistory.credentials;
+  var {client_id: client_id1, url: url1} = vcapServices.stockPrice.credentials;
+  var {client_id: client_id2, url: url2} = vcapServices.stockHistory.credentials;
 
   var pricePromise   = request.getAsync({url: url1 + '/markets/quote',   qs: {client_id: client_id1, symbols: symbols}, json: true});
   var historyPromise = request.getAsync({url: url2 + '/markets/history', qs: {client_id: client_id2, symbols: symbols}, json: true});
 
-  Promise.join(pricePromise, historyPromise, ([pR, pB], [hR, hB]) => {
+  Promise.join(pricePromise, historyPromise, ([, pB], [, hB]) => {
     // build a map of symbol -> price objects
     var priceMap = {};
-    for (var price of pB) {
+    for (const price of pB) {
       priceMap[price.symbol] = price;
     }
 
@@ -96,25 +95,27 @@ router.get('/stockprice', (req, res) => {
     // additionallyalally, add today's price values to the array in one nice
     // happy array family
     for (var symbol in hB) {
-      var price = priceMap[symbol];
-      hB[symbol] = hB[symbol].map(h => ({
-        change: h.close - h.open,
-        symbol: symbol,
-        last: h.close,
-        date: h.date,
-        week_52_high: price.week_52_high,
-        week_52_low: price.week_52_low
-      }));
-      var d = new Date();
-      var previousSymbol = hB[symbol][hB[symbol].length-1];
-      hB[symbol].push({
-        change: usePreviousChangeValues ? previousSymbol.change : price.change,
-        symbol: symbol,
-        last: price.last,
-        date: '' + d.getUTCFullYear() + '-' + (d.getUTCMonth() + 1) + '-' + d.getUTCDate(),
-        week_52_high: price.week_52_high,
-        week_52_low: price.week_52_low
-      });
+      if (hB.hasOwnProperty(symbol)) {
+        var price = priceMap[symbol];
+        hB[symbol] = hB[symbol].map(h => ({
+          change: h.close - h.open,
+          symbol: symbol,
+          last: h.close,
+          date: h.date,
+          week_52_high: price.week_52_high,
+          week_52_low: price.week_52_low
+        }));
+        var d = new Date();
+        var previousSymbol = hB[symbol][hB[symbol].length - 1];
+        hB[symbol].push({
+          change: usePreviousChangeValues ? previousSymbol.change : price.change,
+          symbol: symbol,
+          last: price.last,
+          date: '' + d.getUTCFullYear() + '-' + (d.getUTCMonth() + 1) + '-' + d.getUTCDate(),
+          week_52_high: price.week_52_high,
+          week_52_low: price.week_52_low
+        });
+      }
     }
     res.json(hB);
   }).catch(e => {
@@ -134,13 +135,13 @@ router.get('/tweets', (req, res) => {
   var entity = req.query.entity;
 
   // issue requests for the tweets and the sentiment
-  var {client_id: client_id1, client_secret: client_secret1, url: url1} = vcapServices.stockTweets.credentials;
-  var {client_id: client_id2, client_secret: client_secret2, url: url2} = vcapServices.stockSentiment.credentials;
+  var {client_id: client_id1, url: url1} = vcapServices.stockTweets.credentials;
+  var {client_id: client_id2, url: url2} = vcapServices.stockSentiment.credentials;
   var tweetProm = request.getAsync({url: url1 + '/twitter/find',   qs: {client_id: client_id1, symbol: symbols, entity: entity, language: langCode}, json: true});
   var sentProm  = request.getAsync({url: url2 + '/sentiment/find', qs: {client_id: client_id2, symbol: symbols, entity: entity}, json: true});
 
   // only return one object
-  Promise.join(tweetProm, sentProm, ([tR, tB], [sR, sB]) => {
+  Promise.join(tweetProm, sentProm, ([, tB], [, sB]) => {
     res.json({
       tweets: tB,
       sentiment: sB
@@ -154,8 +155,10 @@ router.get('/tweets', (req, res) => {
 
 /* Helper GET method for companylookup and stockprice similarities */
 function _doGet(url, qs, res) {
-  return request.getAsync({url: url, qs: qs, json: true}).then(([response, body]) => {
-    body.httpCode && res.status(parseInt(body.httpCode));
+  return request.getAsync({url: url, qs: qs, json: true}).then(([, body]) => {
+    if (body.httpCode) {
+      res.status(parseInt(body.httpCode, 10));
+    }
     res.json(body);
   }).catch(e => {
     res.status(500);
@@ -171,20 +174,22 @@ function _doGet(url, qs, res) {
 router.get('/demo/positive', (req, res) => {
   var symbols = req.query.symbols || req.query.symbol;
 
-  var {client_id: client_id1, client_secret: client_secret1, url: url1} = vcapServices.stockPrice.credentials;
-  var {client_id: client_id2, client_secret: client_secret2, url: url2} = vcapServices.stockHistory.credentials;
+  var {client_id: client_id1, url: url1} = vcapServices.stockPrice.credentials;
+  var {client_id: client_id2, url: url2} = vcapServices.stockHistory.credentials;
 
   var pricePromise   = request.getAsync({url: url1 + '/markets/quote',   qs: {client_id: client_id1, symbols: symbols}, json: true});
-  var historyPromise = request.getAsync({url: url1 + '/markets/history', qs: {client_id: client_id2, symbols: symbols}, json: true});
+  var historyPromise = request.getAsync({url: url2 + '/markets/history', qs: {client_id: client_id2, symbols: symbols}, json: true});
 
-  Promise.join(pricePromise, historyPromise, ([pR, pB], [hR, hB]) => {
+  Promise.join(pricePromise, historyPromise, ([, pB], [, hB]) => {
     // if all of the current change values are falsy, we'll want to use yesterday's
     var usePreviousChangeValues = pB.every(p => !p.change);
 
     var prevSymbolMap = {};
     for (var symbol in hB) {
-      var prevSymbol = hB[symbol][hB[symbol].length-1];
-      prevSymbolMap[symbol] = prevSymbol.close - prevSymbol.open;
+      if (hB.hasOwnProperty(symbol)) {
+        var prevSymbol = hB[symbol][hB[symbol].length - 1];
+        prevSymbolMap[symbol] = prevSymbol.close - prevSymbol.open;
+      }
     }
 
     res.json(pB.map(s => ({
@@ -206,20 +211,22 @@ router.get('/demo/positive', (req, res) => {
 router.get('/demo/negative', (req, res) => {
   var symbols = req.query.symbols || req.query.symbol;
 
-  var {client_id: client_id1, client_secret: client_secret1, url: url1} = vcapServices.stockPrice.credentials;
-  var {client_id: client_id2, client_secret: client_secret2, url: url2} = vcapServices.stockHistory.credentials;
+  var {client_id: client_id1, url: url1} = vcapServices.stockPrice.credentials;
+  var {client_id: client_id2, url: url2} = vcapServices.stockHistory.credentials;
 
   var pricePromise   = request.getAsync({url: url1 + '/markets/quote',   qs: {client_id: client_id1, symbols: symbols}, json: true});
   var historyPromise = request.getAsync({url: url2 + '/markets/history', qs: {client_id: client_id2, symbols: symbols}, json: true});
 
-  Promise.join(pricePromise, historyPromise, ([pR, pB], [hR, hB]) => {
+  Promise.join(pricePromise, historyPromise, ([, pB], [, hB]) => {
     // if all of the current change values are falsy, we'll want to use yesterday's
     var usePreviousChangeValues = pB.every(p => !p.change);
 
     var prevSymbolMap = {};
     for (var symbol in hB) {
-      var prevSymbol = hB[symbol][hB[symbol].length-1];
-      prevSymbolMap[symbol] = prevSymbol.close - prevSymbol.open;
+      if (hB.hasOwnProperty(symbol)) {
+        var prevSymbol = hB[symbol][hB[symbol].length - 1];
+        prevSymbolMap[symbol] = prevSymbol.close - prevSymbol.open;
+      }
     }
 
     res.json(pB.map(s => ({
@@ -242,13 +249,13 @@ router.get('/demo/entities', (req, res) => {
   // if the user passes in a language, use that otherwise get it from the request header
   var locales = new locale.Locales(req.headers['accept-language']);
   var langCode = req.query.language || locales.best(supportedLocales).code;
-  var {client_id, client_secret, url} = vcapServices.stockSentiment.credentials;
+  var {client_id, url} = vcapServices.stockSentiment.credentials;
   // companies can be in symbol or symbols field
   var symbols = req.query.symbol || req.query.symbols;
   // request time!
   request.getAsync({url: url + '/news/find', json: true, qs: {
     client_id: client_id, symbols: symbols, language: langCode, elimit: 50, alimit: 0
-  }}).then(([eaRequest, eaBody]) => {
+  }}).then(([, eaBody]) => {
     res.json(eaBody.entities);
   }).catch(e => {
     res.status(500);
@@ -261,13 +268,13 @@ router.get('/demo/articles', (req, res) => {
   // if the user passes in a language, use that otherwise get it from the request header
   var locales = new locale.Locales(req.headers['accept-language']);
   var langCode = req.query.language || locales.best(supportedLocales).code;
-  var {client_id, client_secret, url} = vcapServices.stockSentiment.credentials;
+  var {client_id, url} = vcapServices.stockSentiment.credentials;
   // companies can be in symbol or symbols field
   var symbols = req.query.symbol || req.query.symbols;
   // request time!
   request.getAsync({url: url + '/news/find', json: true, qs: {
     client_id: client_id, symbols: symbols, language: langCode, elimit: 50, alimit: 0
-  }}).then(([eaRequest, eaBody]) => {
+  }}).then(([, eaBody]) => {
     res.json(eaBody.articles);
   }).catch(e => {
     res.status(500);

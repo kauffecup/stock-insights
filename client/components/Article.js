@@ -15,24 +15,21 @@
 //------------------------------------------------------------------------------
 
 import React, { Component, PropTypes } from 'react';
-import Article from './Article';
 
-export default class ArticleList extends Component {
+export default class Article extends Component {
   render() {
+    var a = this.props.article;
     return (
-      <div className="article-list" onClick={e => e.stopPropagation()}>
-        <button className="back" onClick={this.props.onClose}>x</button>
-        <h2>{this.props.selectedCompanies.join(', ')}</h2>
-        <ul className="the-articles">{this.props.articles.map(a =>
-          <Article article={a} />
+      <li className="article">
+        <a className="title-link" href={a.url} target="_blank">{a.title}</a>
+        <ul className="relations">{a.relations.map(r =>
+          <li className="relation">{r}</li>
         )}</ul>
-      </div>
+      </li>
     );
   }
 }
 
-ArticleList.propTypes = {
-  onClose: PropTypes.func.isRequired,
-  selectedCompanies: PropTypes.array.isRequired,
-  articles: PropTypes.array.isRequired
+Article.propTypes = {
+  article: PropTypes.object.isRequired
 };

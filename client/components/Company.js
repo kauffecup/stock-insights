@@ -15,24 +15,31 @@
 //------------------------------------------------------------------------------
 
 import React, { Component, PropTypes } from 'react';
-import Article from './Article';
+import classNames      from 'classnames';
 
-export default class ArticleList extends Component {
+/**
+ * An individual company. Displays the description, ticker symbol, and an `x` that you can
+ * click on to remove the company
+ */
+export default class Company extends Component {
   render() {
+    var c = this.props.company;
+    var classes = classNames('company', {
+      selected: this.props.selected
+    });
     return (
-      <div className="article-list" onClick={e => e.stopPropagation()}>
-        <button className="back" onClick={this.props.onClose}>x</button>
-        <h2>{this.props.selectedCompanies.join(', ')}</h2>
-        <ul className="the-articles">{this.props.articles.map(a =>
-          <Article article={a} />
-        )}</ul>
+      <div className={classes} onClick={this.props.onClick}>
+        <span className="company-description">{c.description}</span>
+        <span className="company-symbol">{c.symbol}</span>
+        <span className="company-close" onClick={e => {e.stopPropagation(); this.props.onRemoveClick(c);}}>x</span>
       </div>
     );
   }
 }
 
-ArticleList.propTypes = {
-  onClose: PropTypes.func.isRequired,
-  selectedCompanies: PropTypes.array.isRequired,
-  articles: PropTypes.array.isRequired
+Company.propTypes = {
+  company: PropTypes.object.isRequired,
+  selected: PropTypes.bool.isRequired,
+  onClick: PropTypes.func.isRequired,
+  onRemoveClick: PropTypes.func.isRequired
 };
