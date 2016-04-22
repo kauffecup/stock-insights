@@ -45,19 +45,19 @@ function flattenStockData(stockData) {
             change: d.change,
             symbol: d.symbol,
             last: d.last,
-            date: moment(d.date)
+            date: moment(d.date, 'YYYY-MM-DD')
           });
         }
       } else {
         stockDateArray = dateArr.map(da => ({
-          date: moment(da.date),
+          date: moment(da.date, 'YYYY-MM-DD'),
           data: [{
             week_52_high: da.week_52_high,
             week_52_low: da.week_52_low,
             change: da.change,
             symbol: da.symbol,
             last: da.last,
-            date: moment(da.date)
+            date: moment(da.date, 'YYYY-MM-DD')
           }]
         }));
       }
