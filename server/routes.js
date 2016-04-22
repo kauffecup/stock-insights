@@ -66,14 +66,15 @@ router.get('/stocknews', (req, res) => {
   // if a language is specified in the request, prioritize that
   var locales = new locale.Locales(req.headers['accept-language']);
   var langCode = req.query.language || locales.best(supportedLocales).code;
-  var symbol = req.query.symbol;
+  var symbol = [].concat(req.query.symbol);
+  console.log(req.query.symbol);
   var {client_id, url} = vcapServices.stockNews.credentials;
-  return _doGet(url + '/news/find', {client_id: client_id, symbol: symbol, language: langCode}, res);
+  return _doGet(url + '/news/find', {client_id: client_id, symbol: symbol.join(','), language: langCode}, res);
 });
 
 /* Stock Price. query takes symbols */
 router.get('/stockprice', (req, res) => {
-  var symbols = req.query.symbols;
+  var symbols = [].concat(req.query.symbols);
 
   var {client_id: client_id1, url: url1} = vcapServices.stockPrice.credentials;
   var {client_id: client_id2, url: url2} = vcapServices.stockHistory.credentials;
@@ -132,7 +133,7 @@ router.get('/tweets', (req, res) => {
   var locales = new locale.Locales(req.headers['accept-language']);
   var langCode = req.query.language || locales.best(supportedLocales).code;
   // proceed with business as usual
-  var symbols = req.query.symbol || req.query.symbols;
+  var symbols = [].concat(req.query.symbol || req.query.symbols);
   var entity = req.query.entity;
 
   // issue requests for the tweets and the sentiment
@@ -173,7 +174,7 @@ function _doGet(url, qs, res) {
 
 /** Get stocks with positive change from a list of symbols, sorted by change */
 router.get('/demo/positive', (req, res) => {
-  var symbols = req.query.symbols || req.query.symbol;
+  var symbols = [].concat(req.query.symbols || req.query.symbol);
 
   var {client_id: client_id1, url: url1} = vcapServices.stockPrice.credentials;
   var {client_id: client_id2, url: url2} = vcapServices.stockHistory.credentials;
@@ -210,7 +211,7 @@ router.get('/demo/positive', (req, res) => {
 
 /** Get stocks with negative change from a list of symbols, sorted by change */
 router.get('/demo/negative', (req, res) => {
-  var symbols = req.query.symbols || req.query.symbol;
+  var symbols = [].concat(req.query.symbols || req.query.symbol);
 
   var {client_id: client_id1, url: url1} = vcapServices.stockPrice.credentials;
   var {client_id: client_id2, url: url2} = vcapServices.stockHistory.credentials;
@@ -252,7 +253,7 @@ router.get('/demo/entities', (req, res) => {
   var langCode = req.query.language || locales.best(supportedLocales).code;
   var {client_id, url} = vcapServices.stockSentiment.credentials;
   // companies can be in symbol or symbols field
-  var symbols = req.query.symbol || req.query.symbols;
+  var symbols = [].concat(req.query.symbol || req.query.symbols);
   // request time!
   request.getAsync({url: url + '/news/find', json: true, qs: {
     client_id: client_id, symbols: symbols.join(','), language: langCode, elimit: 50, alimit: 0
@@ -271,7 +272,7 @@ router.get('/demo/articles', (req, res) => {
   var langCode = req.query.language || locales.best(supportedLocales).code;
   var {client_id, url} = vcapServices.stockSentiment.credentials;
   // companies can be in symbol or symbols field
-  var symbols = req.query.symbol || req.query.symbols;
+  var symbols = [].concat(req.query.symbol || req.query.symbols);
   // request time!
   request.getAsync({url: url + '/news/find', json: true, qs: {
     client_id: client_id, symbols: symbols.join(','), language: langCode, elimit: 50, alimit: 0
