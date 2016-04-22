@@ -67,7 +67,6 @@ router.get('/stocknews', (req, res) => {
   var locales = new locale.Locales(req.headers['accept-language']);
   var langCode = req.query.language || locales.best(supportedLocales).code;
   var symbol = [].concat(req.query.symbol);
-  console.log(req.query.symbol);
   var {client_id, url} = vcapServices.stockNews.credentials;
   return _doGet(url + '/news/find', {client_id: client_id, symbol: symbol.join(','), language: langCode}, res);
 });
@@ -85,7 +84,6 @@ router.get('/stockprice', (req, res) => {
   Promise.join(pricePromise, historyPromise, ([a, pB], [, hB]) => {
     // build a map of symbol -> price objects
     var priceMap = {};
-    console.log(a);
     for (const price of pB) {
       priceMap[price.symbol] = price;
     }
