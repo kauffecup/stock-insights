@@ -78,12 +78,13 @@ router.get('/stockprice', (req, res) => {
   var {client_id: client_id1, url: url1} = vcapServices.stockPrice.credentials;
   var {client_id: client_id2, url: url2} = vcapServices.stockHistory.credentials;
 
-  var pricePromise   = request.getAsync({url: url1 + '/markets/quote',   qs: {client_id: client_id1, symbols: symbols}, json: true});
-  var historyPromise = request.getAsync({url: url2 + '/markets/history', qs: {client_id: client_id2, symbols: symbols}, json: true});
+  var pricePromise   = request.getAsync({url: url1 + '/markets/quote',   qs: {client_id: client_id1, symbols: symbols.join(',')}, json: true});
+  var historyPromise = request.getAsync({url: url2 + '/markets/history', qs: {client_id: client_id2, symbols: symbols.join(',')}, json: true});
 
-  Promise.join(pricePromise, historyPromise, ([, pB], [, hB]) => {
+  Promise.join(pricePromise, historyPromise, ([a, pB], [, hB]) => {
     // build a map of symbol -> price objects
     var priceMap = {};
+    console.log(a);
     for (const price of pB) {
       priceMap[price.symbol] = price;
     }
@@ -137,8 +138,8 @@ router.get('/tweets', (req, res) => {
   // issue requests for the tweets and the sentiment
   var {client_id: client_id1, url: url1} = vcapServices.stockTweets.credentials;
   var {client_id: client_id2, url: url2} = vcapServices.stockSentiment.credentials;
-  var tweetProm = request.getAsync({url: url1 + '/twitter/find',   qs: {client_id: client_id1, symbol: symbols, entity: entity, language: langCode}, json: true});
-  var sentProm  = request.getAsync({url: url2 + '/sentiment/find', qs: {client_id: client_id2, symbol: symbols, entity: entity}, json: true});
+  var tweetProm = request.getAsync({url: url1 + '/twitter/find',   qs: {client_id: client_id1, symbol: symbols.join(','), entity: entity, language: langCode}, json: true});
+  var sentProm  = request.getAsync({url: url2 + '/sentiment/find', qs: {client_id: client_id2, symbol: symbols.join(','), entity: entity}, json: true});
 
   // only return one object
   Promise.join(tweetProm, sentProm, ([, tB], [, sB]) => {
@@ -177,8 +178,8 @@ router.get('/demo/positive', (req, res) => {
   var {client_id: client_id1, url: url1} = vcapServices.stockPrice.credentials;
   var {client_id: client_id2, url: url2} = vcapServices.stockHistory.credentials;
 
-  var pricePromise   = request.getAsync({url: url1 + '/markets/quote',   qs: {client_id: client_id1, symbols: symbols}, json: true});
-  var historyPromise = request.getAsync({url: url2 + '/markets/history', qs: {client_id: client_id2, symbols: symbols}, json: true});
+  var pricePromise   = request.getAsync({url: url1 + '/markets/quote',   qs: {client_id: client_id1, symbols: symbols.join(',')}, json: true});
+  var historyPromise = request.getAsync({url: url2 + '/markets/history', qs: {client_id: client_id2, symbols: symbols.join(',')}, json: true});
 
   Promise.join(pricePromise, historyPromise, ([, pB], [, hB]) => {
     // if all of the current change values are falsy, we'll want to use yesterday's
@@ -214,8 +215,8 @@ router.get('/demo/negative', (req, res) => {
   var {client_id: client_id1, url: url1} = vcapServices.stockPrice.credentials;
   var {client_id: client_id2, url: url2} = vcapServices.stockHistory.credentials;
 
-  var pricePromise   = request.getAsync({url: url1 + '/markets/quote',   qs: {client_id: client_id1, symbols: symbols}, json: true});
-  var historyPromise = request.getAsync({url: url2 + '/markets/history', qs: {client_id: client_id2, symbols: symbols}, json: true});
+  var pricePromise   = request.getAsync({url: url1 + '/markets/quote',   qs: {client_id: client_id1, symbols: symbols.join(',')}, json: true});
+  var historyPromise = request.getAsync({url: url2 + '/markets/history', qs: {client_id: client_id2, symbols: symbols.join(',')}, json: true});
 
   Promise.join(pricePromise, historyPromise, ([, pB], [, hB]) => {
     // if all of the current change values are falsy, we'll want to use yesterday's
@@ -254,7 +255,7 @@ router.get('/demo/entities', (req, res) => {
   var symbols = req.query.symbol || req.query.symbols;
   // request time!
   request.getAsync({url: url + '/news/find', json: true, qs: {
-    client_id: client_id, symbols: symbols, language: langCode, elimit: 50, alimit: 0
+    client_id: client_id, symbols: symbols.join(','), language: langCode, elimit: 50, alimit: 0
   }}).then(([, eaBody]) => {
     res.json(eaBody.entities);
   }).catch(e => {
@@ -273,7 +274,7 @@ router.get('/demo/articles', (req, res) => {
   var symbols = req.query.symbol || req.query.symbols;
   // request time!
   request.getAsync({url: url + '/news/find', json: true, qs: {
-    client_id: client_id, symbols: symbols, language: langCode, elimit: 50, alimit: 0
+    client_id: client_id, symbols: symbols.join(','), language: langCode, elimit: 50, alimit: 0
   }}).then(([, eaBody]) => {
     res.json(eaBody.articles);
   }).catch(e => {
