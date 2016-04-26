@@ -70,14 +70,14 @@ class StockInsights extends Component {
    */
   render() {
     // injected by connect call
-    var {dispatch, isEmbedded, language, forceBubbles, strings, currentDate, potentialCompanies,
+    const {dispatch, isEmbedded, language, forceBubbles, strings, currentDate, potentialCompanies,
       companies, entities, stockData, selectedCompanies, articles, tweets} = this.props;
 
-    var classes = classNames('stock-insights', {
+    const classes = classNames('stock-insights', {
       embedded: isEmbedded
     });
-    var showDateSlider = !selectedCompanies.length || forceBubbles;
-    var showGraph = selectedCompanies.length;
+    const showDateSlider = !selectedCompanies.length || forceBubbles;
+    const showGraph = selectedCompanies.length && Object.keys(stockData.map).length;
     return (
       <div className={classes} onClick={() => tweets.open && dispatch(closeTweets())}>
         <div className="stock-insights-title">
@@ -99,10 +99,11 @@ class StockInsights extends Component {
           onSelect={c => dispatch(toggleSelect(c))}
           onSearch={v => dispatch(searchCompany(v))}
           onClear={() => dispatch(clearPotentialCompanies())} />
-        {showDateSlider &&
-          <DateSlider stockData={stockData.flat} currentDate={currentDate}
-            language={language} onChange={d => dispatch(setDate(d))}/>
-        }
+        {showDateSlider ? <DateSlider
+          stockData={stockData.flat}
+          currentDate={currentDate}
+          language={language}
+          onChange={d => dispatch(setDate(d))}/> : null }
         <div className="cool-stuff">
           <StockVisualizer
             stockData={stockData.flat}
@@ -115,22 +116,20 @@ class StockInsights extends Component {
             selectedCompanies={selectedCompanies}
             onCompanyClick={c => dispatch(toggleSelect(c))}
             onEntityClick={(symbols, entity) => dispatch(getTweets(symbols, entity))} />
-          {tweets.open &&
-            <TweetViewer description={tweets.description}
-              tweets={tweets.tweets}
-              sentiment={tweets.sentiment}
-              strings={strings} />
-          }
-          {!!selectedCompanies.length &&
-            <ArticleList selectedCompanies={selectedCompanies}
-              loading={articles.loading}
-              articles={articles.articles}
-              onClose={() => dispatch(closeArticleList())} />
-          }
+          {tweets.open ? <TweetViewer
+            description={tweets.description}
+            tweets={tweets.tweets}
+            sentiment={tweets.sentiment}
+            strings={strings} /> : null }
+          {selectedCompanies.length ? <ArticleList
+            selectedCompanies={selectedCompanies}
+            loading={articles.loading}
+            articles={articles.articles}
+            onClose={() => dispatch(closeArticleList())} /> : null }
         </div>
-        {showGraph &&
-          <GraphTown dataMap={stockData.map} selectedCompanies={selectedCompanies} />
-        }
+        {showGraph ? <GraphTown
+          dataMap={stockData.map}
+          selectedCompanies={selectedCompanies} /> : null}
       </div>
     );
   }

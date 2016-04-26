@@ -19,11 +19,11 @@ import moment from 'moment';
 
 export default class DateSlider extends Component {
   render() {
-    var {stockData, currentDate, language} = this.props;
-    var startOfCurrentDate = moment(currentDate).startOf('day');
-    var dateArr = stockData.map(sd => sd.date);
-    var currentPos;
-    for (var i = 0; i < dateArr.length; i++) {
+    const {stockData, currentDate, language} = this.props;
+    const startOfCurrentDate = moment(currentDate).startOf('day');
+    const dateArr = stockData.map(sd => sd.date);
+    let currentPos = 0;
+    for (let i = 0; i < dateArr.length; i++) {
       if (moment(dateArr[i]).startOf('day').isSame(startOfCurrentDate)) {
         currentPos = i;
         break;

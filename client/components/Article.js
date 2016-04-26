@@ -22,8 +22,8 @@ export default class Article extends Component {
     return (
       <li className="article">
         <a className="title-link" href={a.url} target="_blank">{a.title}</a>
-        <ul className="relations">{a.relations.map(r =>
-          <li className="relation">{r}</li>
+        <ul className="relations">{a.relations.map((r, i) =>
+          <li key={i} className="relation">{r}</li>
         )}</ul>
       </li>
     );

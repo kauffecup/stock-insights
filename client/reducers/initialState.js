@@ -18,12 +18,12 @@ import moment    from 'moment';
 import Constants from '../constants/Constants';
 
 /** Configure the companies either from the url or from local storage */
-var symbols = /[&?]symbols=([^&]+)/.exec(location.href);
+let symbols = /[&?]symbols=([^&]+)/.exec(location.href);
 symbols = symbols && symbols[1].split(',');
 /** @type {Boolean} If we're running embedded or not. Right now determined by setting symbols in the URL */
-var isEmbedded = symbols && symbols.length;
+const isEmbedded = !!(symbols && symbols.length);
 /** @type {Array.<Companies>} The array of companies initialized from url param or local storage */
-var companies;
+let companies;
 if (isEmbedded) {
   companies = symbols.map(c => ({ symbol: c }) );
 } else {
@@ -32,15 +32,15 @@ if (isEmbedded) {
 }
 
 /** @type {Array} The companies that are selected. Initialized blank unless passed in via URL */
-var selectedCompanies = /[&?]articles=([^&]+)/.exec(location.href);
+let selectedCompanies = /[&?]articles=([^&]+)/.exec(location.href);
 selectedCompanies = (selectedCompanies && selectedCompanies[1].split(',')) || [];
 
 /** @type {string} can force a language by specifying it in the url */
-var language = /[&?]language=([^&]+)/.exec(location.href);
+let language = /[&?]language=([^&]+)/.exec(location.href);
 language = language && language[1];
 
 /** @type {boolean} if we want to see the articles and the stock color bubbles */
-var forcebubbles = /[&?]forcebubbles=([^&]+)/.exec(location.href);
+let forcebubbles = /[&?]forcebubbles=([^&]+)/.exec(location.href);
 forcebubbles = forcebubbles && (forcebubbles[1] === 'true' || forcebubbles[1] === '1');
 
 /** let the hackery commence, if there are symbols specified and forcebubbles is true,

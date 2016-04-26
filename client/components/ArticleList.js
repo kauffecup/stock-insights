@@ -23,8 +23,8 @@ export default class ArticleList extends Component {
       <div className="article-list" onClick={e => e.stopPropagation()}>
         <button className="back" onClick={this.props.onClose}>x</button>
         <h2>{this.props.selectedCompanies.join(', ')}</h2>
-        <ul className="the-articles">{this.props.articles.map(a =>
-          <Article article={a} />
+        <ul className="the-articles">{this.props.articles.map((a, i) =>
+          <Article key={i} article={a} />
         )}</ul>
       </div>
     );
