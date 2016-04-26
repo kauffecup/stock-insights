@@ -15,8 +15,6 @@
 //------------------------------------------------------------------------------
 
 import moment       from 'moment';
-import clone        from 'clone';
-import assign       from 'object-assign';
 import Constants    from '../constants/Constants';
 import initialState from './initialState';
 
@@ -69,8 +67,8 @@ function flattenStockData(stockData) {
 export default function reduce(state = initialState, action) {
   switch (action.type) {
   case Constants.TOGGLE_CONDENSED_COMPANIES:
-    return assign({}, state, {
-      companies: assign({}, state.companies, {
+    return Object.assign({}, state, {
+      companies: Object.assign({}, state.companies, {
         condensed: !state.companies.condensed
       })
     });
@@ -80,33 +78,33 @@ export default function reduce(state = initialState, action) {
     if (!state.isEmbedded) {
       _updateLocalStorage(newAddCompanies);
     }
-    return assign({}, state, {
-      companies: assign({}, state.companies, {
+    return Object.assign({}, state, {
+      companies: Object.assign({}, state.companies, {
         companies: newAddCompanies
       })
     });
 
   case Constants.REMOVE_COMPANY:
     const symbol = action.company.symbol || action.company;
-    var stockDataMap = clone(state.stockData.map);
+    var stockDataMap = Object.assign({}, state.stockData.map);
     delete stockDataMap[symbol];
     const newRemoveCompanies = state.companies.companies.filter(c => c !== action.company);
     if (!state.isEmbedded) {
       _updateLocalStorage(newRemoveCompanies);
     }
-    return assign({}, state, {
+    return Object.assign({}, state, {
       selectedCompanies: state.selectedCompanies.filter(c => c !== (action.company.symbol || action.company)),
-      companies: assign({}, state.companies, {
+      companies: Object.assign({}, state.companies, {
         companies: newRemoveCompanies
       }),
-      stockData: assign({}, state.stockData, {
+      stockData: Object.assign({}, state.stockData, {
         map: stockDataMap,
         flat: flattenStockData(stockDataMap)
       })
     });
 
   case Constants.SELECT_COMPANY:
-    return assign({}, state, {
+    return Object.assign({}, state, {
       selectedCompanies: [...state.selectedCompanies, action.symbol]
     });
 
@@ -114,49 +112,49 @@ export default function reduce(state = initialState, action) {
     var newCompanies = state.selectedCompanies.filter(c => c !== action.symbol);
     var newArticles = newCompanies.length ? state.articles.articles : [];
     var newEntities = newCompanies.length ? state.entities.entities : [];
-    return assign({}, state, {
+    return Object.assign({}, state, {
       selectedCompanies: state.selectedCompanies.filter(c => c !== action.symbol),
-      articles: assign({}, state.articles, {
+      articles: Object.assign({}, state.articles, {
         articles: newArticles
       }),
-      entities: assign({}, state.entities, {
+      entities: Object.assign({}, state.entities, {
         entities: newEntities
       })
     });
 
   case Constants.STOCK_PRICE_DATA:
-    const stockDataMapPrice = clone(state.stockData.map);
+    const stockDataMapPrice = Object.assign({}, state.stockData.map);
     for (var s in action.data) {
       if (action.data.hasOwnProperty(s)) {
         stockDataMapPrice[s] = action.data[s];
       }
     }
-    return assign({}, state, {
-      stockData: assign({}, state.stockData, {
+    return Object.assign({}, state, {
+      stockData: Object.assign({}, state.stockData, {
         map: stockDataMapPrice,
         flat: flattenStockData(stockDataMapPrice)
       })
     });
 
   case Constants.SWITCH_DATE:
-    return assign({}, state, {
+    return Object.assign({}, state, {
       currentDate: action.date
     });
 
   case Constants.NEWS_LOADING:
-    return assign({}, state, {
-      articles: assign({}, state.articles, {
+    return Object.assign({}, state, {
+      articles: Object.assign({}, state.articles, {
         loading: true
       })
     });
 
   case Constants.NEWS_DATA:
-    return assign({}, state, {
-      articles: assign({}, state.articles, {
+    return Object.assign({}, state, {
+      articles: Object.assign({}, state.articles, {
         loading: false,
         articles: action.news.articles
       }),
-      entities: assign({}, state.entities, {
+      entities: Object.assign({}, state.entities, {
         loading: false,
         entities: action.news.entities.map(e => ({
           _id: e.text,
@@ -168,44 +166,44 @@ export default function reduce(state = initialState, action) {
     });
 
   case Constants.CLOSE_ARTICLE_LIST:
-    return assign({}, state, {
+    return Object.assign({}, state, {
       selectedCompanies: [],
-      articles: assign({}, state.articles, {
+      articles: Object.assign({}, state.articles, {
         loading: false,
         articles: []
       }),
-      entities: assign({}, state.entities, {
+      entities: Object.assign({}, state.entities, {
         loading: false,
         entities: []
       })
     });
 
   case Constants.COMPANIES_LOADING:
-    return assign({}, state, {
-      potentialCompanies: assign({}, state.potentialCompanies, {
+    return Object.assign({}, state, {
+      potentialCompanies: Object.assign({}, state.potentialCompanies, {
         status: Constants.POTENTIAL_STATUS_LOADING
       })
     });
 
   case Constants.COMPANY_DATA:
-    return assign({}, state, {
-      potentialCompanies: assign({}, state.potentialCompanies, {
+    return Object.assign({}, state, {
+      potentialCompanies: Object.assign({}, state.potentialCompanies, {
         status: Constants.POTENTIAL_STATUS_RECEIVED,
         companies: action.companies
       })
     });
 
   case Constants.CLEAR_POTENTIAL_COMPANIES:
-    return assign({}, state, {
-      potentialCompanies: assign({}, state.potentialCompanies, {
+    return Object.assign({}, state, {
+      potentialCompanies: Object.assign({}, state.potentialCompanies, {
         status: Constants.POTENTIAL_STATUS_CLEAR,
         companies: []
       })
     });
 
   case Constants.TWEETS_LOADING:
-    return assign({}, state, {
-      tweets: assign({}, state.tweets, {
+    return Object.assign({}, state, {
+      tweets: Object.assign({}, state.tweets, {
         open: true,
         tweets: [],
         sentiment: {},
@@ -219,8 +217,8 @@ export default function reduce(state = initialState, action) {
   case Constants.TWEETS_DATA:
     if (state.tweets.open) {
       var tweets = action.data.tweets;
-      return assign({}, state, {
-        tweets: assign({}, state.tweets, {
+      return Object.assign({}, state, {
+        tweets: Object.assign({}, state.tweets, {
           tweets: typeof tweets.length === 'undefined' ? [] : tweets,
           sentiment: action.data.sentiment
         })
@@ -230,8 +228,8 @@ export default function reduce(state = initialState, action) {
 
   case Constants.CLOSE_TWEETS:
     if (state.tweets.open) {
-      return assign({}, state, {
-        tweets: assign({}, state.tweets, {
+      return Object.assign({}, state, {
+        tweets: Object.assign({}, state.tweets, {
           open: false,
           tweets: [],
           sentiment: {},
@@ -242,7 +240,7 @@ export default function reduce(state = initialState, action) {
     return state;
 
   case Constants.STRING_DATA:
-    return assign({}, state, {
+    return Object.assign({}, state, {
       strings: action.strings
     });
 
