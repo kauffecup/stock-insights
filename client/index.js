@@ -29,7 +29,7 @@ const store = configureStore();
 const rootElement = document.getElementById('root');
 
 // make sure all es6 things work correctly in all browsers
-require('babel/polyfill');
+require('babel-polyfill');
 // load in locales so we can force it if we need to
 // require('moment/locale/en');
 // require('moment/locale/zh');

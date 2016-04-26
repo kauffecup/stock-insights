@@ -13,10 +13,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 //------------------------------------------------------------------------------
+'use strict';
 
-import objectAssign from 'object-assign';
-
-var vcapServices;
+let vcapServices;
 // if running in Bluemix, use the environment variables
 if (process.env.VCAP_SERVICES) {
   vcapServices = JSON.parse(process.env.VCAP_SERVICES);
@@ -66,4 +65,4 @@ for (var service in vcapServices) {
   }
 }
 
-export default objectAssign(envVars, vcapServices);
+module.exports = Object.assign({}, envVars, vcapServices);
