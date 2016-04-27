@@ -35,6 +35,13 @@ if (isEmbedded) {
 let selectedCompanies = /[&?]articles=([^&]+)/.exec(location.href);
 selectedCompanies = (selectedCompanies && selectedCompanies[1].split(',')) || [];
 
+/** Alternatively, the user can specify that everything starts of selected */
+let selectall = /[&?]selectall=([^&]+)/.exec(location.href);
+selectall = selectall && (selectall[1] === 'true' || selectall[1] === '1');
+if (selectall) {
+  selectedCompanies = companies.map(({ symbol }) => symbol);
+}
+
 /** @type {string} can force a language by specifying it in the url */
 let language = /[&?]language=([^&]+)/.exec(location.href);
 language = language && language[1];
