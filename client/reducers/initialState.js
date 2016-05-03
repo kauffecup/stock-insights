@@ -46,6 +46,8 @@ if (selectall) {
 let language = /[&?]language=([^&]+)/.exec(location.href);
 language = language && language[1];
 
+forcebubbles = true;
+
 /** @type {boolean} if we want to see the articles and the stock color bubbles */
 let forcebubbles = /[&?]forcebubbles=([^&]+)/.exec(location.href);
 forcebubbles = forcebubbles && (forcebubbles[1] === 'true' || forcebubbles[1] === '1');
