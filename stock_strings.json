@@ -1,0 +1,23 @@
+{
+  "stockInsights": "Stock Insights",
+
+  "showNames": "Show",
+  "hideNames": "Hide Company Names",
+  "companySearch": "search for companies...",
+  "noResults": "No results",
+
+  "value": "Value",
+  "change": "Change",
+  "week52High": "Week 52 High",
+  "week52Low": "Week 52 Low",
+
+  "sentiment": "Sentiment",
+  "change": "Change",
+  "fiftyTwoLow": "52 Low",
+  "fiftyTwoHigh": "52 High",
+  "valueRelative": "Value Relative to 52 Week",
+
+  "loading": "Loading...",
+
+  "bubbleColor": "Color"
+}
