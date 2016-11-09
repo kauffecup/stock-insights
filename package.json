@@ -17,19 +17,19 @@
       }
     },
     "start": {
-      "command": "node --harmony_destructuring --harmony_default_parameters server/app.js",
+      "command": "node server/app.js",
       "env": {
         "NODE_ENV": "production"
       }
     },
     "dev": {
-      "command": "node --harmony_destructuring --harmony_default_parameters server/app.js",
+      "command": "node server/app.js",
       "env": {
         "NODE_ENV": "development"
       }
     },
     "debug": {
-      "command": "node-debug --nodejs --harmony_destructuring --nodejs --harmony_default_parameters server/app.js",
+      "command": "node-debug server/app.js",
       "env": {
         "NODE_ENV": "development"
       }
@@ -88,6 +88,6 @@
     "webpack-hot-middleware": "^2.10.0"
   },
   "engines": {
-    "node": "5.1.0"
+    "node": "6.7.0"
   }
 }

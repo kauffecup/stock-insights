@@ -19,5 +19,9 @@
 
   "loading": "Loading...",
 
-  "bubbleColor": "Color"
+  "bubbleColor": "Color",
+
+  "positive": "positive",
+  "neutral": "neutral",
+  "negative": "negative"
 }
